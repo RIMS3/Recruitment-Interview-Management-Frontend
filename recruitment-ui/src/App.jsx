@@ -4,6 +4,7 @@ import HomePage from './Home/HomePage';
 import LoginPage from './Auth/LoginForm'; 
 import './App.css'; 
 import InterviewPage from './Interviews/InterviewPage'
+import UserProfile from './UserProfile';
 // Tách Navbar thành component riêng để sử dụng hook useLocation
 const Navbar = () => {
   const navigate = useNavigate();
@@ -36,6 +37,10 @@ const Navbar = () => {
             Đăng nhập
           </button>
           <button className="btn-post">Đăng tuyển ngay</button>
+          {/* Thêm một nút để bạn dễ dàng test chuyển sang trang Profile */}
+          <button style={{marginLeft: '10px'}} onClick={() => navigate('/profile')}>
+            Hồ sơ cá nhân
+          </button>
         </div>
       </div>
     </nav>
@@ -53,7 +58,9 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
-
+{/* Đây là nơi chúng ta tích hợp trang UserProfile */}
+            <Route path="/profile" element={<UserProfile />} />
+          
             <Route path="/interview/:companyId" element={<InterviewPage />} />
           </Routes>
         </main>
