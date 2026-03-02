@@ -8,9 +8,19 @@ const CandidateProfile = () => {
     
     const fileInputRef = useRef(null);
 
-    // ID thật của ứng viên
-    const currentUserId = "A1234567-B123-C123-D123-E00000000005"; 
+    const currentUserId = localStorage.getItem("userId"); 
     const apiUrl = "https://localhost:7272/api/candidateprofiles";
+
+    // 2. TẠO MÀNG BẢO VỆ: CHẶN NGƯỜI CHƯA ĐĂNG NHẬP
+    if (!currentUserId) {
+        return (
+            <div style={{ textAlign: 'center', padding: '50px', marginTop: '50px' }}>
+                <h2 style={{ color: '#ff4d4f' }}>Bạn chưa đăng nhập!</h2>
+                <p style={{ fontSize: '16px', color: '#555' }}>Vui lòng đăng nhập để xem và chỉnh sửa hồ sơ cá nhân của bạn.</p>
+                {/* Bạn có thể dùng useNavigate hoặc thẻ <a> để dẫn họ về trang /login ở đây */}
+            </div>
+        );
+    }
 
     useEffect(() => {
         fetch(`${apiUrl}/user/${currentUserId}`)
