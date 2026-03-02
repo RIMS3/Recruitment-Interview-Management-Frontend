@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation 
 import HomePage from './Home/HomePage'; 
 import LoginPage from './Auth/LoginForm'; 
 import './App.css'; 
+import InterviewPage from './Interviews/InterviewPage'
+import UserProfile from './UserProfile';
 import JobList from './JobPost/JobList';
-import InterviewPage from './Interviews/InterviewPage';
 import { useContext } from "react";
 import { AuthContext } from "./Auth/AuthContext";
 import JobPostDetails from './JobPostDetails/JobPostDetails';
 import SavedJobs from './SavedJobs/SavedJobs';
-
 
 // Tách Navbar thành component riêng để sử dụng hook useLocation
 const Navbar = () => {
@@ -40,6 +40,11 @@ const Navbar = () => {
         </ul>
 
         <div className="nav-auth">
+          
+          {/* Thêm một nút để bạn dễ dàng test chuyển sang trang Profile */}
+          <button style={{marginLeft: '10px'}} onClick={() => navigate('/profile')}>
+            Hồ sơ cá nhân
+          </button>
           {user ? (
             <>
               <span style={{ marginRight: "15px" }}>
@@ -88,6 +93,8 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+{/* Đây là nơi chúng ta tích hợp trang UserProfile */}
+            <Route path="/profile" element={<UserProfile />} />
             <Route path="/joblist" element={<JobList/>} />
              <Route path="/interview/:companyId" element={<InterviewPage />} />
             <Route path="/jobpostdetail/:id" element={<JobPostDetails />} />
