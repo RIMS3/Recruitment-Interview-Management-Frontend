@@ -1,0 +1,76 @@
+.it-locak-container {
+  background-color: #0b0f1a; /* Nền tối đậm */
+  min-height: 100vh;
+  padding: 40px;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+}
+
+.it-locak-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 30px; }
+
+.it-locak-card {
+  background: #161d31; /* Màu card từ trang chủ */
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.it-locak-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.it-locak-table th {
+  background: #1e2745;
+  padding: 15px 20px;
+  text-align: left;
+  font-size: 12px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.it-locak-table td {
+  padding: 18px 20px;
+  border-bottom: 1px solid #1e293b;
+}
+
+.candidate-name {
+  color: #5c67f2; /* Màu Indigo chủ đạo */
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.candidate-email { font-size: 12px; color: #64748b; }
+
+.it-locak-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.status-0 { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.status-1 { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.status-2 { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+.action-btns { display: flex; gap: 8px; justify-content: flex-end; }
+
+.action-btns button {
+  background: #1e293b;
+  border: none;
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-view:hover { background: #5c67f2; }
+.btn-accept:hover { background: #10b981; }
+.btn-reject:hover { background: #ef4444; }
