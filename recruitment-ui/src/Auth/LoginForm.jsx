@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Mail, Lock, LogIn, Code2, Eye, EyeOff, UserPlus, User } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import './LoginStyles.css';
-import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
+
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
 
-  //Xử lý khi Google trả về ID Token
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // ================= GOOGLE LOGIN (GIỮ NGUYÊN) =================
   function handleCredentialResponse(response) {
     fetch("https://localhost:7272/api/Auth/google", {
       method: "POST",
@@ -24,19 +28,18 @@ const LoginForm = () => {
     })
       .then(res => res.json())
       .then(data => {
-        console.log("Backend:", data);
-
-        //LƯU TOKEN
         localStorage.setItem("token", data.accessToken);
         localStorage.setItem("email", data.email);
         localStorage.setItem("fullName", data.fullName);
+        localStorage.setItem("role", data.role);
+
         setUser({
           token: data.accessToken,
           email: data.email,
           fullName: data.fullName,
+          role: data.role,
         });
 
-        // CHUYỂN TRANG
         navigate("/");
       })
       .catch(err => {
@@ -45,7 +48,6 @@ const LoginForm = () => {
       });
   }
 
-  // Khởi tạo Google khi component mount
   useEffect(() => {
     if (!window.google) return;
 
@@ -64,26 +66,91 @@ const LoginForm = () => {
     );
   }, []);
 
+  // ================= LOGIN / REGISTER =================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!email || !password || (!isLogin && !fullName)) {
+      alert("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
+    try {
+      const url = isLogin
+        ? "https://localhost:7272/api/Auth/login"
+        : "https://localhost:7272/api/Auth/register";
+
+      const body = isLogin
+        ? { email, password }
+        : { fullName, email, password };
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : {};
+
+      if (!response.ok) {
+        alert(data.message || "Có lỗi xảy ra");
+        setPassword("");
+        return;
+      }
+
+      if (isLogin) {
+        // LOGIN SUCCESS
+        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("email", data.email);
+        localStorage.setItem("fullName", data.fullName);
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("userId", data.userId);
+   console.log(data.userId);
+        setUser({
+          id: data.userId,
+          token: data.accessToken,
+          email: data.email,
+          fullName: data.fullName,
+          role: data.role,
+        });
+
+        navigate("/");
+      } else {
+        // REGISTER SUCCESS
+        alert("Đăng ký thành công!");
+        setFullName("");
+        setEmail("");
+        setPassword("");
+        setIsLogin(true);
+      }
+
+    } catch (err) {
+      console.error("Server error:", err);
+      alert("Không thể kết nối server");
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="marquee-wrapper">
         <div className="marquee-text">
-          <span>Bùi Xuân Huấn</span> - Ra xã hội làm ăn bươn trải, có làm thì mới có ăn. Không làm mà đòi có ăn thì ăn đầu buồi, ăn cứt.
+          <span>Bùi Xuân Huấn</span> - Ra xã hội làm ăn bươn trải...
         </div>
       </div>
+
       <div className="login-card">
-        {/* Header Section */}
         <div className="login-header">
           <div className="logo-box">
             <Code2 size={32} color="#00b14f" />
           </div>
           <h1>DevHire <span className="text-gradient">IT LOCAK</span></h1>
-          <p className='s'>{isLogin ? 'Nâng tầm sự nghiệp Software Engineer' : 'Gia nhập cộng đồng Developer tài năng'}</p>
+          <p className='s'>
+            {isLogin ? 'Nâng tầm sự nghiệp Software Engineer' : 'Gia nhập cộng đồng Developer tài năng'}
+          </p>
         </div>
 
-        {/* Social Login */}
         <div className="social-group">
-
           <div className="google-wrapper">
             <div id="googleBtn"></div>
           </div>
@@ -93,15 +160,19 @@ const LoginForm = () => {
           <span>HOẶC TIẾP TỤC VỚI</span>
         </div>
 
-        {/* Form Section */}
-        <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
+        <form className="auth-form" onSubmit={handleSubmit}>
 
           {!isLogin && (
             <div className="input-group">
               <label>Họ và tên</label>
               <div className="input-wrapper">
                 <User className="input-icon-left" size={18} />
-                <input type="text" placeholder="Nguyễn Văn A" />
+                <input
+                  type="text"
+                  placeholder="Nguyễn Văn A"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
               </div>
             </div>
           )}
@@ -110,7 +181,12 @@ const LoginForm = () => {
             <label>Email công việc</label>
             <div className="input-wrapper">
               <Mail className="input-icon-left" size={18} />
-              <input type="email" placeholder="name@company.com" />
+              <input
+                type="email"
+                placeholder="name@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
           </div>
 
@@ -124,6 +200,8 @@ const LoginForm = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <button
                 type="button"
@@ -144,7 +222,6 @@ const LoginForm = () => {
           </button>
         </form>
 
-        {/* Footer Section */}
         <div className="footer-toggle">
           <p className="footer-text">
             {isLogin ? "Chưa có tài khoản?" : "Đã có tài khoản?"}{' '}
@@ -152,11 +229,6 @@ const LoginForm = () => {
               {isLogin ? 'Đăng ký ngay' : 'Đăng nhập'}
             </span>
           </p>
-          {isLogin && (
-            <p className="footer-text">
-              Bạn là nhà tuyển dụng? <a href="#recruiter">Đăng tin tại đây</a>
-            </p>
-          )}
         </div>
       </div>
     </div>
