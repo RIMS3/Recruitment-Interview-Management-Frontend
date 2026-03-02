@@ -122,7 +122,8 @@ const JobList = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleToggleSavedJob = async (rawJobId) => {
+    const handleToggleSavedJob = async (e, rawJobId) => {
+        e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài (không làm nhảy trang)
         const jobId = String(rawJobId);
         if (!candidateId) {
             alert('Bạn cần đăng nhập để lưu job.');
@@ -230,7 +231,11 @@ const JobList = () => {
                         const isSaved = savedJobIds.has(jobId);
 
                         return (
-                            <div className="job-card" key={jobId}>
+                            <div 
+                                className="job-card clickable-card" 
+                                key={jobId}
+                                onClick={() => navigate(`/jobpostdetail/${jobId}`)}
+                            >
                                 <div className="logo-box">
                                     <img src="https://static.topcv.vn/company_logo/default-company-logo.png" alt="logo" />
                                 </div>
@@ -254,12 +259,20 @@ const JobList = () => {
                                             <button
                                                 className={`btn-wishlist ${isSaved ? 'saved' : ''}`}
                                                 title={isSaved ? 'Bỏ lưu tin' : 'Lưu tin'}
-                                                onClick={() => handleToggleSavedJob(jobId)}
+                                                onClick={(e) => handleToggleSavedJob(e, jobId)}
                                                 disabled={!!savingMap[jobId]}
                                             >
                                                 ❤
                                             </button>
-                                            <button className="btn-apply">Ứng tuyển ngay</button>
+                                            <button 
+                                                className="btn-apply"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(`/jobpostdetail/${jobId}`);
+                                                }}
+                                            >
+                                                Ứng tuyển ngay
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

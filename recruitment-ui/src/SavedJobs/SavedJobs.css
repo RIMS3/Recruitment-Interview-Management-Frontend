@@ -84,12 +84,21 @@
   align-items: center;
   transition: all 0.3s ease;
   box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  position: relative;
+}
+
+.clickable-card {
+  cursor: pointer;
 }
 
 .saved-job-card:hover {
   border-color: var(--primary-color);
   box-shadow: 0 8px 20px rgba(0, 177, 79, 0.08);
   transform: translateY(-2px);
+}
+
+.saved-job-card:hover .sj-title {
+  color: var(--primary-color);
 }
 
 .sj-logo-box {
@@ -124,12 +133,7 @@
   font-weight: 700;
   color: var(--text-main);
   margin: 0;
-  cursor: pointer;
   transition: color 0.2s;
-}
-
-.sj-title:hover {
-  color: var(--primary-color);
 }
 
 .sj-salary {
@@ -173,6 +177,8 @@
   flex-direction: column;
   gap: 10px;
   min-width: 130px;
+  position: relative;
+  z-index: 2; /* Đảm bảo nút luôn nổi lên trên thẻ để click dễ dàng */
 }
 
 .btn-apply {
@@ -270,7 +276,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .saved-job-card {
+  .saved-job-card { 
     flex-direction: column;
     align-items: flex-start;
   }

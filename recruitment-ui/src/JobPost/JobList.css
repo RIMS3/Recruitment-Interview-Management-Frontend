@@ -236,10 +236,20 @@
     transition: 0.3s ease;
 }
 
+/* Thêm class để báo hiệu card có thể click */
+.clickable-card {
+    cursor: pointer;
+}
+
 .job-card:hover {
     border-color: var(--primary-green);
     box-shadow: 0 10px 25px rgba(0, 177, 79, 0.08);
     transform: translateY(-2px);
+}
+
+/* Hiệu ứng cho title khi hover card */
+.job-card:hover .job-title {
+    color: var(--primary-green);
 }
 
 .logo-box {
@@ -255,7 +265,7 @@
 
 .job-info { flex: 1; }
 .job-top { display: flex; justify-content: space-between; align-items: flex-start; }
-.job-title { font-size: 16px; color: var(--text-main); font-weight: 700; line-height: 1.4; margin-bottom: 4px; }
+.job-title { font-size: 16px; color: var(--text-main); font-weight: 700; line-height: 1.4; margin-bottom: 4px; transition: color 0.2s; }
 
 .job-salary {
     color: var(--primary-green);
@@ -304,6 +314,9 @@
     cursor: pointer;
     font-size: 16px;
     transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-wishlist:hover { color: #ef4444; border-color: #fecaca; background: #fff1f2; }

@@ -41,7 +41,8 @@ const SavedJobs = () => {
     fetchData();
   }, [candidateId]);
 
-  const handleRemove = async (jobId) => {
+  const handleRemove = async (e, jobId) => {
+    e.stopPropagation(); // Ngăn chặn sự kiện click lan ra thẻ cha (không nhảy trang)
     try {
       await unsaveJob(candidateId, jobId);
       setJobs((prev) => prev.filter((job) => String(job.idJobPost || job.jobId || job.id) !== String(jobId)));
@@ -49,6 +50,12 @@ const SavedJobs = () => {
       console.error(error);
       alert(error?.message || 'Không thể bỏ lưu công việc.');
     }
+  };
+
+  const handleApply = (e, jobId) => {
+    e.stopPropagation(); // Ngăn chặn nhảy trang khi bấm nút ứng tuyển
+    // Điều hướng sang trang chi tiết hoặc mở modal ứng tuyển tùy logic của bạn
+    navigate(`/jobpostdetail/${jobId}`);
   };
 
   return (
@@ -90,14 +97,18 @@ const SavedJobs = () => {
                 : 'Thỏa thuận';
             
             return (
-              <div className="saved-job-card" key={currentJobId}>
+              <div 
+                className="saved-job-card clickable-card" 
+                key={currentJobId}
+                onClick={() => navigate(`/jobpostdetail/${currentJobId}`)}
+              >
                 <div className="sj-logo-box">
                   <img src="https://static.topcv.vn/company_logo/default-company-logo.png" alt="Company Logo" />
                 </div>
                 
                 <div className="sj-content">
                   <div className="sj-header">
-                    <h3 className="sj-title" onClick={() => navigate(`/jobs/${currentJobId}`)}>
+                    <h3 className="sj-title">
                       {job.title}
                     </h3>
                     <div className="sj-salary">{salaryText}</div>
@@ -118,10 +129,15 @@ const SavedJobs = () => {
                 </div>
 
                 <div className="sj-actions">
-                  <button className="btn-apply">Ứng tuyển</button>
+                  <button 
+                    className="btn-apply"
+                    onClick={(e) => handleApply(e, currentJobId)}
+                  >
+                    Ứng tuyển
+                  </button>
                   <button 
                     className="btn-remove" 
-                    onClick={() => handleRemove(currentJobId)}
+                    onClick={(e) => handleRemove(e, currentJobId)}
                     title="Bỏ lưu công việc này"
                   >
                     Bỏ lưu
