@@ -58,6 +58,6 @@ export function getCandidateIdFromSession() {
 }
 
 // Bật true để test nhanh khi chưa map candidateId từ login.
-export const DEV_BYPASS_LOGIN_TO_SAVE = true;
+export const DEV_BYPASS_LOGIN_TO_SAVE = false;
 
 export const DEV_CANDIDATE_ID = 'B1111111-1111-1111-1111-111111111111';
