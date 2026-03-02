@@ -1,141 +1,161 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const CandidateProfile = ({ userId }) => {
+const CandidateProfile = () => {
     const [profile, setProfile] = useState({});
-    const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({});
+    const [isEditing, setIsEditing] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    
+    const fileInputRef = useRef(null);
 
-    // Sửa lại thành port thật của bạn (VD: 7272)
-    const apiUrl = 'https://localhost:7272/api/candidateprofiles'; 
+    // ID thật của ứng viên
+    const currentUserId = "A1234567-B123-C123-D123-E00000000005"; 
+    const apiUrl = "https://localhost:7272/api/candidateprofiles";
 
     useEffect(() => {
-        fetch(`${apiUrl}/user/${userId}`)
+        fetch(`${apiUrl}/user/${currentUserId}`)
             .then(res => res.json())
             .then(data => {
                 setProfile(data);
-                // Xử lý cắt chuỗi ngày tháng (nếu có giờ phút) để gắn vào input type="date"
+                // Cắt bỏ phần giờ phút, chỉ lấy ngày tháng năm để đưa vào input type="date"
                 const formattedData = { ...data };
                 if (formattedData.dateOfBirth) {
                     formattedData.dateOfBirth = formattedData.dateOfBirth.split('T')[0];
                 }
                 setFormData(formattedData);
             })
-            .catch(err => console.error("Lỗi khi tải dữ liệu:", err));
-    }, [userId]);
+            .catch(err => console.error("Lỗi tải dữ liệu:", err));
+    }, [currentUserId]);
 
-    const handleChange = (e) => {
+    // Xử lý Upload Ảnh
+    const handleAvatarChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formDataFile = new FormData();
+        formDataFile.append("file", file);
+
+        setIsUploading(true);
+        fetch(`${apiUrl}/${profile.id}/avatar`, {
+            method: 'POST',
+            body: formDataFile,
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.avatarUrl) {
+                alert("Cập nhật ảnh đại diện thành công!");
+                
+                // 1. Cập nhật ảnh lên màn hình
+                setProfile(prev => ({ ...prev, avatarUrl: data.avatarUrl }));
+                
+                // 2. Ghi chú ảnh mới vào bản nháp để khi lưu chữ không bị mất ảnh
+                setFormData(prev => ({ ...prev, avatarUrl: data.avatarUrl })); 
+            }
+        })
+        .catch(err => alert("Lỗi tải ảnh lên!"))
+        .finally(() => {
+            setIsUploading(false);
+            e.target.value = null; 
+        });
+    };
+
+    // Xử lý nhập form chữ
+    const handleInputChange = (e) => {
         const value = e.target.type === 'number' ? parseFloat(e.target.value) : e.target.value;
         setFormData({ ...formData, [e.target.name]: value });
     };
 
-    const handleSave = () => {
-        // Ép kiểu Gender về số nguyên trước khi gửi
+    // Xử lý lưu thông tin (PUT)
+    const handleSaveProfile = () => {
+        // Đảm bảo Gender là số nguyên theo Enum C#
         const payload = { ...formData, gender: parseInt(formData.gender) || 0 };
 
         fetch(`${apiUrl}/${profile.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
-        })
-        .then(res => {
+        }).then(res => {
             if (res.ok) {
-                alert("Cập nhật hồ sơ thành công!");
-                setProfile(payload);
+                alert("Cập nhật thông tin thành công!");
+                // Chỉ đè phần thông tin chữ mới lên, giữ nguyên avatar
+                setProfile(prev => ({ ...prev, ...payload })); 
                 setIsEditing(false);
             } else {
-                alert("Có lỗi xảy ra khi cập nhật!");
+                alert("Có lỗi khi lưu thông tin.");
             }
-        })
-        .catch(err => console.error(err));
+        });
     };
 
-    // Hàm phụ trợ: Dịch giới tính từ số sang chữ
-    const getGenderText = (genderCode) => {
-        if (genderCode === 1) return "Nam";
-        if (genderCode === 2) return "Nữ";
-        if (genderCode === 3) return "Khác";
-        return "Chưa cập nhật";
-    };
-
-    if (!profile.id) return <div style={{ padding: '20px' }}>Đang tải dữ liệu hồ sơ...</div>;
+    if (!profile.id) return <div style={{ textAlign: 'center', padding: '50px' }}>Đang tải dữ liệu hồ sơ...</div>;
+    const defaultAvatar = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
     return (
-        <div style={{ padding: '30px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', maxWidth: '800px', margin: '0 auto' }}>
-            <h2 style={{ color: '#00b14f', borderBottom: '2px solid #eee', paddingBottom: '10px' }}>Hồ sơ Ứng viên</h2>
+        <div style={styles.container}>
+            <h2 style={{ color: '#00b14f', textAlign: 'center', marginBottom: '30px' }}>Hồ sơ Ứng viên</h2>
             
+            {/* KHU VỰC AVATAR */}
+            <div style={styles.avatarSection}>
+                <div style={styles.avatarWrapper}>
+                    <img src={profile.avatarUrl || defaultAvatar} alt="Avatar" style={{...styles.avatarImage, opacity: isUploading ? 0.5 : 1}} />
+                    <button onClick={() => fileInputRef.current.click()} style={styles.cameraButton} disabled={isUploading}>📷</button>
+                </div>
+                <p style={{ fontSize: '13px', color: '#888' }}>{isUploading ? "Đang xử lý..." : "Đổi ảnh đại diện"}</p>
+                <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handleAvatarChange} />
+            </div>
+
+            {/* KHU VỰC THÔNG TIN */}
             {!isEditing ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '20px' }}>
-                    <p><strong>Ngày sinh:</strong> {profile.dateOfBirth ? profile.dateOfBirth.split('T')[0] : 'Chưa cập nhật'}</p>
-                    <p><strong>Giới tính:</strong> {getGenderText(profile.gender)}</p>
-                    <p><strong>Địa chỉ:</strong> {profile.address || 'Chưa cập nhật'}</p>
-                    <p><strong>Kinh nghiệm:</strong> {profile.experienceYears != null ? `${profile.experienceYears} năm` : 'Chưa cập nhật'}</p>
-                    <p><strong>Cấp bậc mong muốn:</strong> {profile.jobLevel || 'Chưa cập nhật'}</p>
-                    <p><strong>Lương hiện tại:</strong> {profile.currentSalary ? `${profile.currentSalary.toLocaleString()} VNĐ` : 'Chưa cập nhật'}</p>
-                    <p><strong>Lương mong muốn:</strong> {profile.desiredSalary ? `${profile.desiredSalary.toLocaleString()} VNĐ` : 'Chưa cập nhật'}</p>
+                // Chế độ xem
+                <div style={styles.infoGrid}>
+                    <p><strong>Ngày sinh:</strong> {profile.dateOfBirth ? profile.dateOfBirth.split('T')[0] : 'Chưa có'}</p>
+                    <p><strong>Địa chỉ:</strong> {profile.address || 'Chưa có'}</p>
+                    <p><strong>Kinh nghiệm:</strong> {profile.experienceYears != null ? `${profile.experienceYears} năm` : 'Chưa có'}</p>
+                    <p><strong>Cấp bậc:</strong> {profile.jobLevel || 'Chưa có'}</p>
+                    <p><strong>Lương hiện tại:</strong> {profile.currentSalary ? `${profile.currentSalary} triệu` : 'Chưa có'}</p>
+                    <p><strong>Lương mong muốn:</strong> {profile.desiredSalary ? `${profile.desiredSalary} triệu` : 'Chưa có'}</p>
                     <div style={{ gridColumn: 'span 2' }}>
-                        <p><strong>Tóm tắt bản thân:</strong></p>
-                        <p style={{ whiteSpace: 'pre-wrap', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '4px' }}>
-                            {profile.summary || 'Chưa có thông tin giới thiệu.'}
-                        </p>
+                        <p><strong>Giới thiệu bản thân:</strong></p>
+                        <p style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}>{profile.summary || 'Chưa cập nhật'}</p>
                     </div>
-                    <div style={{ gridColumn: 'span 2', textAlign: 'right' }}>
-                        <button onClick={() => setIsEditing(true)} style={{ padding: '10px 20px', backgroundColor: '#00b14f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                            Chỉnh sửa hồ sơ
-                        </button>
+                    <div style={{ gridColumn: 'span 2', textAlign: 'center', marginTop: '15px' }}>
+                        <button onClick={() => setIsEditing(true)} style={styles.editButton}>Chỉnh sửa hồ sơ</button>
                     </div>
                 </div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '20px' }}>
-                    <div>
-                        <label>Ngày sinh:</label>
-                        <input type="date" name="dateOfBirth" value={formData.dateOfBirth || ''} onChange={handleChange} style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
-                    </div>
-                    <div>
-                        <label>Giới tính:</label>
-                        <select name="gender" value={formData.gender || ''} onChange={handleChange} style={{ width: '100%', padding: '8px', marginTop: '5px' }}>
-                            <option value={0}>-- Chọn giới tính --</option>
-                            <option value={1}>Nam</option>
-                            <option value={2}>Nữ</option>
-                            <option value={3}>Khác</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Địa chỉ:</label>
-                        <input name="address" value={formData.address || ''} onChange={handleChange} style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
-                    </div>
-                    <div>
-                        <label>Kinh nghiệm (năm):</label>
-                        <input type="number" name="experienceYears" value={formData.experienceYears || ''} onChange={handleChange} style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
-                    </div>
-                    <div>
-                        <label>Lương hiện tại (VNĐ):</label>
-                        <input type="number" name="currentSalary" value={formData.currentSalary || ''} onChange={handleChange} style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
-                    </div>
-                    <div>
-                        <label>Lương mong muốn (VNĐ):</label>
-                        <input type="number" name="desiredSalary" value={formData.desiredSalary || ''} onChange={handleChange} style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
-                    </div>
+                // Chế độ sửa
+                <div style={styles.infoGrid}>
+                    <div><label>Ngày sinh:</label><input type="date" name="dateOfBirth" value={formData.dateOfBirth || ''} onChange={handleInputChange} style={styles.input} /></div>
+                    <div><label>Địa chỉ:</label><input type="text" name="address" value={formData.address || ''} onChange={handleInputChange} style={styles.input} /></div>
+                    <div><label>Kinh nghiệm (năm):</label><input type="number" name="experienceYears" value={formData.experienceYears || ''} onChange={handleInputChange} style={styles.input} /></div>
+                    <div><label>Cấp bậc mong muốn:</label><input type="text" name="jobLevel" value={formData.jobLevel || ''} onChange={handleInputChange} style={styles.input} /></div>
+                    <div><label>Lương hiện tại (triệu):</label><input type="number" name="currentSalary" value={formData.currentSalary || ''} onChange={handleInputChange} style={styles.input} /></div>
+                    <div><label>Lương mong muốn (triệu):</label><input type="number" name="desiredSalary" value={formData.desiredSalary || ''} onChange={handleInputChange} style={styles.input} /></div>
                     <div style={{ gridColumn: 'span 2' }}>
-                        <label>Cấp bậc hiện tại / mong muốn (Ví dụ: Intern, Fresher, Middle):</label>
-                        <input name="jobLevel" value={formData.jobLevel || ''} onChange={handleChange} style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
+                        <label>Giới thiệu bản thân:</label>
+                        <textarea name="summary" value={formData.summary || ''} onChange={handleInputChange} rows="4" style={styles.input}></textarea>
                     </div>
-                    <div style={{ gridColumn: 'span 2' }}>
-                        <label>Tóm tắt bản thân:</label>
-                        <textarea name="summary" value={formData.summary || ''} onChange={handleChange} rows="5" style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
-                    </div>
-                    
-                    <div style={{ gridColumn: 'span 2', textAlign: 'right', marginTop: '10px' }}>
-                        <button onClick={() => setIsEditing(false)} style={{ padding: '10px 20px', backgroundColor: '#ccc', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '10px' }}>
-                            Hủy
-                        </button>
-                        <button onClick={handleSave} style={{ padding: '10px 20px', backgroundColor: '#00b14f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                            Lưu thay đổi
-                        </button>
+                    <div style={{ gridColumn: 'span 2', textAlign: 'center', marginTop: '15px' }}>
+                        <button onClick={() => setIsEditing(false)} style={styles.cancelButton}>Hủy bỏ</button>
+                        <button onClick={handleSaveProfile} style={styles.saveButton}>Lưu thay đổi</button>
                     </div>
                 </div>
             )}
         </div>
     );
+};
+
+// CSS dùng chung
+const styles = {
+    container: { maxWidth: '800px', margin: '40px auto', padding: '30px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', fontFamily: 'Arial, sans-serif' },
+    avatarSection: { display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '30px' },
+    avatarWrapper: { position: 'relative', width: '130px', height: '130px' },
+    avatarImage: { width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '3px solid #00b14f' },
+    cameraButton: { position: 'absolute', bottom: 0, right: 0, backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '50%', padding: '8px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
+    infoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', backgroundColor: '#f9f9f9', padding: '25px', borderRadius: '8px' },
+    input: { width: '100%', padding: '10px', marginTop: '5px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' },
+    editButton: { padding: '10px 25px', backgroundColor: '#00b14f', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' },
+    saveButton: { padding: '10px 25px', backgroundColor: '#00b14f', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' },
+    cancelButton: { padding: '10px 25px', backgroundColor: '#e0e0e0', color: '#333', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', marginRight: '15px' }
 };
 
 export default CandidateProfile;

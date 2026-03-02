@@ -6,7 +6,6 @@ import './App.css';
 import InterviewPage from './Interviews/InterviewPage'
 import UserProfile from './UserProfile';
 import JobList from './JobPost/JobList';
-import InterviewPage from './Interviews/InterviewPage';
 import { useContext } from "react";
 import { AuthContext } from "./Auth/AuthContext";
 import JobPostDetails from './JobPostDetails/JobPostDetails';
@@ -40,10 +39,7 @@ const Navbar = () => {
         </ul>
 
         <div className="nav-auth">
-          <button className="btn-login" onClick={() => navigate('/login')}>
-            Đăng nhập
-          </button>
-          <button className="btn-post">Đăng tuyển ngay</button>
+          
           {/* Thêm một nút để bạn dễ dàng test chuyển sang trang Profile */}
           <button style={{marginLeft: '10px'}} onClick={() => navigate('/profile')}>
             Hồ sơ cá nhân
