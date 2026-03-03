@@ -14,45 +14,75 @@ const LoginForm = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  //THÊM: Nếu đã login rồi thì không cho vào /login nữa
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const role = Number(localStorage.getItem("role"));
+
+    if (token) {
+      if (role === 0) {
+        navigate("/select-role");
+      } else {
+        navigate("/");
+      }
+    }
+  }, [navigate]);
 
   // ================= GOOGLE LOGIN (GIỮ NGUYÊN) =================
-  function handleCredentialResponse(response) {
-    fetch("https://localhost:7272/api/Auth/google", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        idToken: response.credential,
-      }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        localStorage.setItem("token", data.accessToken);
-        localStorage.setItem("email", data.email);
-        localStorage.setItem("fullName", data.fullName);
-        localStorage.setItem("role", data.role);
-
-        setUser({
-          token: data.accessToken,
-          email: data.email,
-          fullName: data.fullName,
-          role: data.role,
-        });
-
-        navigate("/");
-      })
-      .catch(err => {
-        console.error("Login failed:", err);
-        alert("Đăng nhập Google thất bại!");
+  async function handleCredentialResponse(response) {
+    try {
+      const res = await fetch("https://localhost:7272/api/Auth/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idToken: response.credential,
+        }),
       });
+
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : {};
+
+      if (!res.ok) {
+        alert(data.message || "Đăng nhập Google thất bại!");
+        return;
+      }
+
+      // Lưu localStorage
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("email", data.email);
+      localStorage.setItem("fullName", data.fullName);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("userId", data.userId);
+
+      // Cập nhật context
+      setUser({
+        id: data.userId,
+        token: data.accessToken,
+        email: data.email,
+        fullName: data.fullName,
+        role: data.role,
+      });
+
+      // 🔥 THÊM LOGIC ROLE
+      if (data.role === 0) {
+        navigate("/select-role");
+      } else {
+        navigate("/");
+      }
+    } catch (err) {
+      console.error("Google login error:", err);
+      alert("Không thể kết nối server");
+    }
   }
 
   useEffect(() => {
     if (!window.google) return;
 
     window.google.accounts.id.initialize({
-      client_id: "319275534367-9rj78f047dfp9c5ig55fk25gbpmtvpah.apps.googleusercontent.com",
+      client_id:
+        "319275534367-9rj78f047dfp9c5ig55fk25gbpmtvpah.apps.googleusercontent.com",
       callback: handleCredentialResponse,
     });
 
@@ -99,14 +129,14 @@ const LoginForm = () => {
         return;
       }
 
+      // LOGIN SUCCESS
       if (isLogin) {
-        // LOGIN SUCCESS
-        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("email", data.email);
         localStorage.setItem("fullName", data.fullName);
         localStorage.setItem("role", data.role);
         localStorage.setItem("userId", data.userId);
-   console.log(data.userId);
+
         setUser({
           id: data.userId,
           token: data.accessToken,
@@ -115,7 +145,13 @@ const LoginForm = () => {
           role: data.role,
         });
 
-        navigate("/");
+        if (data.role === 0) {
+          navigate("/select-role");
+        } else {
+          navigate("/");
+        }
+
+
       } else {
         // REGISTER SUCCESS
         alert("Đăng ký thành công!");
