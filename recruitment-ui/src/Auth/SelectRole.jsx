@@ -21,7 +21,7 @@ export default function SelectRole() {
 
       const res = await axios.post(
         "https://localhost:7272/api/auth/select-role",
-        role, // ✅ Gửi trực tiếp số (backend nhận int)
+        { role }, // ✅ Gửi trực tiếp số (backend nhận int)
         {
           headers: {
             Authorization: `Bearer ${token}`,

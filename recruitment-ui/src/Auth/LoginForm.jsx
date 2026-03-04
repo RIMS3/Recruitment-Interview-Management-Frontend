@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Mail, Lock, LogIn, Code2, Eye, EyeOff, UserPlus, User } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-hot-toast'; // Import thư viện thông báo
 import './LoginStyles.css';
 import { AuthContext } from "./AuthContext";
 
@@ -27,6 +28,7 @@ const LoginForm = () => {
       }
     }
   }, [navigate]);
+
 
   // ================= GOOGLE LOGIN (GIỮ NGUYÊN) =================
   async function handleCredentialResponse(response) {
@@ -101,9 +103,11 @@ const LoginForm = () => {
     e.preventDefault();
 
     if (!email || !password || (!isLogin && !fullName)) {
-      alert("Vui lòng nhập đầy đủ thông tin");
+      toast.error("Vui lòng nhập đầy đủ thông tin");
       return;
     }
+
+    const toastId = toast.loading(isLogin ? "Đang đăng nhập..." : "Đang tạo tài khoản...");
 
     try {
       const url = isLogin
@@ -124,13 +128,14 @@ const LoginForm = () => {
       const data = text ? JSON.parse(text) : {};
 
       if (!response.ok) {
-        alert(data.message || "Có lỗi xảy ra");
+        toast.error(data.message || "Có lỗi xảy ra", { id: toastId });
         setPassword("");
         return;
       }
 
       // LOGIN SUCCESS
       if (isLogin) {
+
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("email", data.email);
         localStorage.setItem("fullName", data.fullName);
@@ -139,11 +144,14 @@ const LoginForm = () => {
 
         setUser({
           id: data.userId,
+          candidateId: data.candidateId,
+          cvId: data.cvId,
           token: data.accessToken,
           email: data.email,
           fullName: data.fullName,
           role: data.role,
         });
+
 
         if (data.role === 0) {
           navigate("/select-role");
@@ -152,9 +160,10 @@ const LoginForm = () => {
         }
 
 
+
       } else {
         // REGISTER SUCCESS
-        alert("Đăng ký thành công!");
+        toast.success("Đăng ký thành công! Hãy đăng nhập.", { id: toastId });
         setFullName("");
         setEmail("");
         setPassword("");
@@ -163,7 +172,7 @@ const LoginForm = () => {
 
     } catch (err) {
       console.error("Server error:", err);
-      alert("Không thể kết nối server");
+      toast.error("Không thể kết nối server", { id: toastId });
     }
   };
 
@@ -180,7 +189,7 @@ const LoginForm = () => {
           <div className="logo-box">
             <Code2 size={32} color="#00b14f" />
           </div>
-          <h1>DevHire <span className="text-gradient">IT LOCAK</span></h1>
+          <h1>DevHire <span className="text-gradient">IT LOCAL</span></h1>
           <p className='s'>
             {isLogin ? 'Nâng tầm sự nghiệp Software Engineer' : 'Gia nhập cộng đồng Developer tài năng'}
           </p>

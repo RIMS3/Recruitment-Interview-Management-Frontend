@@ -1,142 +1,265 @@
-/* --- Tối ưu hóa cho mọi kích cỡ màn hình --- */
+/* Tổng thể trang */
 .job-page-wrapper {
-    /* Giữ khung tối đa để không bị quá loãng trên màn hình 4K/màn to */
     max-width: 1140px;
-    /* Căn giữa trang và giữ margin âm để sát Header như bạn muốn */
-    margin: -10px auto 20px auto; 
-    padding: 0 15px; /* Padding này giúp nội dung không chạm mép khi mở trên điện thoại/màn nhỏ */
-    font-family: 'Inter', sans-serif;
+    margin: 20px auto; 
+    padding: 0 15px; 
+    font-family: 'Inter', -apple-system, sans-serif;
     background-color: #f4f7f6;
-    width: 100%; /* Đảm bảo wrapper luôn chiếm hết chiều ngang khả dụng */
+    width: 100%; 
     box-sizing: border-box;
+    position: relative;
 }
 
-/* Breadcrumb - Giữ nguyên của bạn */
-.job-breadcrumb {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 15px;
-}
-.job-breadcrumb a { color: #00b14f; text-decoration: none; }
-.job-breadcrumb span { margin: 0 8px; color: #ccc; }
-
-.job-container-layout {
+/* --- THÔNG BÁO TOAST --- */
+.custom-toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background-color: #00b14f; /* Xanh lá cho thành công */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     display: flex;
-    gap: 24px;
-    width: 100%;
+    align-items: center;
+    gap: 15px;
+    z-index: 10000;
+    min-width: 300px;
+    animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.job-main-column { flex: 2; }
-.job-sidebar-column { flex: 1; }
+/* Màu Toast khi có lỗi hoặc cảnh báo (isSuccess: false) */
+.toast-error {
+    background-color: #f29d00 !important; /* Màu cam cảnh báo */
+    box-shadow: 0 10px 30px rgba(242, 157, 0, 0.2) !important;
+}
 
-/* Cards trắng - Giữ nguyên của bạn */
-.job-header-card, .job-content-card, .company-card-right, .general-info-card-right {
+.toast-icon { font-size: 24px; }
+.toast-content strong { display: block; font-size: 16px; margin-bottom: 2px; }
+.toast-content p { margin: 0; font-size: 14px; opacity: 0.9; }
+
+@keyframes slideInRight {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* --- BREADCRUMB --- */
+.job-breadcrumb { 
+    font-size: 14px; 
+    color: #666; 
+    margin-bottom: 20px; 
+}
+.job-breadcrumb a { color: #00b14f; text-decoration: none; transition: 0.2s; }
+.job-breadcrumb a:hover { text-decoration: underline; }
+.job-breadcrumb span { margin: 0 10px; color: #ccc; }
+
+/* --- LAYOUT CHÍNH --- */
+.job-container-layout { 
+    display: flex; 
+    gap: 24px; 
+    width: 100%; 
+}
+
+.job-main-column { flex: 2; min-width: 0; }
+.job-sidebar-column { flex: 1; min-width: 300px; }
+
+/* Các thẻ Card trắng */
+.job-header-card, 
+.job-content-card, 
+.company-card-right, 
+.general-info-card-right {
     background: #fff;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 24px;
     margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.job-main-title { font-size: 24px; color: #333; margin-bottom: 20px; font-weight: 700; }
+/* --- HEADER CÔNG VIỆC --- */
+.job-main-title { 
+    font-size: 26px; 
+    color: #333; 
+    margin: 0 0 25px 0; 
+    font-weight: 700; 
+    line-height: 1.3;
+}
 
-/* --- GIỮ NGUYÊN MỨC LƯƠNG, ĐỊA ĐIỂM TRÊN 1 HÀNG --- */
 .job-stats-container {
     display: flex;
     justify-content: flex-start;
-    gap: 35px;
-    margin-bottom: 20px;
-    flex-wrap: nowrap;
+    gap: 40px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
 }
 
-.stat-box { 
-    display: flex; 
-    align-items: center; 
-    gap: 12px; 
-    white-space: nowrap;
-}
-
-/* --- FIX: CĂN ICON VÀO CHÍNH GIỮA Ô TRÒN MÀU XANH --- */
+.stat-box { display: flex; align-items: center; gap: 12px; }
 .stat-icon { 
-    font-size: 24px; 
+    font-size: 22px; 
     background: #eafbef; 
     border-radius: 50%; 
-    
-    /* Thiết lập kích thước cố định để đảm bảo hình tròn chuẩn */
-    width: 44px; 
-    height: 44px; 
-    
-    /* Ép icon (💵, 📍, ⏳) vào tâm tuyệt đối */
+    width: 48px; 
+    height: 48px; 
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    padding: 0; /* Xóa padding cũ để tránh làm lệch icon */
-    flex-shrink: 0; /* Không cho vòng tròn bị bóp méo khi màn hình nhỏ */
+    flex-shrink: 0;
 }
 
-.stat-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-.stat-label { display: block; font-size: 13px; color: #666; margin-bottom: 2px; }
+.stat-info { display: flex; flex-direction: column; }
+.stat-label { font-size: 13px; color: #777; margin-bottom: 4px; }
 .stat-value { font-weight: 600; font-size: 15px; color: #333; }
 
-.job-deadline { font-size: 14px; color: #666; margin-bottom: 15px; }
-
-/* Buttons - Giữ nguyên 100% của bạn */
-.job-actions { display: flex; gap: 12px; }
-.btn-apply-now {
-    flex: 3; background: #00b14f; color: #fff; border: none; 
-    padding: 14px; border-radius: 5px; font-weight: bold; cursor: pointer;
-    transition: 0.3s;
+.job-deadline { 
+    font-size: 14px; 
+    color: #dd4b39; 
+    background: #fff5f5;
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 25px; 
 }
-.btn-apply-now:hover { background: #009643; }
+
+/* --- NÚT BẤM --- */
+.job-actions { display: flex; gap: 15px; }
+
+.btn-apply-now {
+    flex: 3; 
+    background: #00b14f; 
+    color: #fff; 
+    border: none; 
+    padding: 14px 20px; 
+    border-radius: 8px; 
+    font-size: 16px;
+    font-weight: bold; 
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-apply-now:hover:not(:disabled) { 
+    background: #009643; 
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 177, 79, 0.2);
+}
+
+.btn-apply-now:disabled {
+    background-color: #a5d6a7;
+    cursor: not-allowed;
+    transform: none;
+}
 
 .btn-save-job {
-    flex: 1; border: 1px solid #00b14f; color: #00b14f; 
-    background: #fff; border-radius: 5px; cursor: pointer; font-weight: 600;
+    flex: 1; 
+    border: 1px solid #00b14f; 
+    color: #00b14f; 
+    background: #fff; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 600;
+    transition: 0.3s;
 }
 
-/* Content Details */
-.content-heading { border-left: 5px solid #00b14f; padding-left: 12px; font-size: 18px; margin-bottom: 20px; font-weight: 700; }
-.requirement-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-.req-label { font-weight: 600; font-size: 14px; }
-.req-tag { background: #f1f3f5; padding: 5px 15px; border-radius: 20px; font-size: 13px; color: #495057; }
-
-.description-section h3 { font-size: 16px; font-weight: 700; margin: 20px 0 10px 0; color: #333; }
-.desc-text { line-height: 1.6; color: #555; font-size: 15px; white-space: pre-line; }
-
-/* Sidebar Company */
-.company-header-flex { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; }
-.company-logo-img { 
-    width: 64px; height: 64px; border: 1px solid #eee; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden;
-}
-.company-name-box h4 { margin: 0; font-size: 16px; color: #333; }
-.pro-label { background: #ffede0; color: #f27024; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
-.company-meta-list p { font-size: 14px; color: #666; margin-bottom: 8px; }
-.view-company-link { 
-    display: block; text-align: center; color: #00b14f; 
-    text-decoration: none; margin-top: 15px; font-size: 14px; font-weight: 600;
+.btn-save-job:hover {
+    background: #f0fff4;
 }
 
-/* --- Thông tin chung (Xuống dòng dưới mỗi mục) --- */
-.general-info-card-right .gen-item { 
-    display: block; 
-    margin-bottom: 15px; 
-    font-size: 14px; 
+/* --- NỘI DUNG CHI TIẾT --- */
+.content-heading { 
+    border-left: 5px solid #00b14f; 
+    padding-left: 15px; 
+    font-size: 20px; 
+    margin: 0 0 25px 0; 
+    font-weight: 700; 
+    color: #333;
 }
-.general-info-card-right .gen-label { 
-    display: block; 
-    color: #666; 
-    margin-bottom: 4px; 
-}
-.general-info-card-right .gen-val { 
-    display: block; 
-    font-weight: 600; 
+
+.description-section { margin-bottom: 30px; }
+.description-section h3 { 
+    font-size: 17px; 
+    font-weight: 700; 
+    margin: 0 0 12px 0; 
     color: #333; 
 }
 
-.status-msg { text-align: center; padding: 50px; font-size: 18px; color: #666; }
+.desc-text { 
+    line-height: 1.8; 
+    color: #4a4a4a; 
+    font-size: 15px; 
+    white-space: pre-line; /* Giữ nguyên xuống dòng từ database */
+}
+
+/* --- SIDEBAR CÔNG TY --- */
+.company-header-flex { 
+    display: flex; 
+    gap: 15px; 
+    margin-bottom: 20px; 
+    align-items: center; 
+}
+
+.company-logo-img { 
+    width: 70px; 
+    height: 70px; 
+    border: 1px solid #eee; 
+    border-radius: 10px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: #fff;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.company-logo-img img { width: 100%; height: 100%; object-fit: contain; }
+
+.company-name-box h4 { 
+    margin: 0 0 5px 0; 
+    font-size: 17px; 
+    color: #333; 
+    line-height: 1.4;
+}
+
+.pro-label { 
+    background: #ffede0; 
+    color: #f27024; 
+    font-size: 11px; 
+    padding: 3px 10px; 
+    border-radius: 12px; 
+    font-weight: 700; 
+    text-transform: uppercase;
+}
+
+.company-meta-list p { 
+    font-size: 14px; 
+    color: #555; 
+    margin: 12px 0; 
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.view-company-link { 
+    display: block; 
+    text-align: center; 
+    color: #00b14f; 
+    text-decoration: none; 
+    margin-top: 20px; 
+    font-size: 15px; 
+    font-weight: 600;
+    padding: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.view-company-link:hover { color: #009643; }
+
+/* Trạng thái tải dữ liệu */
+.status-msg { 
+    text-align: center; 
+    padding: 100px 20px; 
+    font-size: 18px; 
+    color: #888; 
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 992px) {
+    .job-container-layout { flex-direction: column; }
+    .job-sidebar-column { min-width: 100%; }
+    .job-stats-container { gap: 20px; }
+}

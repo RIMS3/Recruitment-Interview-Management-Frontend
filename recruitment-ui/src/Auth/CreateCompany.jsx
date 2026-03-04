@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import "./CreateCompany.css";
+import { useNavigate } from "react-router-dom";
+
 
 const CreateCompany = () => {
+   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     taxCode: "",
@@ -26,16 +29,17 @@ const CreateCompany = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`
         },
         body: JSON.stringify(formData)
       });
-
+      
       const result = await response.json();
 
       if (response.ok) {
         alert("Tạo công ty thành công!");
         console.log(result);
+        navigate("/");
       } else {
         alert(result.message || "Có lỗi xảy ra");
       }
