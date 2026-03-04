@@ -51,8 +51,17 @@
     margin-bottom: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
+
 .job-main-title { font-size: 24px; color: #333; margin-bottom: 20px; font-weight: 700; }
-.job-stats-container { display: flex; justify-content: flex-start; gap: 35px; margin-bottom: 20px; flex-wrap: nowrap; }
+
+.job-stats-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 35px;
+    margin-bottom: 20px;
+    flex-wrap: nowrap;
+}
+
 .stat-box { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
 
 .stat-icon { 
@@ -74,12 +83,20 @@
 .job-deadline { font-size: 14px; color: #666; margin-bottom: 15px; }
 
 .job-actions { display: flex; gap: 12px; }
+
 .btn-apply-now {
     flex: 3; background: #00b14f; color: #fff; border: none; 
     padding: 14px; border-radius: 5px; font-weight: bold; cursor: pointer;
     transition: 0.3s;
 }
+
 .btn-apply-now:hover { background: #009643; }
+
+/* FIX: Thêm trạng thái khi đang xử lý để nút không bị click liên tục */
+.btn-apply-now:disabled {
+    background-color: #a5d6a7;
+    cursor: not-allowed;
+}
 
 .btn-save-job {
     flex: 1; border: 1px solid #00b14f; color: #00b14f; 
@@ -112,3 +129,7 @@
 .general-info-card-right .gen-val { display: block; font-weight: 600; color: #333; }
 
 .status-msg { text-align: center; padding: 50px; font-size: 18px; color: #666; }
+.toast-error {
+    background-color: #e53935 !important;
+    box-shadow: 0 10px 25px rgba(229, 57, 53, 0.3);
+}
