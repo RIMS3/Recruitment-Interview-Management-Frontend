@@ -31,50 +31,45 @@ const LoginForm = () => {
 
 
   // ================= GOOGLE LOGIN (GIỮ NGUYÊN) =================
-  async function handleCredentialResponse(response) {
-    try {
-      const res = await fetch("https://localhost:7272/api/Auth/google", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          idToken: response.credential,
-        }),
-      });
+async function handleCredentialResponse(response) {
+  try {
+    const res = await fetch("https://localhost:7272/api/Auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken: response.credential }),
+    });
 
-      const text = await res.text();
-      const data = text ? JSON.parse(text) : {};
+    const data = await res.json(); // Sử dụng trực tiếp res.json()
 
-      if (!res.ok) {
-        alert(data.message || "Đăng nhập Google thất bại!");
-        return;
-      }
+    if (!res.ok) {
+      alert(data.message || "Đăng nhập Google thất bại!");
+      return;
+    }
 
-      // Lưu localStorage
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("email", data.email);
-      localStorage.setItem("fullName", data.fullName);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("userId", data.userId);
+    // ✅ Bây giờ data đã có đầy đủ userId và role từ Backend trả về
+    localStorage.setItem("accessToken", data.accessToken);
+    localStorage.setItem("email", data.email);
+    localStorage.setItem("fullName", data.fullName);
+    localStorage.setItem("role", data.role);
+    localStorage.setItem("userId", data.userId);
 
-      // Cập nhật context
-      setUser({
-        id: data.userId,
-        token: data.accessToken,
-        email: data.email,
-        fullName: data.fullName,
-        role: data.role,
-      });
+    // Cập nhật context
+    setUser({
+      id: data.userId,
+      token: data.accessToken,
+      email: data.email,
+      fullName: data.fullName,
+      role: data.role,
+    });
 
-      // 🔥 THÊM LOGIC ROLE
-      if (data.role === 0) {
-        navigate("/select-role");
-      } else {
-        navigate("/");
-      }
-    } catch (err) {
-      console.error("Google login error:", err);
+    // 🔥 ĐIỀU HƯỚNG: Role 0 là chưa chọn vai trò
+    if (data.role === 0) {
+      navigate("/select-role");
+    } else {
+      navigate("/");
+    }
+  } catch (err) {
+    console.error("Google login error:", err);
       alert("Không thể kết nối server");
     }
   }

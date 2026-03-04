@@ -4,6 +4,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // thêm dòng này
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -21,10 +22,12 @@ export const AuthProvider = ({ children }) => {
         role: role !== null ? parseInt(role) : null,
       });
     }
+
+    setLoading(false); // rất quan trọng
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -3,7 +3,12 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+
+  // 🟡 Đang load user từ localStorage → chưa quyết định gì
+  if (loading) {
+    return null; // hoặc <div>Loading...</div>
+  }
 
   // ❌ Chưa login
   if (!user) {
@@ -15,7 +20,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/select-role" replace />;
   }
 
-  // ❌ Có yêu cầu role cụ thể
+  // ❌ Không đúng role
   if (requiredRole && user.role !== requiredRole) {
     return <Navigate to="/" replace />;
   }

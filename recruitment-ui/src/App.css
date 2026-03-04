@@ -1,25 +1,35 @@
-/* App shell styles scoped to navbar/layout only to avoid global CSS collisions */
+/* 1. KHAI BÁO BIẾN - Quản lý tập trung màu sắc */
 :root {
-  --primary: #00b14f;
-  --secondary: #212f3f;
+  /* Màu chủ đạo lấy từ logo IT LOCAK */
+  --primary: #5c67f2;      /* Màu xanh dương logo */
+  --primary-light: #eef2ff; /* Màu nền xanh cực nhẹ */
+  --primary-hover: #4f46e5;
+  --secondary: #212f3f;    /* Màu chữ/nền phụ */
+  --white: #ffffff;
+  --danger: #e11d48;       /* Màu đỏ cho Logout */
+  --border-color: #eee;
 }
 
-.app-container {
-  width: 100%;
+/* 2. CÀI ĐẶT CHUNG */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+.app-container, 
 .app-main-content {
   width: 100%;
 }
 
-/* Navbar */
+/* 3. NAVBAR LAYOUT */
 .main-navbar {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   height: 72px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -35,6 +45,7 @@
   padding: 0 20px;
 }
 
+/* 4. LOGO & MENU */
 .logo-text {
   font-size: 22px;
   font-weight: 800;
@@ -47,7 +58,7 @@
 
 .navbar-logo-box {
   background: var(--primary);
-  color: #fff;
+  color: var(--white);
   padding: 2px 10px;
   border-radius: 6px;
   font-family: serif;
@@ -71,11 +82,62 @@
   color: var(--primary);
 }
 
+/* 5. AUTH SECTION (Nút bấm & Profile) */
 .nav-auth {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 15px;
 }
 
+/* Container Xin chào - Màu xanh dương đồng bộ logo */
+.user-profile-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  background: var(--primary-light);
+  border: 1.5px solid var(--primary);
+  border-radius: 99px;
+  transition: all 0.3s ease;
+}
+
+.user-profile-nav:hover {
+  background: var(--white);
+  box-shadow: 0 4px 12px rgba(92, 103, 242, 0.15);
+}
+
+/* Avatar hiển thị ảnh hoặc chữ cái đầu */
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  overflow: hidden; /* Cắt ảnh theo hình tròn */
+  box-shadow: 0 2px 5px rgba(92, 103, 242, 0.2);
+}
+
+.nav-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.welcome-text {
+  font-size: 14px;
+  color: var(--secondary);
+}
+
+.welcome-text strong {
+  font-weight: 700;
+}
+
+/* 6. BUTTONS */
 .navbar-btn-login {
   padding: 10px 24px;
   border-radius: 8px;
@@ -88,21 +150,40 @@
 }
 
 .navbar-btn-login:hover {
-  background: rgba(0, 177, 79, 0.05);
+  background: var(--primary-light);
 }
 
 .navbar-btn-post {
   padding: 10px 24px;
   border-radius: 8px;
   background: var(--secondary);
-  color: #fff;
+  color: var(--white);
   border: none;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(33, 47, 63, 0.2);
+  transition: all 0.2s;
 }
 
 .navbar-btn-post:hover {
   background: #2c3e50;
   transform: translateY(-1px);
+}
+
+.navbar-btn-logout {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #fee2e2;
+  background: #fff1f2;
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navbar-btn-logout:hover {
+  background: var(--danger);
+  color: var(--white);
+  border-color: var(--danger);
 }
