@@ -1,76 +1,262 @@
-.it-locak-container {
-  background-color: #0b0f1a; /* Nền tối đậm */
+/* Tổng thể Layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  padding: 40px;
-  color: #ffffff;
+  background-color: #f8fafc;
   font-family: 'Inter', sans-serif;
 }
 
-.it-locak-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 5px;
+.app-wrapper {
+  padding: 40px 80px;
+  flex: 1; /* Đẩy footer xuống đáy trang */
 }
 
-.subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 30px; }
+/* Header Section */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 32px;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  border-left: 8px solid #6366f1;
+}
 
-.it-locak-card {
-  background: #161d31; /* Màu card từ trang chủ */
-  border: 1px solid #1e293b;
-  border-radius: 12px;
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.waiting-count {
+  margin-top: 8px;
+  font-size: 15px;
+  color: #64748b;
+}
+
+.count-badge {
+  background: #6366f1;
+  color: white;
+  padding: 2px 12px;
+  border-radius: 99px;
+  font-weight: 700;
+}
+
+/* Filters & Search */
+.app-filters {
+  display: flex;
+  gap: 16px;
+}
+
+/* Tìm và thay thế đoạn này */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  /* Đẩy vào sâu hơn (28px thay vì 20px) */
+  left: 28px; 
+  color: #94a3b8;
+  z-index: 10;
+  /* Đảm bảo icon luôn ở giữa theo chiều dọc */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.search-input {
+  min-width: 350px;
+  /* Tăng padding-left lên 64px để chữ bắt đầu sau icon một khoảng thoáng */
+  padding: 14px 14px 14px 64px !important; 
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  font-size: 15px !important;
+  color: #1e293b !important;
+  background: white !important;
+}
+
+.search-input:focus {
+  border-color: #6366f1 !important;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+}
+.status-select {
+  padding: 0 20px;
+  border-radius: 16px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Grid Layout */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+/* Candidate Card */
+.candidate-card {
+  background: white;
+  border-radius: 24px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
 
-.it-locak-table {
-  width: 100%;
-  border-collapse: collapse;
+.candidate-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
 }
 
-.it-locak-table th {
-  background: #1e2745;
-  padding: 15px 20px;
-  text-align: left;
-  font-size: 12px;
-  color: #94a3b8;
-  text-transform: uppercase;
+.card-top {
+  padding: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 
-.it-locak-table td {
-  padding: 18px 20px;
-  border-bottom: 1px solid #1e293b;
+.avatar, .avatar-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  object-fit: cover;
 }
 
-.candidate-name {
-  color: #5c67f2; /* Màu Indigo chủ đạo */
-  font-weight: 600;
-  cursor: pointer;
+.avatar {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
 }
 
-.candidate-email { font-size: 12px; color: #64748b; }
+.candidate-meta h4 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 17px;
+}
 
-.it-locak-badge {
-  padding: 4px 12px;
-  border-radius: 20px;
+.candidate-meta .email {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.card-middle {
+  padding: 0 24px 24px;
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.job-info .label {
+  display: block;
   font-size: 11px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.job-title {
+  font-weight: 700;
+  color: #334155;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 
-.status-0 { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-.status-1 { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.status-2 { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.status-0 { background: #fffbeb; color: #d97706; }
+.status-1 { background: #f0fdf4; color: #16a34a; }
+.status-2 { background: #fef2f2; color: #dc2626; }
 
-.action-btns { display: flex; gap: 8px; justify-content: flex-end; }
+.card-actions {
+  padding: 16px 24px;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
 
-.action-btns button {
-  background: #1e293b;
-  border: none;
-  color: white;
-  padding: 8px;
-  border-radius: 8px;
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  border: none;
   transition: 0.2s;
 }
 
-.btn-view:hover { background: #5c67f2; }
-.btn-accept:hover { background: #10b981; }
-.btn-reject:hover { background: #ef4444; }
+.btn-view { background: white; color: #475569; border: 1px solid #e2e8f0; }
+.btn-view:hover { background: #f1f5f9; }
+
+.decision-buttons { display: flex; gap: 8px; }
+.btn-accept { background: #10b981; color: white; }
+.btn-reject { background: #ef4444; color: white; }
+
+/* Main Footer */
+.main-footer {
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 80px 80px 40px;
+  margin-top: 60px;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 60px;
+}
+
+.footer-logo { color: #818cf8; font-size: 24px; font-weight: 800; margin-bottom: 20px; }
+.footer-section h4 { color: white; margin-bottom: 24px; font-size: 18px; }
+.footer-section ul { list-style: none; padding: 0; }
+.footer-section li { margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
+.footer-section li:hover { color: white; }
+
+.social-links { display: flex; gap: 20px; margin-top: 24px; }
+.icon-hover:hover { color: #818cf8; cursor: pointer; }
+
+.footer-bottom {
+  padding-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+/* Loading */
+.loading-box { text-align: center; padding: 100px; color: #64748b; }
+.spin { animation: rotate 1s linear infinite; margin-bottom: 16px; }
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
