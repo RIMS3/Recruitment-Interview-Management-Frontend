@@ -12,6 +12,7 @@ import SelectRole from "./Auth/SelectRole";
 import ProtectedRoute from "./Auth/ProtectedRoute";
 import RoleGuard from "./Auth/RoleGuard";
 import CreateCompany from "./Auth/CreateCompany";
+import ApplicationList from "./Applications/ApplicationList";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -34,7 +35,16 @@ const Navbar = () => {
 
         <ul className="nav-menu">
           <li>Việc làm</li>
-          <li>Hồ sơ & CV</li>
+          <li
+            onClick={() => {
+              if (user?.role === 3) {
+                navigate("/employer/applications");
+              }
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            Hồ sơ & CV
+          </li>
           <li>Công cụ</li>
           <li>Cẩm nang</li>
         </ul>
@@ -42,12 +52,29 @@ const Navbar = () => {
         <div className="nav-auth">
           {user ? (
             <>
-              <span style={{ marginRight: "15px" }}>
-                Xin chào {user.fullName}
-              </span>
+              <div className="user-profile-nav blue-theme">
+                <div className="nav-avatar">
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt="avatar"
+                      onError={(e) => {
+                        e.target.style.display = 'none'; // Ẩn ảnh nếu link lỗi
+                        e.target.nextSibling.style.display = 'flex'; // Hiện chữ cái đầu
+                      }}
+                    />
+                  ) : null}
+                  <div className="avatar-fallback" style={{ display: user.avatarUrl ? 'none' : 'flex' }}>
+                    {user.fullName?.charAt(0).toUpperCase()}
+                  </div>
+                </div>
+                <span className="welcome-text">
+                  Xin chào, <strong>{user.fullName}</strong>
+                </span>
+              </div>
 
               <button
-                className="navbar-btn-login"
+                className="navbar-btn-logout"
                 onClick={() => {
                   localStorage.clear();
                   setUser(null);
@@ -59,16 +86,10 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <button
-                className="navbar-btn-login"
-                onClick={() => navigate("/login")}
-              >
+              <button className="navbar-btn-login" onClick={() => navigate("/login")}>
                 Đăng nhập
               </button>
-
-              <button className="navbar-btn-post">
-                Đăng tuyển ngay
-              </button>
+              <button className="navbar-btn-post">Đăng tuyển ngay</button>
             </>
           )}
         </div>
@@ -85,13 +106,21 @@ function App() {
 
         <main className="app-main-content">
           <Routes>
-             <Route path="/"element={<RoleGuard><HomePage />
-                </RoleGuard>
-              }
+            <Route path="/" element={<RoleGuard><HomePage />
+            </RoleGuard>
+            }
             />
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/select-role" element={<SelectRole />} />
+            <Route
+              path="/employer/applications"
+              element={
+                <ProtectedRoute requiredRole={3}>
+                  <ApplicationList />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/joblist" element={<JobList />} />
             <Route path="/jobpostdetail/:id" element={<JobPostDetails />} />
             <Route path="/interview/:companyId" element={<InterviewPage />} />

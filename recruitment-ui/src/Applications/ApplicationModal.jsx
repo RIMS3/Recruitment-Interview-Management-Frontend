@@ -1,54 +1,108 @@
-import React from 'react';
-import { X, Briefcase, GraduationCap, Code, MapPin, DollarSign } from 'lucide-react';
-import './ApplicationModal.css';
+import React from "react";
+import { X, Check, XCircle, ExternalLink, Calendar, Mail, Briefcase } from "lucide-react";
+import "./ApplicationModal.css";
 
-const ApplicationModal = ({ isOpen, onClose, app }) => {
-  if (!isOpen || !app) return null;
+const ApplicationModal = ({ app, onClose, onAction }) => {
+  if (!app) return null;
+
+  const getStatusLabel = (status) => {
+    const labels = {
+      0: { text: "Chờ duyệt", class: "status-0" },
+      1: { text: "Đã chấp nhận", class: "status-1" },
+      2: { text: "Đã từ chối", class: "status-2" },
+    };
+    return labels[status] || { text: "", class: "" };
+  };
+
+  const statusInfo = getStatusLabel(app.status);
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="btn-close" onClick={onClose}><X /></button>
-        
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
         <div className="modal-header">
-          <div className="avatar">{app.fullName[0]}</div>
-          <div>
-            <h2>{app.candidateName}</h2>
-            <p className="indigo-text">{app.jobTitle}</p>
-          </div>
+          <h3>Thông tin ứng viên</h3>
+          <button className="close-btn" onClick={onClose}>
+            <X size={20} />
+          </button>
         </div>
 
+        {/* Profile Identity Section */}
         <div className="modal-body">
-          <div className="sidebar-info">
-            <div className="info-box">
-              <p><MapPin size={14}/> {app.address || "Chưa cập nhật"}</p>
-              <p><DollarSign size={14}/> {app.currentSalary?.toLocaleString()} VND</p>
+          <div className="modal-profile-card">
+            <div className="profile-main">
+              {app.candidateAvatar ? (
+                <img 
+                  src={app.candidateAvatar} 
+                  alt={app.candidateName} 
+                  className="modal-avatar-img"
+                  onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                />
+              ) : null}
+              <div className="avatar large" style={{ display: app.candidateAvatar ? 'none' : 'flex' }}>
+                {app.candidateName?.charAt(0).toUpperCase()}
+              </div>
+              <div className="profile-text">
+                <h4>{app.candidateName}</h4>
+                <div className="profile-subtext">
+                  <Mail size={14} />
+                  <span>{app.candidateEmail}</span>
+                </div>
+              </div>
             </div>
-            <a href={app.fileUrl} target="_blank" className="btn-download">Xem CV Gốc (PDF)</a>
           </div>
 
-          <div className="main-info">
-            <section>
-              <h3><Briefcase size={18}/> Kinh nghiệm</h3>
-              <div className="detail-card">
-                <strong>{app.experienceYears} năm kinh nghiệm</strong>
-                <p>{app.position}</p>
-              </div>
-            </section>
-            
-            <section>
-              <h3><GraduationCap size={18}/> Học vấn</h3>
-              <div className="detail-card">{app.educationSummary}</div>
-            </section>
-            
-            <section>
-              <h3><Code size={18}/> Kỹ năng chuyên môn</h3>
-              <div className="skills-flex">
-                {app.field?.split(',').map((s, i) => <span key={i} className="skill-tag">{s.trim()}</span>)}
-              </div>
-            </section>
+          {/* Details Section */}
+          <div className="info-grid">
+            <div className="info-row">
+              <label><Briefcase size={14} /> Vị trí ứng tuyển</label>
+              <span>{app.jobTitle}</span>
+            </div>
+
+            <div className="info-row">
+              <label><Calendar size={14} /> Ngày nộp hồ sơ</label>
+              <span>{new Date(app.appliedAt).toLocaleDateString('vi-VN')}</span>
+            </div>
+
+            <div className="info-row">
+              <label>Trạng thái hiện tại</label>
+              <span className={`status ${statusInfo.class}`}>
+                {statusInfo.text}
+              </span>
+            </div>
           </div>
+
+          {/* CV Button */}
+          <a
+            href={app.cvUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cv-link-btn"
+          >
+            <span>Xem CV chi tiết</span>
+            <ExternalLink size={18} />
+          </a>
         </div>
+
+        {/* Action Buttons */}
+        {app.status === 0 && (
+          <div className="modal-footer">
+            <button 
+              className="btn-modal btn-modal-reject" 
+              onClick={() => onAction(app.applicationId, 2)}
+            >
+              <XCircle size={18} />
+              Từ chối
+            </button>
+            <button 
+              className="btn-modal btn-modal-accept" 
+              onClick={() => onAction(app.applicationId, 1)}
+            >
+              <Check size={18} />
+              Chấp nhận hồ sơ
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
