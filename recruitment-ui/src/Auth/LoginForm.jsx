@@ -137,6 +137,10 @@ async function handleCredentialResponse(response) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("userId", data.userId);
 
+        if (data.candidateId) {
+            localStorage.setItem("candidateId", data.candidateId);
+        }
+
         setUser({
           id: data.userId,
           candidateId: data.candidateId,

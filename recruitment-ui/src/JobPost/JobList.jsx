@@ -1,15 +1,26 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSavedJobIds, toggleSavedJob } from '../Services/SavedJobsApi';
-import { DEV_BYPASS_LOGIN_TO_SAVE, DEV_CANDIDATE_ID, getCandidateIdFromSession } from '../Services/candidateSession';
+import { DEV_BYPASS_LOGIN_TO_SAVE, DEV_CANDIDATE_ID } from '../Services/candidateSession';
+import { AuthContext } from '../Auth/AuthContext'; // <-- Đã import AuthContext
 import './JobList.css';
 
 const JobList = () => {
     const navigate = useNavigate();
+    
+    // 1. Lấy thông tin user đăng nhập từ App.jsx truyền xuống
+    const { user } = useContext(AuthContext);
+
+    // 2. Tự động lấy ID chuẩn từ user
     const candidateId = useMemo(() => {
         if (DEV_BYPASS_LOGIN_TO_SAVE) return DEV_CANDIDATE_ID;
-        return getCandidateIdFromSession();
-    }, []);
+        
+        // Lấy candidateId hoặc id (đề phòng BE chưa đổi tên), nếu chưa đăng nhập thì null
+        const currentId = user?.candidateId || user?.id || null;
+        console.log("👉 ID Ứng viên hiện tại trong JobList:", currentId); // In ra để dễ check
+        
+        return currentId;
+    }, [user]);
 
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -125,6 +136,8 @@ const JobList = () => {
     const handleToggleSavedJob = async (e, rawJobId) => {
         e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài (không làm nhảy trang)
         const jobId = String(rawJobId);
+        
+        // 3. Đã có ID thật nên nó sẽ vượt qua ải này thành công!
         if (!candidateId) {
             alert('Bạn cần đăng nhập để lưu job.');
             return;
