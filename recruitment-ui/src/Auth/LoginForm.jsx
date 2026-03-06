@@ -31,46 +31,49 @@ const LoginForm = () => {
 
 
   // ================= GOOGLE LOGIN (GIỮ NGUYÊN) =================
-async function handleCredentialResponse(response) {
-  try {
-    const res = await fetch("https://localhost:7272/api/Auth/google", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken: response.credential }),
-    });
+  async function handleCredentialResponse(response) {
 
-    const data = await res.json(); // Sử dụng trực tiếp res.json()
+    const toastId = toast.loading("Đang đăng nhập bằng Google...");
 
-    if (!res.ok) {
-      alert(data.message || "Đăng nhập Google thất bại!");
-      return;
-    }
+    try {
+      const res = await fetch("https://localhost:7272/api/Auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken: response.credential }),
+      });
 
-    // ✅ Bây giờ data đã có đầy đủ userId và role từ Backend trả về
-    localStorage.setItem("accessToken", data.accessToken);
-    localStorage.setItem("email", data.email);
-    localStorage.setItem("fullName", data.fullName);
-    localStorage.setItem("role", data.role);
-    localStorage.setItem("userId", data.userId);
+      const data = await res.json();
 
-    // Cập nhật context
-    setUser({
-      id: data.userId,
-      token: data.accessToken,
-      email: data.email,
-      fullName: data.fullName,
-      role: data.role,
-    });
+      if (!res.ok) {
+        toast.error(data.message || "Đăng nhập Google thất bại!", { id: toastId });
+        return;
+      }
 
-    // 🔥 ĐIỀU HƯỚNG: Role 0 là chưa chọn vai trò
-    if (data.role === 0) {
-      navigate("/select-role");
-    } else {
-      navigate("/");
-    }
-  } catch (err) {
-    console.error("Google login error:", err);
-      alert("Không thể kết nối server");
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("email", data.email);
+      localStorage.setItem("fullName", data.fullName);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("userId", data.userId);
+
+      setUser({
+        id: data.userId,
+        token: data.accessToken,
+        email: data.email,
+        fullName: data.fullName,
+        role: data.role,
+      });
+
+      toast.success("Đăng nhập Google thành công!", { id: toastId });
+
+      if (data.role === 0) {
+        navigate("/select-role");
+      } else {
+        navigate("/");
+      }
+
+    } catch (err) {
+      console.error("Google login error:", err);
+      toast.error("Không thể kết nối server", { id: toastId });
     }
   }
 
@@ -130,6 +133,7 @@ async function handleCredentialResponse(response) {
 
       // LOGIN SUCCESS
       if (isLogin) {
+        toast.success("Đăng nhập thành công!", { id: toastId });
 
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("email", data.email);
