@@ -16,6 +16,7 @@ const ListAppliedJobs = () => {
 
     const fetchAppliedJobs = async () => {
         try {
+            // API trả về danh sách các công việc ứng viên đã nộp
             const response = await fetch(`https://localhost:7272/api/ViewListJobApply/candidate/${candidateId}`);
             const data = await response.json();
             setAppliedList(data);
@@ -63,11 +64,22 @@ const ListAppliedJobs = () => {
                 <div className="job-grid">
                     {appliedList.map((item) => {
                         const status = getStatusDetails(item.status);
+                        
+                        // QUAN TRỌNG: Map theo jobId để link không bị undefined
+                        // Ưu tiên lấy 'jobId' (mã bắt đầu bằng f666... hoặc f333...)
+                        const targetJobId = item.jobId || item.id || item.idJobPost;
+
                         return (
                             <div key={item.applicationId} className="job-item-card">
                                 <div 
                                     className="job-info-left" 
-                                    onClick={() => navigate(`/jobpostdetail/${item.id || item.jobId}`)}
+                                    onClick={() => {
+                                        if (targetJobId) {
+                                            navigate(`/jobpostdetail/${targetJobId}`);
+                                        } else {
+                                            alert("Lỗi: Không tìm thấy JobId cho công việc này!");
+                                        }
+                                    }}
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <h3 className="job-name">{item.jobTitle}</h3>
@@ -82,7 +94,7 @@ const ListAppliedJobs = () => {
                                     <button 
                                         className="btn-unapply" 
                                         onClick={(e) => {
-                                            e.stopPropagation();
+                                            e.stopPropagation(); // Không kích hoạt navigate của thẻ cha khi bấm xóa
                                             handleUnapply(item.applicationId);
                                         }}
                                     >
@@ -96,7 +108,7 @@ const ListAppliedJobs = () => {
                 </div>
             </div>
 
-            {/* NÚT THOÁT Ở GÓC DƯỚI BÊN TRÁI */}
+            {/* NÚT THOÁT QUAY LẠI (GÓC DƯỚI BÊN TRÁI) */}
             <button 
                 className="floating-exit-btn" 
                 title="Quay lại"
