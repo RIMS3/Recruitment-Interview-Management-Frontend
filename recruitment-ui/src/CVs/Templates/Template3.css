@@ -1,0 +1,222 @@
+/* =========================================================
+   STYLE DÀNH RIÊNG CHO TEMPLATE 3 
+========================================================= */
+.template-3 {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  background: transparent;
+  overflow: hidden; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.t3-header {
+  background-color: #51680e;
+  color: white;
+  padding: 30px 40px;
+  text-align: right;
+  min-height: 120px;
+  box-sizing: border-box;
+}
+
+.t3-name {
+  font-size: 36px;
+  font-weight: 900;
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+.t3-position {
+  font-size: 18px;
+  font-weight: normal;
+}
+
+/* Body */
+.t3-body {
+  display: flex;
+  flex: 1;
+}
+
+/* Cột trái */
+.t3-left-col {
+  width: 62%;
+  background-color: #FDF7E7; /* Màu vàng kem */
+  padding: 40px 30px;
+  color: #333;
+}
+
+.golden-text {
+  color: #D39C2E; /* Màu vàng cam */
+}
+
+.t3-section {
+  margin-bottom: 35px;
+}
+
+.t3-section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #D39C2E;
+  padding-bottom: 5px;
+  display: inline-block;
+  width: 100%;
+}
+
+.t3-title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.t3-icon-bg {
+  background-color: #D39C2E;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+}
+
+.t3-text {
+  font-size: 13px;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+.t3-item {
+  margin-bottom: 20px;
+}
+
+.t3-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.t3-date {
+  font-size: 13px;
+  color: #555;
+}
+
+.t3-bold-text {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.t3-bullet-list {
+  padding-left: 15px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.t3-bullet-list li {
+  margin-bottom: 5px;
+  text-align: justify;
+}
+
+/* Cột phải */
+.t3-right-col {
+  width: 38%;
+  background-color: #3D3D3D; /* Màu xám đậm */
+  padding: 40px 30px;
+  color: white;
+}
+
+.t3-avatar-wrapper {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.t3-avatar {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  object-fit: cover;
+}
+
+.t3-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+  font-size: 13px;
+}
+
+.t3-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.t3-icon-golden {
+  color: #D39C2E;
+  font-size: 16px;
+}
+
+.t3-icon-golden-lg {
+  color: #D39C2E;
+  font-size: 24px;
+}
+
+.t3-right-section {
+  margin-bottom: 30px;
+}
+
+.t3-right-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid white;
+}
+
+.t3-right-item {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.t3-right-item strong {
+  display: block;
+  margin-bottom: 3px;
+}
+
+/* Thanh Progress Bar Kỹ năng */
+.t3-skill-item {
+  margin-bottom: 15px;
+}
+
+.t3-skill-name {
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.t3-progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #666;
+}
+
+.t3-progress {
+  height: 100%;
+  background-color: #D39C2E;
+}
+
+/* Hover effect for editable fields */
+.template-3 [contenteditable="true"]:hover {
+  border: 1px dashed rgba(128, 128, 128, 0.4);
+  background: rgba(128, 128, 128, 0.05);
+  border-radius: 2px;
+}
+.t3-right-col [contenteditable="true"]:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}

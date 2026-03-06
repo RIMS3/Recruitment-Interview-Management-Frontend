@@ -1,21 +1,33 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSavedJobs, unsaveJob } from '../Services/SavedJobsApi';
-import { DEV_BYPASS_LOGIN_TO_SAVE, DEV_CANDIDATE_ID, getCandidateIdFromSession } from '../Services/candidateSession';
+import { DEV_BYPASS_LOGIN_TO_SAVE, DEV_CANDIDATE_ID } from '../Services/candidateSession';
+import { AuthContext } from '../Auth/AuthContext'; // <-- Import AuthContext giống JobList
 import './SavedJobs.css';
 
 const SavedJobs = () => {
   const navigate = useNavigate();
+  
+  // 1. Lấy thông tin user đăng nhập từ Context
+  const { user } = useContext(AuthContext);
+
+  // 2. Tự động lấy ID chuẩn từ user
   const candidateId = useMemo(() => {
     if (DEV_BYPASS_LOGIN_TO_SAVE) return DEV_CANDIDATE_ID;
-    return getCandidateIdFromSession();
-  }, []);
+    
+    // Lấy candidateId hoặc id, nếu chưa đăng nhập thì null
+    const currentId = user?.candidateId || user?.id || null;
+    console.log("👉 ID dùng để load trang Saved Jobs:", currentId); // Log ra để check
+    
+    return currentId;
+  }, [user]);
   
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      // Nếu không có ID thì dừng luôn (chưa đăng nhập)
       if (!candidateId) {
         setLoading(false);
         return;
@@ -78,12 +90,13 @@ const SavedJobs = () => {
           </div>
         )}
 
+        {/* Đã sửa lại logic hiển thị nút lúc trống để nó không bị lọt ra ngoài */}
         {!loading && jobs.length === 0 && (
           <div className="empty-state">
             <div className="empty-icon">📁</div>
             <h3>Chưa có việc làm nào được lưu</h3>
             <p>Hãy tiếp tục tìm kiếm và lưu lại những công việc phù hợp với bạn nhé.</p>
-            <button className="btn-primary mt-3" onClick={() => navigate('/joblist')}>
+            <button className="btn-primary mt-3" onClick={() => navigate('/joblist')} style={{ padding: '10px 20px', borderRadius: '5px', cursor: 'pointer' }}>
               Khám phá việc làm ngay
             </button>
           </div>
