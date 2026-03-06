@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-// Thêm useNavigate vào đây
 import { useParams, Link, useNavigate } from 'react-router-dom'; 
 import './JobDetails.css';
 
@@ -16,6 +15,12 @@ const JobPostDetails = () => {
     const [isApplying, setIsApplying] = useState(false);
 
     useEffect(() => {
+        // Kiểm tra ID để tránh lỗi gọi API với giá trị undefined
+        if (!id || id === 'undefined') {
+            setLoading(false);
+            return;
+        }
+
         const userId = localStorage.getItem("userId");
         const initData = async () => {
             try {
@@ -110,7 +115,7 @@ const JobPostDetails = () => {
 
             <nav className="job-breadcrumb">
                 <Link to="/">Việc làm</Link> <span>/</span> 
-                <Link to="/jobs">IT Phần mềm</Link> <span>/</span> 
+                <Link to="/joblist">IT Phần mềm</Link> <span>/</span> 
                 {job.title}
             </nav>
 
@@ -188,7 +193,18 @@ const JobPostDetails = () => {
                 </div>
             </div>
 
-            {/* NÚT FIXED - Đã thêm onClick để điều hướng sang trang danh sách ứng tuyển */}
+            {/* NÚT THOÁT QUAY LẠI JOBLIST (GÓC DƯỚI BÊN TRÁI) */}
+            <button 
+                className="floating-back-btn" 
+                title="Quay lại danh sách"
+                onClick={() => navigate('/joblist')}
+            >
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#00b14f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+            </button>
+
+            {/* NÚT FIXED XEM DANH SÁCH ỨNG TUYỂN (GÓC DƯỚI BÊN PHẢI) */}
             <button 
                 className="floating-user-add-btn" 
                 title="Danh sách ứng tuyển"
