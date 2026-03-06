@@ -7,17 +7,27 @@ const ListAppliedJobs = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // CandidateId mẫu theo yêu cầu hệ thống của bạn
-    const candidateId = "CCB1695B-D1F3-4CFD-B475-8D7B7BDA3DDE";
+    // 1. Lấy candidateId từ localStorage thay vì fix cứng
+    const candidateId = localStorage.getItem('candidateId'); 
 
     useEffect(() => {
+        // 2. Kiểm tra nếu không có candidateId (chưa đăng nhập) thì đẩy về trang login hoặc báo lỗi
+        if (!candidateId) {
+            console.error("Không tìm thấy Candidate ID. Vui lòng đăng nhập.");
+            setLoading(false);
+            // navigate('/login'); // Bạn có thể mở comment này nếu muốn tự động chuyển hướng
+            return;
+        }
+        
         fetchAppliedJobs();
-    }, []);
+    }, [candidateId]); // Chạy lại nếu candidateId thay đổi
 
     const fetchAppliedJobs = async () => {
         try {
             // API trả về danh sách các công việc ứng viên đã nộp
             const response = await fetch(`https://localhost:7272/api/ViewListJobApply/candidate/${candidateId}`);
+            if (!response.ok) throw new Error("Lỗi khi tải dữ liệu từ server");
+            
             const data = await response.json();
             setAppliedList(data);
         } catch (error) {
@@ -48,7 +58,7 @@ const ListAppliedJobs = () => {
 
     const getStatusDetails = (status) => {
         switch (status) {
-            case 0: return { text: "Pending", class: "status-pending" }; //
+            case 0: return { text: "Pending", class: "status-pending" };
             case 1: return { text: "Accepted", class: "status-accepted" };
             case 2: return { text: "Rejected", class: "status-rejected" };
             default: return { text: "Unknown", class: "status-default" };
@@ -56,59 +66,62 @@ const ListAppliedJobs = () => {
     };
 
     if (loading) return <div className="status-loading">Đang tải danh sách hồ sơ...</div>;
+    
+    // 3. Hiển thị thông báo nếu không có dữ liệu hoặc chưa đăng nhập
+    if (!candidateId) return <div className="status-loading">Vui lòng đăng nhập để xem danh sách.</div>;
 
     return (
         <div className="list-applied-page">
             <div className="content-container">
                 <h2 className="main-title">Việc làm đã ứng tuyển</h2>
                 <div className="job-grid">
-                    {appliedList.map((item) => {
-                        const status = getStatusDetails(item.status);
-                        
-                        // QUAN TRỌNG: Map theo jobId để link không bị undefined
-                        // Ưu tiên lấy 'jobId' (mã bắt đầu bằng f666... hoặc f333...)
-                        const targetJobId = item.jobId || item.id || item.idJobPost;
+                    {appliedList.length > 0 ? (
+                        appliedList.map((item) => {
+                            const status = getStatusDetails(item.status);
+                            const targetJobId = item.jobId || item.id || item.idJobPost;
 
-                        return (
-                            <div key={item.applicationId} className="job-item-card">
-                                <div 
-                                    className="job-info-left" 
-                                    onClick={() => {
-                                        if (targetJobId) {
-                                            navigate(`/jobpostdetail/${targetJobId}`);
-                                        } else {
-                                            alert("Lỗi: Không tìm thấy JobId cho công việc này!");
-                                        }
-                                    }}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <h3 className="job-name">{item.jobTitle}</h3>
-                                    <p className="comp-name">{item.companyName}</p>
-                                    <span className="apply-date">Ngày nộp: {new Date(item.appliedAt).toLocaleDateString('vi-VN')}</span>
-                                </div>
-                                
-                                <div className="job-action-right">
-                                    <div className={`status-tag ${status.class}`}>
-                                        {status.text}
-                                    </div>
-                                    <button 
-                                        className="btn-unapply" 
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Không kích hoạt navigate của thẻ cha khi bấm xóa
-                                            handleUnapply(item.applicationId);
+                            return (
+                                <div key={item.applicationId} className="job-item-card">
+                                    <div 
+                                        className="job-info-left" 
+                                        onClick={() => {
+                                            if (targetJobId) {
+                                                navigate(`/jobpostdetail/${targetJobId}`);
+                                            } else {
+                                                alert("Lỗi: Không tìm thấy JobId cho công việc này!");
+                                            }
                                         }}
+                                        style={{ cursor: 'pointer' }}
                                     >
-                                        <svg viewBox="0 0 24 24" width="16" fill="currentColor" style={{marginRight: '4px'}}><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                                        Xóa
-                                    </button>
+                                        <h3 className="job-name">{item.jobTitle}</h3>
+                                        <p className="comp-name">{item.companyName}</p>
+                                        <span className="apply-date">Ngày nộp: {new Date(item.appliedAt).toLocaleDateString('vi-VN')}</span>
+                                    </div>
+                                    
+                                    <div className="job-action-right">
+                                        <div className={`status-tag ${status.class}`}>
+                                            {status.text}
+                                        </div>
+                                        <button 
+                                            className="btn-unapply" 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleUnapply(item.applicationId);
+                                            }}
+                                        >
+                                            <svg viewBox="0 0 24 24" width="16" fill="currentColor" style={{marginRight: '4px'}}><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                            Xóa
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })
+                    ) : (
+                        <div className="no-data">Bạn chưa ứng tuyển công việc nào.</div>
+                    )}
                 </div>
             </div>
 
-            {/* NÚT THOÁT QUAY LẠI (GÓC DƯỚI BÊN TRÁI) */}
             <button 
                 className="floating-exit-btn" 
                 title="Quay lại"
