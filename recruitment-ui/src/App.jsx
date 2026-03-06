@@ -13,7 +13,10 @@ import ProtectedRoute from "./Auth/ProtectedRoute";
 import RoleGuard from "./Auth/RoleGuard";
 import CreateCompany from "./Auth/CreateCompany";
 import ApplicationList from "./Applications/ApplicationList";
-
+import AdminDashboard from './Dashboard/AdminDashboard';
+import CandidateProfile from "./CandidateProfile"; 
+import EmployerProfile from "./EmployerProfile";
+import UserProfile from "./UserProfile";
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,6 +37,9 @@ const Navbar = () => {
         </Link>
 
         <ul className="nav-menu">
+          <li onClick={() => navigate("/admin/dashboard")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
+      Quản trị hệ thống
+    </li>
           <li>Việc làm</li>
           <li
             onClick={() => {
@@ -52,15 +58,26 @@ const Navbar = () => {
         <div className="nav-auth">
           {user ? (
             <>
-              <div className="user-profile-nav blue-theme">
+              <div 
+                className="user-profile-nav blue-theme"
+                style={{ cursor: "pointer" }} 
+                onClick={() => {
+                  if (user.role === 2) {
+                    navigate("/candidate-profile"); // Ứng viên
+                  } else if (user.role === 3) {
+                    navigate("/employer-profile"); // Nhà tuyển dụng
+                  }
+                
+                }}
+              >
                 <div className="nav-avatar">
                   {user.avatarUrl ? (
                     <img
                       src={user.avatarUrl}
                       alt="avatar"
                       onError={(e) => {
-                        e.target.style.display = 'none'; // Ẩn ảnh nếu link lỗi
-                        e.target.nextSibling.style.display = 'flex'; // Hiện chữ cái đầu
+                        e.target.style.display = 'none'; 
+                        e.target.nextSibling.style.display = 'flex'; 
                       }}
                     />
                   ) : null}
@@ -125,7 +142,17 @@ function App() {
             <Route path="/jobpostdetail/:id" element={<JobPostDetails />} />
             <Route path="/interview/:companyId" element={<InterviewPage />} />
             <Route path="/interviews" element={<InterviewPage />} />
-
+            <Route path="/candidate-profile" element={<CandidateProfile />} />
+            <Route path="/employer-profile" element={<EmployerProfile />} />
+            <Route path="/user-profile" element={<UserProfile />} />
+<Route 
+  path="/admin/dashboard" 
+  element={
+    <ProtectedRoute requiredRole={1}> {/* Giả sử Admin là Role 1 */}
+      <AdminDashboard />
+    </ProtectedRoute>
+  } 
+/>
             <Route
               path="/saved-jobs"
               element={
@@ -141,5 +168,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;

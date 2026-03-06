@@ -65,7 +65,8 @@ async function handleCredentialResponse(response) {
     // 🔥 ĐIỀU HƯỚNG: Role 0 là chưa chọn vai trò
     if (data.role === 0) {
       navigate("/select-role");
-    } else {
+    } else if (data.role === 1) {
+        navigate("/admin/dashboard"); // Admin -> Dashboardelse {
       navigate("/");
     }
   } catch (err) {
