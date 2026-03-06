@@ -42,16 +42,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      {/* <Route
-        path="/create-company"
-        element={
-          <ProtectedRoute requiredRole={3}>
-            <CreateCompany />
-          </ProtectedRoute>
-        }
-      /> */}
       {/* TEST FRONTEND ONLY */}
-<Route path="/create-company" element={<CreateCompany />} />
+      <Route path="/create-company" element={<CreateCompany />} />
 
       {/* Default */}
       <Route path="*" element={<Navigate to="/jobs" replace />} />
