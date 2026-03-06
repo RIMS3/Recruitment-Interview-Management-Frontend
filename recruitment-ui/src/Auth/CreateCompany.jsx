@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import "./CreateCompany.css";
 import { useNavigate } from "react-router-dom";
-
+import toast from "react-hot-toast";
 
 const CreateCompany = () => {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     taxCode: "",
@@ -24,6 +25,13 @@ const CreateCompany = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.name) {
+      toast.error("Vui lòng nhập tên công ty");
+      return;
+    }
+
+    const toastId = toast.loading("Đang tạo công ty...");
+
     try {
       const response = await fetch("https://localhost:7272/api/companies", {
         method: "POST",
@@ -33,19 +41,30 @@ const CreateCompany = () => {
         },
         body: JSON.stringify(formData)
       });
-      
+
       const result = await response.json();
 
       if (response.ok) {
-        alert("Tạo công ty thành công!");
+
+        toast.success("Tạo công ty thành công!", { id: toastId });
+
         console.log(result);
-        navigate("/");
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1200);
+
       } else {
-        alert(result.message || "Có lỗi xảy ra");
+
+        toast.error(result.message || "Có lỗi xảy ra", { id: toastId });
+
       }
+
     } catch (error) {
+
       console.error(error);
-      alert("Không thể kết nối server");
+      toast.error("Không thể kết nối server", { id: toastId });
+
     }
   };
 

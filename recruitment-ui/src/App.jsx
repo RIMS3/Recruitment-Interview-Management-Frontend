@@ -16,6 +16,9 @@ import CVs from "./CVs/CVs";
 import CVTemplates from "./CVs/CVTemplates";
 import CreateCV from "./CVs/CreateCV";
 import ApplicationList from "./Applications/ApplicationList";
+import { Toaster } from "react-hot-toast";
+
+
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -99,9 +102,19 @@ const Navbar = () => {
 function App() {
   return (
     <Router>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            fontSize: "16px",
+            padding: "16px 24px"
+          }
+        }}
+      />
       <div className="app-container">
         <Navbar />
-
+        
         <main className="app-main-content">
           <Routes>
             <Route path="/" element={<RoleGuard><HomePage />
