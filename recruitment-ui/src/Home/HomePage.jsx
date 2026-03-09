@@ -56,7 +56,8 @@ const HomePage = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch('https://localhost:7272/api/jobs');
+        // CẬP NHẬT: Sử dụng biến môi trường thay vì localhost cứng
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/jobs`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         setJobs(data);

@@ -41,7 +41,8 @@ const CVManagement = () => {
   useEffect(() => {
     const fetchTemplateImages = async () => {
       try {
-        const response = await fetch('https://localhost:7272/api/cvs/images');
+        // Cập nhật: Sử dụng biến môi trường
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/images`);
         if (response.ok) {
           const data = await response.json();
           setTemplateImages(data);
@@ -61,7 +62,8 @@ const CVManagement = () => {
         let realCandidateId = user?.candidateId; 
 
         if (!realCandidateId) {
-          const profileResponse = await fetch(`https://localhost:7272/api/cvs/my-candidate-id`, {
+          // Cập nhật: Sử dụng biến môi trường
+          const profileResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/my-candidate-id`, {
              headers: { 
                  'Accept': 'application/json',
                  'Authorization': `Bearer ${token}` 
@@ -69,16 +71,17 @@ const CVManagement = () => {
           });
           
           if (profileResponse.ok) {
-             const profileData = await profileResponse.json();
-             realCandidateId = profileData.candidateId; 
+              const profileData = await profileResponse.json();
+              realCandidateId = profileData.candidateId; 
           } else {
-             console.error("Lỗi API my-candidate-id, không thể lấy ID ứng viên");
-             setIsLoading(false);
-             return; 
+              console.error("Lỗi API my-candidate-id, không thể lấy ID ứng viên");
+              setIsLoading(false);
+              return; 
           }
         }
 
-        const response = await fetch(`https://localhost:7272/api/cvs/candidate/${realCandidateId}`, {
+        // Cập nhật: Sử dụng biến môi trường
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/candidate/${realCandidateId}`, {
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}` 
@@ -105,7 +108,6 @@ const CVManagement = () => {
 
   const handleToggleJobSearch = () => {
     setIsSearchingJob(!isSearchingJob);
-    // TODO: Có thể gọi API cập nhật trạng thái xuống backend ở đây
   };
 
   return (
@@ -153,7 +155,6 @@ const CVManagement = () => {
         </section>
 
         <aside className="sidebar">
-          {/* Card Thông tin User */}
           <div className="profile-card box-shadow">
             <div className="profile-info">
               <div className="avatar-lg"></div>
@@ -165,7 +166,6 @@ const CVManagement = () => {
             </div>
           </div>
 
-          {/* Card Bật Tắt Trạng Thái Tìm Việc (Sử dụng CSS bạn đã viết sẵn) */}
           <div className="profile-card box-shadow">
             <div className="toggle-row">
               <label className="switch">

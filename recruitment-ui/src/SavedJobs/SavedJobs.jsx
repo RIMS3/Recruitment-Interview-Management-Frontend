@@ -2,22 +2,22 @@ import React, { useEffect, useMemo, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSavedJobs, unsaveJob } from '../Services/SavedJobsApi';
 import { DEV_BYPASS_LOGIN_TO_SAVE, DEV_CANDIDATE_ID } from '../Services/candidateSession';
-import { AuthContext } from '../Auth/AuthContext'; // <-- Import AuthContext giống JobList
+import { AuthContext } from '../Auth/AuthContext'; 
 import './SavedJobs.css';
 
 const SavedJobs = () => {
   const navigate = useNavigate();
   
-  // 1. Lấy thông tin user đăng nhập từ Context
+  // 1. Lấy thông tin user đăng nhập từ AuthContext
   const { user } = useContext(AuthContext);
 
-  // 2. Tự động lấy ID chuẩn từ user
+  // 2. Tự động xác định Candidate ID dựa trên môi trường (Dev bypass hoặc Real user)
   const candidateId = useMemo(() => {
     if (DEV_BYPASS_LOGIN_TO_SAVE) return DEV_CANDIDATE_ID;
     
-    // Lấy candidateId hoặc id, nếu chưa đăng nhập thì null
+    // Ưu tiên lấy candidateId từ thông tin đăng nhập
     const currentId = user?.candidateId || user?.id || null;
-    console.log("👉 ID dùng để load trang Saved Jobs:", currentId); // Log ra để check
+    console.log("👉 ID dùng để load trang Saved Jobs:", currentId); 
     
     return currentId;
   }, [user]);
@@ -25,16 +25,20 @@ const SavedJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 3. Tải danh sách công việc đã lưu từ Backend
   useEffect(() => {
     const fetchData = async () => {
-      // Nếu không có ID thì dừng luôn (chưa đăng nhập)
+      // Nếu chưa đăng nhập (không có ID), không thực hiện gọi API
       if (!candidateId) {
         setLoading(false);
         return;
       }
 
       try {
+        // Hàm getSavedJobs bên trong đã được cập nhật để dùng VITE_API_BASE_URL
         const result = await getSavedJobs(candidateId);
+        
+        // Xử lý linh hoạt các kiểu trả về của API (Array trực tiếp hoặc Object chứa data)
         if (Array.isArray(result)) {
           setJobs(result);
         } else if (result && Array.isArray(result.data)) {
@@ -53,10 +57,13 @@ const SavedJobs = () => {
     fetchData();
   }, [candidateId]);
 
+  // 4. Xử lý bỏ lưu công việc
   const handleRemove = async (e, jobId) => {
-    e.stopPropagation(); // Ngăn chặn sự kiện click lan ra thẻ cha (không nhảy trang)
+    e.stopPropagation(); // Ngăn sự kiện click lan ra card cha
     try {
+      // Gọi service để xóa bản ghi lưu trữ trên DB
       await unsaveJob(candidateId, jobId);
+      // Cập nhật lại UI ngay lập tức bằng cách lọc bỏ job vừa xóa khỏi state
       setJobs((prev) => prev.filter((job) => String(job.idJobPost || job.jobId || job.id) !== String(jobId)));
     } catch (error) {
       console.error(error);
@@ -65,8 +72,7 @@ const SavedJobs = () => {
   };
 
   const handleApply = (e, jobId) => {
-    e.stopPropagation(); // Ngăn chặn nhảy trang khi bấm nút ứng tuyển
-    // Điều hướng sang trang chi tiết hoặc mở modal ứng tuyển tùy logic của bạn
+    e.stopPropagation(); 
     navigate(`/jobpostdetail/${jobId}`);
   };
 
@@ -90,7 +96,6 @@ const SavedJobs = () => {
           </div>
         )}
 
-        {/* Đã sửa lại logic hiển thị nút lúc trống để nó không bị lọt ra ngoài */}
         {!loading && jobs.length === 0 && (
           <div className="empty-state">
             <div className="empty-icon">📁</div>
@@ -121,15 +126,11 @@ const SavedJobs = () => {
                 
                 <div className="sj-content">
                   <div className="sj-header">
-                    <h3 className="sj-title">
-                      {job.title}
-                    </h3>
+                    <h3 className="sj-title">{job.title}</h3>
                     <div className="sj-salary">{salaryText}</div>
                   </div>
                   
-                  <div className="sj-company-name">
-                    HỆ THỐNG QUẢN LÝ TUYỂN DỤNG RIMS
-                  </div>
+                  <div className="sj-company-name">HỆ THỐNG QUẢN LÝ TUYỂN DỤNG RIMS</div>
                   
                   <div className="sj-tags">
                     <span className="sj-tag location">
@@ -142,10 +143,7 @@ const SavedJobs = () => {
                 </div>
 
                 <div className="sj-actions">
-                  <button 
-                    className="btn-apply"
-                    onClick={(e) => handleApply(e, currentJobId)}
-                  >
+                  <button className="btn-apply" onClick={(e) => handleApply(e, currentJobId)}>
                     Ứng tuyển
                   </button>
                   <button 

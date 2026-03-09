@@ -18,7 +18,8 @@ const CVTemplates = () => {
   useEffect(() => {
     const fetchTemplateImages = async () => {
       try {
-        const response = await fetch('https://localhost:7272/api/cvs/images');
+        // Sử dụng biến môi trường thay cho localhost cứng
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/images`);
         if (response.ok) {
           const imageUrls = await response.json(); 
           setTemplates(prevTemplates => prevTemplates.map((tpl, index) => {
@@ -48,11 +49,10 @@ const CVTemplates = () => {
       }
 
       // 2. GỌI API LẤY CANDIDATE ID TỪ BACKEND
-      // Lưu ý: Đảm bảo bạn đã viết API này bên Backend C# nhé
-      const profileRes = await fetch('https://localhost:7272/api/cvs/my-candidate-id', {
+      const profileRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/my-candidate-id`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`, // Truyền token để Backend nhận diện user
+          'Authorization': `Bearer ${token}`, 
           'Content-Type': 'application/json'
         }
       });
@@ -81,11 +81,9 @@ const CVTemplates = () => {
       formData.append('position', 'Vị trí ứng tuyển');
       formData.append('email', user?.email || '');
       formData.append('isDefault', 'true');
-      
-      // ✅ BỔ SUNG DÒNG NÀY ĐỂ BÁO CHO BACKEND BIẾT BẠN CHỌN MẪU NÀO
       formData.append('templateId', templateId); 
 
-      const response = await fetch('https://localhost:7272/api/cvs', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}` 
@@ -95,7 +93,6 @@ const CVTemplates = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // Chuyển hướng sang trang Edit với ID thật vừa được tạo
         navigate(`/create-cv/${data.id}`, { state: { selectedTemplate: templateId } });
       } else {
         const errorText = await response.text();
