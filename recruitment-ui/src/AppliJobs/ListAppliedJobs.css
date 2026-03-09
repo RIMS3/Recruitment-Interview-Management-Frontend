@@ -1,77 +1,223 @@
+/* --- TỔNG THỂ --- */
 .list-applied-page {
-    background-color: #f4f7f6;
+    background-color: #f8fafc; /* Màu nền hiện đại nhẹ nhàng */
     min-height: 100vh;
-    padding: 40px 20px;
-    display: flex;
-    justify-content: center;
-    position: relative;
+    padding: 60px 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .content-container {
     width: 100%;
-    max-width: 900px;
+    max-width: 950px;
+    margin: 0 auto;
 }
 
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 35px;
+}
+
+.main-title {
+    border-left: 6px solid #00b14f;
+    padding-left: 20px;
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.job-count {
+    color: #64748b;
+    font-size: 15px;
+}
+
+/* --- CARD CÔNG VIỆC --- */
 .job-item-card {
-    background: #fff;
+    background: #ffffff;
     padding: 24px;
-    border-radius: 16px;
+    border-radius: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
+.job-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    border-color: #dcfce7;
+}
+
+.job-info-left {
+    flex: 1;
+    cursor: pointer;
+}
+
+.job-name {
+    color: #059669;
+    font-size: 20px;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+}
+
+.comp-name {
+    color: #475569;
+    font-weight: 500;
+    margin: 0 0 10px 0;
+    font-size: 16px;
+}
+
+.meta-info {
+    display: flex;
+    gap: 15px;
+}
+
+.apply-date {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+/* --- TRẠNG THÁI & NÚT --- */
 .job-action-right {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
 }
 
-.status-tag, .btn-unapply {
-    width: 100px;
-    height: 34px;
+.status-tag {
+    min-width: 110px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
-    font-weight: 600;
     border-radius: 10px;
-    box-sizing: border-box;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
-/* NÚT THOÁT GÓC DƯỚI BÊN TRÁI */
-.floating-exit-btn {
-    position: fixed;
-    left: 30px;
-    bottom: 30px;
-    width: 55px;
-    height: 55px;
-    background-color: #ffffff;
-    border: none;
+.status-pending { background: #fef3c7; color: #d97706; }
+.status-accepted { background: #dcfce7; color: #059669; }
+.status-rejected { background: #fee2e2; color: #dc2626; }
+
+.btn-unapply {
+    background: white;
+    border: 1.5px solid #ef4444;
+    color: #ef4444;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-unapply:hover {
+    background: #fef2f2;
+    transform: scale(1.05);
+}
+
+/* --- EMPTY STATE (KHI CHƯA CÓ VIỆC) --- */
+.empty-state-wrapper {
+    background: white;
+    border-radius: 30px;
+    padding: 80px 40px;
+    text-align: center;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    border: 1px solid #f1f5f9;
+}
+
+.empty-icon-circle {
+    width: 120px;
+    height: 120px;
+    background: #f0fdf4;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    margin: 0 auto 30px;
+}
+
+.empty-state-content h3 {
+    font-size: 24px;
+    color: #1e293b;
+    margin-bottom: 15px;
+}
+
+.empty-state-content p {
+    color: #64748b;
+    max-width: 500px;
+    margin: 0 auto 35px;
+    line-height: 1.6;
+}
+
+.btn-explore-now {
+    background: #00b14f;
+    color: white;
+    border: none;
+    padding: 16px 36px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
-    z-index: 1000;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
+    box-shadow: 0 10px 15px -3px rgba(0, 177, 79, 0.3);
+}
+
+.btn-explore-now:hover {
+    background: #008f40;
+    transform: translateY(-3px);
+    box-shadow: 0 20px 25px -5px rgba(0, 177, 79, 0.4);
+}
+
+/* --- LOADING & FLOATING --- */
+.loading-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #00b14f;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #00b14f;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.floating-exit-btn {
+    position: fixed;
+    left: 40px;
+    bottom: 40px;
+    width: 60px;
+    height: 60px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+    z-index: 100;
 }
 
 .floating-exit-btn:hover {
-    transform: scale(1.1);
-    background-color: #f0fff4;
+    transform: scale(1.1) rotate(-10deg);
+    background: #f0fdf4;
 }
-
-/* Màu trạng thái Enum */
-.status-pending { background: #fff4e6; color: #fd7e14; }
-.status-accepted { background: #eafbef; color: #00b14f; }
-.status-rejected { background: #fff5f5; color: #fa5252; }
-
-.job-name { color: #00b14f; font-size: 18px; font-weight: 700; }
-.btn-unapply { border: 1px solid #ff4d4f; color: #ff4d4f; background: #fff; cursor: pointer; }
-.btn-unapply:hover { background: #fff1f0; }
-.main-title { border-left: 5px solid #00b14f; padding-left: 15px; margin-bottom: 30px; font-size: 24px; }
