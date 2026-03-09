@@ -12,16 +12,36 @@ import SelectRole from "./Auth/SelectRole";
 import ProtectedRoute from "./Auth/ProtectedRoute";
 import RoleGuard from "./Auth/RoleGuard";
 import CreateCompany from "./Auth/CreateCompany";
+import CVs from "./CVs/CVs";
+import CVTemplates from "./CVs/CVTemplates";
+import CreateCV from "./CVs/CreateCV";
 import ApplicationList from "./Applications/ApplicationList";
 import AdminDashboard from './Dashboard/AdminDashboard';
 import CandidateProfile from "./CandidateProfile"; 
 import EmployerProfile from "./EmployerProfile";
 import UserProfile from "./UserProfile";
+import ListAppliedJobs from './AppliJobs/ListAppliedJobs';
+import { Toaster } from "react-hot-toast";
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, setUser } = useContext(AuthContext);
+  const handleProfileClick = () => {
+    const role = localStorage.getItem("role");
 
+    if (role === "2") {
+      navigate("/manage-cv"); // Candidate
+    }
+    else if (role === "3") {
+      navigate("/employer/applications"); // Employer
+    }
+    else if (role === "1") {
+      navigate("/admin/cvs"); // Admin
+    }
+    else {
+      navigate("/login");
+    }
+  };
   const hideNavbarPaths = ["/login"];
 
   if (hideNavbarPaths.includes(location.pathname)) {
@@ -42,11 +62,7 @@ const Navbar = () => {
     </li>
           <li>Việc làm</li>
           <li
-            onClick={() => {
-              if (user?.role === 3) {
-                navigate("/employer/applications");
-              }
-            }}
+            onClick={handleProfileClick}
             style={{ cursor: "pointer" }}
           >
             Hồ sơ & CV
@@ -118,6 +134,16 @@ const Navbar = () => {
 function App() {
   return (
     <Router>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            fontSize: "16px",
+            padding: "16px 24px"
+          }
+        }}
+      />
       <div className="app-container">
         <Navbar />
 
@@ -130,6 +156,14 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/select-role" element={<SelectRole />} />
+            <Route
+              path="/manage-cv"
+              element={
+                <ProtectedRoute requiredRole={2}>
+                  <CVs />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/employer/applications"
               element={
@@ -153,15 +187,42 @@ function App() {
     </ProtectedRoute>
   } 
 />
+            <Route path="/applied-jobs" element={<ListAppliedJobs />} />
+            
+
+            <Route path="/saved-jobs" element={
+
+              <ProtectedRoute>
+                <SavedJobs />
+              </ProtectedRoute>
+            }
+            />
+            <Route path="/create-company" element={<CreateCompany />} />
             <Route
-              path="/saved-jobs"
+              path="/manage-cv"
               element={
+
                 <ProtectedRoute>
-                  <SavedJobs />
+                  <CVs />
                 </ProtectedRoute>
               }
             />
-            <Route path="/create-company" element={<CreateCompany />} />
+            <Route
+              path="/cv-templates"
+              element={
+                <ProtectedRoute>
+                  <CVTemplates />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create-cv/:cvId"
+              element={
+                <ProtectedRoute>
+                  <CreateCV />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
       </div>

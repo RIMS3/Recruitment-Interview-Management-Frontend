@@ -1,0 +1,196 @@
+/* =========================================================
+   STYLE DÀNH RIÊNG CHO TEMPLATE 1 (XANH RÊU / XANH ĐEN)
+========================================================= */
+.template-1 {
+  display: flex;
+  flex-direction: row;
+  padding: 0 !important; /* Xóa padding mặc định để màu đổ tràn viền A4 */
+  background: transparent;
+  overflow: hidden; 
+}
+
+/* --- CỘT TRÁI --- */
+.t1-left-pane {
+  width: 38%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Khối màu xanh rêu */
+.t1-left-header {
+  background-color: #40612f; 
+  padding: 40px 30px;
+  color: white;
+  min-height: 160px; /* Cân bằng với header khối xám bên phải */
+  box-sizing: border-box;
+}
+
+.t1-name {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.t1-position {
+  font-size: 16px;
+  font-weight: 500;
+  opacity: 0.95;
+}
+
+/* Khối màu xanh đen slate */
+.t1-left-body {
+  background-color: #2e3e4a; 
+  flex: 1;
+  padding: 40px 30px;
+  color: white;
+}
+
+.t1-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 40px;
+  font-size: 13px;
+}
+
+.t1-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.t1-left-section {
+  margin-bottom: 30px;
+}
+
+.t1-left-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #8c9e82; /* Đường kẻ dưới tiêu đề */
+  letter-spacing: 1px;
+}
+
+.t1-left-item {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  color: #cfd6da;
+}
+.t1-left-item strong {
+  color: white;
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+/* --- CỘT PHẢI --- */
+.t1-right-pane {
+  width: 62%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Khối màu xám nhạt ở trên cùng */
+.t1-right-header {
+  background-color: #e5e7e4; 
+  height: 160px;
+  position: relative;
+}
+
+/* Ảnh đại diện chèn lơ lửng */
+.t1-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 5px solid white;
+  position: absolute;
+  top: 50%;
+  right: 50px; 
+  transform: translateY(-50%);
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.t1-right-body {
+  background-color: white;
+  flex: 1;
+  padding: 40px 35px;
+}
+
+.t1-right-section {
+  margin-bottom: 35px;
+}
+
+.t1-right-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.t1-right-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #333;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* Đường kẻ ngang kéo dài bên phải tiêu đề */
+.t1-right-line {
+  flex: 1;
+  height: 2px;
+  background-color: #8c9e82;
+}
+
+.t1-right-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #444;
+  text-align: justify;
+}
+
+.t1-exp-item {
+  margin-bottom: 25px;
+}
+
+.t1-exp-header {
+  font-size: 15px;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.t1-exp-sub {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.t1-bullet-list {
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #444;
+}
+
+.t1-bullet-list li {
+  margin-bottom: 6px;
+  text-align: justify;
+}
+
+/* Override lại contentEditable để phù hợp với nền sáng/tối */
+.template-1 [contenteditable="true"]:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.02);
+}
+.t1-left-pane [contenteditable="true"]:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}

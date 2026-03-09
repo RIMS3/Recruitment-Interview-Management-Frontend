@@ -1,35 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom'; 
 import './JobDetails.css';
 
 const JobPostDetails = () => {
-    const { id } = useParams(); // Job ID từ URL
+    const { id } = useParams();
+    const navigate = useNavigate();
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
     
-    // State lưu trữ candidateId sau khi quy đổi từ userId
+    // States quản lý thông tin người dùng
     const [candidateId, setCandidateId] = useState(null);
+    const [cvId, setCvId] = useState(null);
 
-    // State quản lý thông báo (Toast)
+    // States quản lý thông báo (Toast)
     const [showToast, setShowToast] = useState(false);
     const [toastMsg, setToastMsg] = useState("");
     const [isError, setIsError] = useState(false);
     const [isApplying, setIsApplying] = useState(false);
 
     useEffect(() => {
-        const userId = localStorage.getItem("userId");
+        if (!id || id === 'undefined') {
+            setLoading(false);
+            return;
+        }
+
+        // 1. LẤY DỮ LIỆU TỪ LOCALSTORAGE
+        const storedUserId = localStorage.getItem("userId");
+        const storedCvId = localStorage.getItem("cvId"); 
         
-        // Hàm lấy dữ liệu khởi tạo
+        // Cập nhật cvId vào state nếu có
+        if (storedCvId) {
+            setCvId(storedCvId);
+        }
+
         const initData = async () => {
             try {
-                // 1. Lấy chi tiết công việc
+                // Fetch thông tin chi tiết công việc
                 const jobRes = await fetch(`https://localhost:7272/api/jobs/${id}`);
                 const jobData = await jobRes.json();
                 setJob(jobData);
 
-                // 2. Nếu có userId, gọi API lấy candidateId
-                if (userId) {
-                    const candRes = await fetch(`https://localhost:7272/api/application/candidate/${userId}`);
+                // 2. NẾU ĐÃ LOGIN, FETCH TIẾP CANDIDATEID TỪ USERID
+                if (storedUserId) {
+                    const candRes = await fetch(`https://localhost:7272/api/application/candidate/${storedUserId}`);
                     const candData = await candRes.json();
                     if (candData.isSuccess) {
                         setCandidateId(candData.candidateId);
@@ -41,30 +54,36 @@ const JobPostDetails = () => {
                 setLoading(false);
             }
         };
-
         initData();
     }, [id]);
 
-    // Hàm xử lý ứng tuyển
     const handleApply = async () => {
-        // Kiểm tra đăng nhập
+        // KIỂM TRA ĐĂNG NHẬP
         if (!localStorage.getItem("userId")) {
             showNotify(true, "Vui lòng đăng nhập để thực hiện ứng tuyển!");
             return;
         }
 
-        // Kiểm tra xem đã lấy được candidateId chưa
+        // KIỂM TRA THÔNG TIN ỨNG VIÊN
         if (!candidateId) {
-            showNotify(true, "Không tìm thấy thông tin ứng viên của bạn!");
+            showNotify(true, "Không tìm thấy thông tin ứng viên! Vui lòng cập nhật hồ sơ.");
+            return;
+        }
+
+        // KIỂM TRA CV (Lấy trực tiếp từ localStorage để đảm bảo dữ liệu mới nhất)
+        const currentCvId = localStorage.getItem("cvId") || cvId;
+        if (!currentCvId) {
+            showNotify(true, "Bạn chưa chọn hoặc chưa có CV. Vui lòng tạo CV trước!");
             return;
         }
 
         setIsApplying(true);
-        
+
+        // PAYLOAD ĐÃ THAY ĐỔI: Dùng cvId động
         const applyPayload = {
             jobId: id, 
-            candidateId: candidateId, // Sử dụng ID đã quy đổi
-            cvId: "19191919-1919-1919-1919-191919191919" // ID CV mặc định
+            candidateId: candidateId,
+            cvId: currentCvId 
         };
 
         try {
@@ -73,24 +92,20 @@ const JobPostDetails = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(applyPayload)
             });
-
             const result = await response.json();
 
-            // Xử lý payload: { isSuccess, message }
             if (result.isSuccess) {
                 showNotify(false, result.message || "Ứng tuyển thành công!");
             } else {
-                // Trường hợp đã ứng tuyển hoặc lỗi nghiệp vụ khác
-                showNotify(true, result.message);
+                showNotify(true, result.message || "Ứng tuyển thất bại.");
             }
         } catch (err) {
-            showNotify(true, "Có lỗi kết nối xảy ra. Vui lòng thử lại sau!");
+            showNotify(true, "Lỗi kết nối Server. Vui lòng thử lại sau!");
         } finally {
             setIsApplying(false);
         }
     };
 
-    // Hàm tiện ích hiển thị thông báo
     const showNotify = (error, msg) => {
         setIsError(error);
         setToastMsg(msg);
@@ -114,7 +129,7 @@ const JobPostDetails = () => {
 
     return (
         <div className="job-page-wrapper">
-            {/* THÔNG BÁO (TOAST) */}
+            {/* TOAST NOTIFICATION */}
             {showToast && (
                 <div className={`custom-toast ${isError ? 'toast-error' : ''}`}>
                     <span className="toast-icon">{isError ? '⚠️' : '✅'}</span>
@@ -127,7 +142,7 @@ const JobPostDetails = () => {
 
             <nav className="job-breadcrumb">
                 <Link to="/">Việc làm</Link> <span>/</span> 
-                <Link to="/jobs">IT Phần mềm</Link> <span>/</span> 
+                <Link to="/joblist">IT Phần mềm</Link> <span>/</span> 
                 {job.title}
             </nav>
 
@@ -204,6 +219,29 @@ const JobPostDetails = () => {
                     </div>
                 </div>
             </div>
+
+            {/* NÚT QUAY LẠI */}
+            <button 
+                className="floating-back-btn" 
+                title="Quay lại danh sách"
+                onClick={() => navigate('/joblist')}
+            >
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#00b14f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+            </button>
+
+            {/* NÚT XEM DANH SÁCH ĐÃ NỘP */}
+            <button 
+                className="floating-user-add-btn" 
+                title="Danh sách ứng tuyển"
+                onClick={() => navigate('/applied-jobs')}
+            >
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                    <path d="M7 12C9.21 12 11 10.21 11 8C11 5.79 9.21 4 7 4C4.79 4 3 5.79 3 8C3 10.21 4.79 12 7 12ZM7 14C4.33 14 0 15.34 0 18V20H14V18C14 15.34 9.67 14 7 14Z" fill="#00b14f"/>
+                    <path d="M21 9V6H19V9H16V11H19V14H21V11H24V9H21Z" fill="#00b14f"/>
+                </svg>
+            </button>
         </div>
     );
 };

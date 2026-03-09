@@ -15,7 +15,7 @@
     position: fixed;
     top: 25px;
     right: 25px;
-    background-color: #00b14f; /* Xanh lá cho thành công */
+    background-color: #00b14f;
     color: white;
     padding: 15px 25px;
     border-radius: 10px;
@@ -28,9 +28,8 @@
     animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Màu Toast khi có lỗi hoặc cảnh báo (isSuccess: false) */
 .toast-error {
-    background-color: #f29d00 !important; /* Màu cam cảnh báo */
+    background-color: #f29d00 !important;
     box-shadow: 0 10px 30px rgba(242, 157, 0, 0.2) !important;
 }
 
@@ -184,7 +183,7 @@
     line-height: 1.8; 
     color: #4a4a4a; 
     font-size: 15px; 
-    white-space: pre-line; /* Giữ nguyên xuống dòng từ database */
+    white-space: pre-line;
 }
 
 /* --- SIDEBAR CÔNG TY --- */
@@ -226,15 +225,6 @@
     text-transform: uppercase;
 }
 
-.company-meta-list p { 
-    font-size: 14px; 
-    color: #555; 
-    margin: 12px 0; 
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-}
-
 .view-company-link { 
     display: block; 
     text-align: center; 
@@ -262,4 +252,61 @@
     .job-container-layout { flex-direction: column; }
     .job-sidebar-column { min-width: 100%; }
     .job-stats-container { gap: 20px; }
+}
+
+/* --- CSS CHO NÚT FIXED MỚI GÓC PHẢI --- */
+.floating-user-add-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Shadow giống mẫu */
+    transition: all 0.3s ease;
+}
+
+.floating-user-add-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.floating-user-add-btn svg {
+    width: 28px;
+    height: 28px;
+}
+.floating-back-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px; /* Định vị bên trái */
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.floating-back-btn:hover {
+    transform: scale(1.1);
+    background-color: #f9f9f9;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.floating-back-btn svg {
+    width: 28px;
+    height: 28px;
 }

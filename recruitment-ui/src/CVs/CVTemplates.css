@@ -1,0 +1,141 @@
+.template-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.template-header {
+  margin-bottom: 24px;
+}
+
+.breadcrumb {
+  color: #00b14f;
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.template-header h1 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.template-header .subtitle {
+  color: #555;
+  font-size: 15px;
+}
+
+.template-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: #00b14f;
+  color: #00b14f;
+}
+
+.filter-btn.active {
+  background-color: #00b14f;
+  color: white;
+  border-color: #00b14f;
+}
+
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.template-card {
+  text-align: center;
+}
+
+.template-img-wrapper {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: 1px solid #eee;
+  background: #fff;
+  padding: 10px;
+}
+
+.template-img-wrapper img {
+  width: 100%;
+  display: block;
+}
+
+/* Hiệu ứng trỏ chuột vào hiện nút "Dùng mẫu này" */
+.template-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.template-img-wrapper:hover .template-overlay {
+  opacity: 1;
+}
+
+.btn-use-template {
+  background-color: #00b14f;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.template-img-wrapper:hover .btn-use-template {
+  transform: translateY(0);
+}
+
+.btn-use-template:hover {
+  background-color: #009643;
+}
+
+.template-name {
+  margin-top: 16px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.loading-overlay {
+  text-align: center;
+  padding: 20px;
+  font-weight: bold;
+  color: #00b14f;
+}

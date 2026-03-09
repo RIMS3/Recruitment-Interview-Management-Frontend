@@ -1,0 +1,210 @@
+/* =========================================================
+   STYLE DÀNH RIÊNG CHO TEMPLATE 2 (DARK MODE - TIKTOK)
+========================================================= */
+.template-2 {
+  background-color: #0d0d0d; /* Nền đen */
+  color: #ffffff; /* Chữ trắng */
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
+.a4-paper.template-2 { /* Đổi thành .a4-paper.template-2 để tăng độ ưu tiên đè lên màu trắng */
+  background-color: #0d0d0d !important; /* Thêm !important để ép buộc nhận nền đen */
+  color: #ffffff; /* Chữ trắng */
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
+/* Phần Header (Avatar + Info) */
+.t2-header {
+  display: flex;
+  gap: 30px;
+}
+
+/* Khung Avatar Tiktok */
+.t2-avatar-container {
+  width: 250px;
+  height: 350px;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+  background: #222;
+}
+
+.t2-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+}
+
+.t2-tiktok-top {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.t2-tiktok-right {
+  position: absolute;
+  right: 15px;
+  bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.t2-icon-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.t2-icon { font-size: 24px; }
+.red-heart { color: #ff3b30; }
+.t2-icon-text { font-size: 11px; font-weight: bold; }
+
+.t2-tiktok-bottom {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  font-weight: bold;
+  font-size: 14px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+}
+
+/* Thông tin cá nhân bên phải */
+.t2-info-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.t2-fullname {
+  font-size: 32px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+}
+
+.t2-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.t2-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #ddd;
+}
+
+.t2-contact-item strong {
+  color: #fff;
+  min-width: 90px;
+}
+
+.t2-icon-circle {
+  background: #222;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.t2-objective {
+  margin-top: 5px;
+  line-height: 1.6;
+  font-size: 13px;
+  color: #bbb;
+}
+
+/* Phần Body (Chia 2 cột) */
+.t2-body {
+  display: flex;
+  gap: 30px;
+}
+
+.t2-col-left { width: 35%; }
+.t2-col-right { width: 65%; }
+
+/* Tiêu đề các mục (Có gạch chân đỏ) */
+.t2-section { margin-bottom: 30px; }
+
+.t2-section-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+  position: relative;
+  letter-spacing: 1px;
+}
+
+.t2-section-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 50px;
+  height: 3px;
+  background-color: #ff3b30; /* Đường gạch chân màu đỏ giống mẫu */
+}
+
+/* Nội dung bên trong */
+.t2-item {
+  margin-bottom: 20px;
+}
+
+.t2-item h4 {
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #fff;
+}
+
+.t2-time {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.t2-bullet-list {
+  padding-left: 20px;
+  margin-top: 5px;
+  font-size: 13px;
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.t2-bullet-list li {
+  margin-bottom: 6px;
+}
+
+/* Override lại contentEditable riêng cho nền đen */
+.template-2 [contenteditable="true"]:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+}
+.template-2 [contenteditable="true"]:focus {
+  border-color: #ff3b30;
+  background: rgba(255, 59, 48, 0.05);
+}
