@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Search, MapPin, ChevronRight, Zap, Facebook, 
+  Search, MapPin, ChevronRight, ChevronLeft, Zap, Facebook, 
   Linkedin, Mail, Phone, TrendingUp, Award, 
   Users, ArrowRight, Loader2 
 } from 'lucide-react';
@@ -45,37 +45,69 @@ const HomePage = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [banners, setBanners] = useState([]);
 
-  const banners = [
-    { url: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1200", title: "Kết nối sự nghiệp mơ ước" },
-    { url: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200", title: "Hơn 5000+ Job IT mới mỗi ngày" },
-    { url: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=1200", title: "Phát triển cùng RecruitFree" }
-  ];
+  // --- LẤY ROLE CỦA USER HIỆN TẠI ---
+  const userRole = localStorage.getItem("role");
 
   // CALL API
   useEffect(() => {
-    const fetchJobs = async () => {
+    const fetchData = async () => {
       try {
-        // CẬP NHẬT: Sử dụng biến môi trường thay vì localhost cứng
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/jobs`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setJobs(data);
+        setLoading(true);
+        const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
+        const [jobsRes, bannersRes] = await Promise.all([
+          fetch(`${baseUrl}/jobs`),
+          fetch(`${baseUrl}/Banners`)
+        ]);
+
+        if (jobsRes.ok) {
+          const jobsData = await jobsRes.json();
+          setJobs(jobsData);
+        }
+
+        if (bannersRes.ok) {
+          const bannersData = await bannersRes.json();
+          setBanners(bannersData || []); 
+        }
+
       } catch (error) {
-        console.error("Error fetching jobs:", error);
+        console.error("Lỗi khi tải dữ liệu:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchJobs();
+    fetchData();
   }, []);
 
+  // Logic tự động chuyển Slide Banner theo thời gian cài đặt
   useEffect(() => {
-    const timer = setInterval(() => {
+    if (banners.length <= 1) return;
+
+    const currentDuration = (banners[currentBanner]?.duration || 5) * 1000;
+    const timer = setTimeout(() => {
       setCurrentBanner((prev) => (prev + 1) % banners.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [banners.length]);
+    }, currentDuration);
+
+    return () => clearTimeout(timer);
+  }, [banners, currentBanner]);
+
+  // Hàm chuyển ảnh thủ công
+  const nextBanner = () => {
+    setCurrentBanner((prev) => (prev + 1) % banners.length);
+  };
+
+  const prevBanner = () => {
+    setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
+  };
+
+  // --- HÀM XỬ LÝ KHI CLICK VÀO BANNER ---
+  const handleBannerClick = () => {
+    if (userRole === "1") {
+      navigate("/admin/banners");
+    }
+  };
 
   const formatSalary = (min, max) => {
     return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
@@ -115,17 +147,63 @@ const HomePage = () => {
       {/* Banner Slider */}
       <div className="container">
         <div className="banner-slider-modern">
-          {banners.map((banner, index) => (
+          {banners.length > 0 ? (
+            <>
+              {banners.map((banner, index) => (
+                <div 
+                  key={banner.id || index} 
+                  className={`banner-slide ${index === currentBanner ? 'active' : ''}`}
+                  style={{ 
+                    backgroundImage: `url(${banner.imageUrl})`,
+                    cursor: userRole === "1" ? "pointer" : "default" // Chỉ hiện bàn tay nếu là Admin
+                  }}
+                  onClick={handleBannerClick} // Gắn sự kiện click
+                >
+                  <div className="banner-text-overlay">
+                    <h2>{banner.title}</h2>
+                  </div>
+                </div>
+              ))}
+
+              {/* Mũi tên điều hướng trái/phải */}
+              {banners.length > 1 && (
+                <>
+                  <button className="banner-nav-btn prev" onClick={prevBanner}>
+                    <ChevronLeft size={28} />
+                  </button>
+                  <button className="banner-nav-btn next" onClick={nextBanner}>
+                    <ChevronRight size={28} />
+                  </button>
+
+                  {/* Thanh gạch báo vị trí banner hiện tại */}
+                  <div className="banner-indicators">
+                    {banners.map((_, index) => (
+                      <button
+                        key={index}
+                        className={`indicator-bar ${index === currentBanner ? 'active' : ''}`}
+                        onClick={() => setCurrentBanner(index)}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            // Fallback khi không có banner
             <div 
-              key={index} 
-              className={`banner-slide ${index === currentBanner ? 'active' : ''}`}
-              style={{ backgroundImage: `url(${banner.url})` }}
+              className="banner-slide active"
+              style={{ 
+                backgroundImage: `url(https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1200)`,
+                cursor: userRole === "1" ? "pointer" : "default" // Chỉ hiện bàn tay nếu là Admin
+              }}
+              onClick={handleBannerClick} // Gắn sự kiện click cho cả ảnh mặc định
             >
               <div className="banner-text-overlay">
-                <h2>{banner.title}</h2>
+                <h2>Hãy thêm Banner từ trang Admin</h2>
               </div>
             </div>
-          ))}
+          )}
         </div>
       </div>
 
@@ -175,8 +253,8 @@ const HomePage = () => {
           </div>
         ) : (
           <div className="job-grid-modern">
-        {jobs.slice(0, 9).map(job => (
-          <div key={job.idJobPost} className={`job-card-modern ${job.salaryMax >= 3000 ? 'hot-border' : ''}`}>
+            {jobs.slice(0, 9).map(job => (
+              <div key={job.idJobPost} className={`job-card-modern ${job.salaryMax >= 3000 ? 'hot-border' : ''}`}>
                 {job.salaryMax >= 3000 && <span className="hot-tag"><Zap size={12} fill="currentColor"/> HOT</span>}
                 <div className="card-top">
                   <div className="company-logo-modern">{job.title.charAt(0)}</div>
@@ -252,12 +330,12 @@ const HomePage = () => {
           <div className="footer-contact">
             <h4>Liên hệ</h4>
             <p><Phone size={16} /> 1900 888 999</p>
-            <p><Mail size={16} /> career@recruitfree.vn</p>
+            <p><Mail size={16} /> career@itlocak.vn</p>
           </div>
         </div>
         <div className="footer-bottom-bar">
           <div className="container-fluid flex-between">
-            <p>© 2026 RecruitFree Platform. All rights reserved.</p>
+            <p>© 2026 ITLoCak Platform. All rights reserved.</p>
             <p>Made with ❤️ by Pham Trung Duc</p>
           </div>
         </div>

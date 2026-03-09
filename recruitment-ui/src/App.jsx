@@ -18,6 +18,7 @@ import CreateCV from "./CVs/CreateCV";
 import ApplicationList from "./Applications/ApplicationList";
 import ListAppliedJobs from './AppliJobs/ListAppliedJobs';
 import { Toaster } from "react-hot-toast";
+import BannerManager from "./Banner/BannerManager";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -193,6 +194,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CreateCV />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/banners"
+              element={
+                <ProtectedRoute requiredRole={1}>
+                  <BannerManager />
                 </ProtectedRoute>
               }
             />
