@@ -4,7 +4,7 @@ import './JobDetails.css';
 
 const JobPostDetails = () => {
     const { id } = useParams();
-    const navigate = useNavigate(); // Khởi tạo điều hướng
+    const navigate = useNavigate();
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
     const [candidateId, setCandidateId] = useState(null);
@@ -15,7 +15,6 @@ const JobPostDetails = () => {
     const [isApplying, setIsApplying] = useState(false);
 
     useEffect(() => {
-        // Kiểm tra ID để tránh lỗi gọi API với giá trị undefined
         if (!id || id === 'undefined') {
             setLoading(false);
             return;
@@ -24,15 +23,21 @@ const JobPostDetails = () => {
         const userId = localStorage.getItem("userId");
         const initData = async () => {
             try {
+                // 1. Lấy thông tin công việc
                 const jobRes = await fetch(`https://localhost:7272/api/jobs/${id}`);
                 const jobData = await jobRes.json();
                 setJob(jobData);
 
+                // 2. Lấy candidateId dựa trên userId (RIMS logic)
                 if (userId) {
-                    const candRes = await fetch(`https://localhost:7272/api/application/candidate/${userId}`);
-                    const candData = await candRes.json();
-                    if (candData.isSuccess) {
-                        setCandidateId(candData.candidateId);
+                    const candRes = await fetch(`https://localhost:7272/api/Application/candidate/${userId}`);
+                    if (candRes.ok) {
+                        const candData = await candRes.json();
+                        if (candData.candidateId) {
+                            setCandidateId(candData.candidateId);
+                            // Lưu vào local để ListAppliedJobs có thể dùng
+                            localStorage.setItem("candidateId", candData.candidateId);
+                        }
                     }
                 }
             } catch (err) {
@@ -45,6 +50,7 @@ const JobPostDetails = () => {
     }, [id]);
 
     const handleApply = async () => {
+        // Kiểm tra đăng nhập
         if (!localStorage.getItem("userId")) {
             showNotify(true, "Vui lòng đăng nhập để thực hiện ứng tuyển!");
             return;
@@ -55,26 +61,72 @@ const JobPostDetails = () => {
         }
 
         setIsApplying(true);
-        const applyPayload = {
-            jobId: id, 
-            candidateId: candidateId,
-            cvId: "19191919-1919-1919-1919-191919191919" 
-        };
 
         try {
-            const response = await fetch(`https://localhost:7272/api/application/apply`, {
+            // KIỂM TRA HOẶC TẠO CV TỰ ĐỘNG
+            let currentCvId = localStorage.getItem("cvId");
+
+            if (!currentCvId || currentCvId === "undefined" || currentCvId === "null") {
+                console.log("Đang tạo CV mới bằng FormData [FromForm]...");
+                
+                const cvFormData = new FormData();
+                cvFormData.append("CandidateId", candidateId);
+                
+                // Cần khớp với CreateCvRequestDto ở Backend (Họ tên, Tiêu đề...)
+                cvFormData.append("Title", "Hồ sơ ứng tuyển mặc định");
+                // Giả lập FullName để tránh lỗi Validation "Họ tên không..."
+                cvFormData.append("FullName", "Ứng viên RIMS"); 
+
+                const cvResponse = await fetch(`https://localhost:7272/api/Cvs`, {
+                    method: 'POST',
+                    body: cvFormData 
+                    // Lưu ý: Không set Content-Type header cho FormData
+                });
+
+                // XỬ LÝ LỖI VALIDATION (TRÁNH LỖI Unexpected token 'H')
+                const contentType = cvResponse.headers.get("content-type");
+                let cvResult;
+
+                if (contentType && contentType.includes("application/json")) {
+                    cvResult = await cvResponse.json();
+                } else {
+                    // Nếu Backend trả về text thuần (ví dụ: "Họ tên không được trống")
+                    const errorText = await cvResponse.text();
+                    throw new Error(errorText || "Lỗi dữ liệu đầu vào khi tạo CV.");
+                }
+
+                if (cvResponse.ok && cvResult.id) {
+                    currentCvId = cvResult.id;
+                    localStorage.setItem("cvId", currentCvId);
+                } else {
+                    throw new Error(cvResult.message || "Tạo CV thất bại.");
+                }
+            }
+
+            // THỰC HIỆN ỨNG TUYỂN
+            const applyPayload = {
+                jobId: id, 
+                candidateId: candidateId,
+                cvId: currentCvId
+            };
+
+            const response = await fetch(`https://localhost:7272/api/Application/apply`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(applyPayload)
             });
+
             const result = await response.json();
+            
             if (result.isSuccess) {
                 showNotify(false, result.message || "Ứng tuyển thành công!");
             } else {
-                showNotify(true, result.message);
+                showNotify(true, result.message || "Ứng tuyển thất bại.");
             }
+
         } catch (err) {
-            showNotify(true, "Có lỗi kết nối xảy ra. Vui lòng thử lại sau!");
+            console.error("Lỗi quá trình xử lý:", err);
+            showNotify(true, err.message);
         } finally {
             setIsApplying(false);
         }
@@ -84,7 +136,7 @@ const JobPostDetails = () => {
         setIsError(error);
         setToastMsg(msg);
         setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
+        setTimeout(() => setShowToast(false), 3500);
     };
 
     const formatDate = (dateString) => {
@@ -193,7 +245,6 @@ const JobPostDetails = () => {
                 </div>
             </div>
 
-            {/* NÚT THOÁT QUAY LẠI JOBLIST (GÓC DƯỚI BÊN TRÁI) */}
             <button 
                 className="floating-back-btn" 
                 title="Quay lại danh sách"
@@ -204,7 +255,6 @@ const JobPostDetails = () => {
                 </svg>
             </button>
 
-            {/* NÚT FIXED XEM DANH SÁCH ỨNG TUYỂN (GÓC DƯỚI BÊN PHẢI) */}
             <button 
                 className="floating-user-add-btn" 
                 title="Danh sách ứng tuyển"

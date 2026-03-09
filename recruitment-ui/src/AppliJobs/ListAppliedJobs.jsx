@@ -7,17 +7,29 @@ const ListAppliedJobs = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // CandidateId mẫu theo yêu cầu hệ thống của bạn
-    const candidateId = "CCB1695B-D1F3-4CFD-B475-8D7B7BDA3DDE";
-
     useEffect(() => {
-        fetchAppliedJobs();
-    }, []);
+        // 1. Lấy candidateId động từ localStorage
+        const storedCandidateId = localStorage.getItem("candidateId");
 
-    const fetchAppliedJobs = async () => {
+        // 2. Kiểm tra đăng nhập/quyền ứng viên
+        if (!storedCandidateId) {
+            alert("Vui lòng đăng nhập với vai trò ứng viên để xem danh sách này!");
+            navigate('/login'); // Hoặc navigate('/') tùy logic của bạn
+            return;
+        }
+
+        fetchAppliedJobs(storedCandidateId);
+    }, [navigate]);
+
+    const fetchAppliedJobs = async (candidateId) => {
         try {
-            // API trả về danh sách các công việc ứng viên đã nộp
+            setLoading(true);
             const response = await fetch(`https://localhost:7272/api/ViewListJobApply/candidate/${candidateId}`);
+            
+            if (!response.ok) {
+                throw new Error("Không thể kết nối đến máy chủ.");
+            }
+
             const data = await response.json();
             setAppliedList(data);
         } catch (error) {
@@ -48,7 +60,7 @@ const ListAppliedJobs = () => {
 
     const getStatusDetails = (status) => {
         switch (status) {
-            case 0: return { text: "Pending", class: "status-pending" }; //
+            case 0: return { text: "Pending", class: "status-pending" };
             case 1: return { text: "Accepted", class: "status-accepted" };
             case 2: return { text: "Rejected", class: "status-rejected" };
             default: return { text: "Unknown", class: "status-default" };
@@ -61,54 +73,65 @@ const ListAppliedJobs = () => {
         <div className="list-applied-page">
             <div className="content-container">
                 <h2 className="main-title">Việc làm đã ứng tuyển</h2>
-                <div className="job-grid">
-                    {appliedList.map((item) => {
-                        const status = getStatusDetails(item.status);
-                        
-                        // QUAN TRỌNG: Map theo jobId để link không bị undefined
-                        // Ưu tiên lấy 'jobId' (mã bắt đầu bằng f666... hoặc f333...)
-                        const targetJobId = item.jobId || item.id || item.idJobPost;
+                
+                {/* 3. Xử lý UX khi danh sách trống */}
+                {appliedList.length === 0 ? (
+                    <div className="empty-state">
+                        <p>Bạn chưa ứng tuyển công việc nào.</p>
+                        <button className="btn-go-search" onClick={() => navigate('/joblist')}>
+                            Tìm việc ngay
+                        </button>
+                    </div>
+                ) : (
+                    <div className="job-grid">
+                        {appliedList.map((item) => {
+                            const status = getStatusDetails(item.status);
+                            const targetJobId = item.jobId || item.id || item.idJobPost;
 
-                        return (
-                            <div key={item.applicationId} className="job-item-card">
-                                <div 
-                                    className="job-info-left" 
-                                    onClick={() => {
-                                        if (targetJobId) {
-                                            navigate(`/jobpostdetail/${targetJobId}`);
-                                        } else {
-                                            alert("Lỗi: Không tìm thấy JobId cho công việc này!");
-                                        }
-                                    }}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <h3 className="job-name">{item.jobTitle}</h3>
-                                    <p className="comp-name">{item.companyName}</p>
-                                    <span className="apply-date">Ngày nộp: {new Date(item.appliedAt).toLocaleDateString('vi-VN')}</span>
-                                </div>
-                                
-                                <div className="job-action-right">
-                                    <div className={`status-tag ${status.class}`}>
-                                        {status.text}
-                                    </div>
-                                    <button 
-                                        className="btn-unapply" 
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Không kích hoạt navigate của thẻ cha khi bấm xóa
-                                            handleUnapply(item.applicationId);
+                            return (
+                                <div key={item.applicationId} className="job-item-card">
+                                    <div 
+                                        className="job-info-left" 
+                                        onClick={() => {
+                                            if (targetJobId) {
+                                                navigate(`/jobpostdetail/${targetJobId}`);
+                                            } else {
+                                                alert("Lỗi: Không tìm thấy JobId cho công việc này!");
+                                            }
                                         }}
+                                        style={{ cursor: 'pointer' }}
                                     >
-                                        <svg viewBox="0 0 24 24" width="16" fill="currentColor" style={{marginRight: '4px'}}><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                                        Xóa
-                                    </button>
+                                        <h3 className="job-name">{item.jobTitle}</h3>
+                                        <p className="comp-name">{item.companyName}</p>
+                                        <span className="apply-date">
+                                            Ngày nộp: {new Date(item.appliedAt).toLocaleDateString('vi-VN')}
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="job-action-right">
+                                        <div className={`status-tag ${status.class}`}>
+                                            {status.text}
+                                        </div>
+                                        <button 
+                                            className="btn-unapply" 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleUnapply(item.applicationId);
+                                            }}
+                                        >
+                                            <svg viewBox="0 0 24 24" width="16" fill="currentColor" style={{marginRight: '4px'}}>
+                                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                            </svg>
+                                            Xóa
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
 
-            {/* NÚT THOÁT QUAY LẠI (GÓC DƯỚI BÊN TRÁI) */}
             <button 
                 className="floating-exit-btn" 
                 title="Quay lại"
