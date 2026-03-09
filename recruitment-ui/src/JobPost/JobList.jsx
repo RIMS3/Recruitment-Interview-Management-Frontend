@@ -2,23 +2,20 @@ import React, { useState, useEffect, useCallback, useMemo, useContext } from 're
 import { useNavigate } from 'react-router-dom';
 import { getSavedJobIds, toggleSavedJob } from '../Services/SavedJobsApi';
 import { DEV_BYPASS_LOGIN_TO_SAVE, DEV_CANDIDATE_ID } from '../Services/candidateSession';
-import { AuthContext } from '../Auth/AuthContext'; // <-- Đã import AuthContext
+import { AuthContext } from '../Auth/AuthContext'; 
 import './JobList.css';
 
 const JobList = () => {
     const navigate = useNavigate();
     
-    // 1. Lấy thông tin user đăng nhập từ App.jsx truyền xuống
+    // 1. Lấy thông tin user đăng nhập từ AuthContext
     const { user } = useContext(AuthContext);
 
     // 2. Tự động lấy ID chuẩn từ user
     const candidateId = useMemo(() => {
         if (DEV_BYPASS_LOGIN_TO_SAVE) return DEV_CANDIDATE_ID;
-        
-        // Lấy candidateId hoặc id (đề phòng BE chưa đổi tên), nếu chưa đăng nhập thì null
         const currentId = user?.candidateId || user?.id || null;
-        console.log("👉 ID Ứng viên hiện tại trong JobList:", currentId); // In ra để dễ check
-        
+        console.log("👉 ID Ứng viên hiện tại trong JobList:", currentId); 
         return currentId;
     }, [user]);
 
@@ -42,10 +39,11 @@ const JobList = () => {
         PageSize: 6
     });
 
+    // CẬP NHẬT: Sử dụng biến môi trường để lấy dữ liệu khởi tạo bộ lọc
     useEffect(() => {
         const initData = async () => {
             try {
-                const res = await fetch('https://localhost:7272/api/jobs');
+                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/jobs`);
                 const data = await res.json();
 
                 const locations = [...new Set(data.map(j => j.location))].filter(Boolean).sort();
@@ -80,6 +78,7 @@ const JobList = () => {
         }
     }, [candidateId]);
 
+    // CẬP NHẬT: Sử dụng biến môi trường cho API lọc công việc
     const fetchJobs = useCallback(async () => {
         setLoading(true);
         try {
@@ -91,7 +90,7 @@ const JobList = () => {
             params.append('PageNumber', filters.PageNumber);
             params.append('PageSize', filters.PageSize);
 
-            const response = await fetch(`https://localhost:7272/api/jobs/filter?${params.toString()}`);
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/jobs/filter?${params.toString()}`);
             const data = await response.json();
             setJobs(data);
         } catch (err) {
@@ -134,10 +133,9 @@ const JobList = () => {
     };
 
     const handleToggleSavedJob = async (e, rawJobId) => {
-        e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài (không làm nhảy trang)
+        e.stopPropagation(); 
         const jobId = String(rawJobId);
         
-        // 3. Đã có ID thật nên nó sẽ vượt qua ải này thành công!
         if (!candidateId) {
             alert('Bạn cần đăng nhập để lưu job.');
             return;

@@ -1,6 +1,7 @@
 import { DEV_BYPASS_LOGIN_TO_SAVE } from './candidateSession';
 
-const API_BASE_URL = 'https://localhost:7272';
+// Thay đổi: Lấy URL gốc từ biến môi trường
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL.replace('/api', ''); 
 const DEV_SAVED_JOB_IDS_KEY = 'dev_saved_job_ids';
 
 function buildAuthHeaders(extraHeaders = {}) {
@@ -49,6 +50,7 @@ export async function getSavedJobIds(candidateId) {
     return readDevSavedIds();
   }
 
+  // Cập nhật: Sử dụng API_BASE_URL + path
   const response = await fetch(`${API_BASE_URL}/api/saved-jobs/${candidateId}/ids`, {
     headers: buildAuthHeaders(),
     credentials: 'include'

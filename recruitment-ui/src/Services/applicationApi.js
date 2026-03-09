@@ -1,9 +1,8 @@
-const API_URL = "https://localhost:7272/api/employer-applications";
+// Thay đổi: Sử dụng biến môi trường và nối thêm endpoint cụ thể
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/employer-applications`;
 
 export const applicationApi = {
-
   getList: async ({ companyId, searchTitle = "", status = "" }) => {
-
     let queryParams = new URLSearchParams();
 
     if (companyId) {

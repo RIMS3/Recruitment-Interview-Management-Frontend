@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import html2pdf from 'html2pdf.js'; // 👉 THÊM: Import thư viện xuất PDF
+import html2pdf from 'html2pdf.js'; 
 import Template1 from './Templates/Template1';
 import Template2 from './Templates/Template2';
 import Template3 from './Templates/Template3';
@@ -16,7 +16,6 @@ const CreateCV = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 👉 THÊM: Tạo ref để "móc" vào khung CV cần xuất PDF
   const cvRef = useRef(null); 
 
   // 1. STATE CHUẨN ĐỂ PUT JSON LÊN BACKEND
@@ -47,7 +46,8 @@ const CreateCV = () => {
   useEffect(() => {
     const fetchCVData = async () => {
       try {
-        const response = await fetch(`https://localhost:7272/api/cvs/${cvId}`);
+        // Cập nhật: Sử dụng biến môi trường cho phương thức GET
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}`);
         if (response.ok) {
           const data = await response.json();
           
@@ -99,12 +99,10 @@ const CreateCV = () => {
     });
   };
 
-  // 👉 THÊM: HÀM XỬ LÝ XUẤT PDF
   const handleExportPDF = () => {
-    const element = cvRef.current; // Lấy thẻ div chứa CV
+    const element = cvRef.current; 
     if (!element) return;
 
-    // Đặt tên file thân thiện (Bỏ dấu cách thay bằng dấu _)
     const fileName = cvData.fullName 
       ? `CV_${cvData.fullName.trim().replace(/\s+/g, '_')}.pdf` 
       : 'My_CV.pdf';
@@ -113,11 +111,10 @@ const CreateCV = () => {
       margin:       0,
       filename:     fileName,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true }, // Cực quan trọng để load ảnh Avatar từ server khác
+      html2canvas:  { scale: 2, useCORS: true }, 
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // Biến hóa HTML thành PDF và tải về
     html2pdf().set(opt).from(element).save();
   };
 
@@ -130,6 +127,7 @@ const CreateCV = () => {
 
     setIsSaving(true);
     try {
+      // Logic xử lý safeGender và safeBirthday giữ nguyên
       let safeGender = null;
       if (cvData.gender !== null && cvData.gender !== undefined && cvData.gender !== "") {
           const gStr = String(cvData.gender).toLowerCase().trim();
@@ -217,7 +215,8 @@ const CreateCV = () => {
       };
 
       const token = localStorage.getItem("accessToken");
-      const response = await fetch(`https://localhost:7272/api/cvs/${cvId}/editor`, {
+      // Cập nhật: Sử dụng biến môi trường cho phương thức PUT (Lưu CV)
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}/editor`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -253,7 +252,6 @@ const CreateCV = () => {
 
   return (
     <div className="create-cv-layout">
-      {/* Header nổi (Sticky Bar) chứa Tên CV và Nút Lưu / Nút PDF */}
       <header className="workspace-header">
         <div className="header-container">
           <input 
@@ -266,7 +264,6 @@ const CreateCV = () => {
           />
           
           <div style={{ display: 'flex', gap: '12px' }}>
-            {/* 👉 THÊM: Nút bấm Xuất PDF */}
             <button 
               className="btn-export" 
               onClick={handleExportPDF}
@@ -299,9 +296,7 @@ const CreateCV = () => {
         </div>
       </header>
 
-      {/* Khu vực giấy A4 hiển thị CV */}
       <main className="cv-workspace">
-        {/* 👉 THÊM: Gắn ref vào div bọc template để làm mốc chụp PDF */}
         <div ref={cvRef}>
           {renderTemplate()}
         </div>
