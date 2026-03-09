@@ -119,6 +119,9 @@ function App() {
     <Router>
       <Toaster
         position="top-center"
+        containerStyle={{
+          zIndex: 99999
+        }}
         toastOptions={{
           duration: 3000,
           style: {
@@ -161,7 +164,7 @@ function App() {
             <Route path="/interviews" element={<InterviewPage />} />
 
             <Route path="/applied-jobs" element={<ListAppliedJobs />} />
-            
+
 
             <Route path="/saved-jobs" element={
 

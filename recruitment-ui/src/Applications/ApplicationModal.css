@@ -1,3 +1,4 @@
+/* --- Khung ngoài và Overlay --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -9,21 +10,34 @@
   z-index: 9999;
 }
 
-.modal-box {
+.modal-box.modal-two-column {
   background: white;
   width: 100%;
-  max-width: 520px;
+  max-width: 1100px;
+  display: flex;
   border-radius: 28px;
   overflow: hidden;
   box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
-  animation: slideUp 0.3s ease-out;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+/* --- Cấu trúc cột --- */
+.modal-left {
+  width: 420px;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  background: white;
 }
 
+.modal-right {
+  flex: 1;
+  background: #f8fafc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- Header --- */
 .modal-header {
   padding: 24px 32px;
   border-bottom: 1px solid #f1f5f9;
@@ -46,7 +60,6 @@
   padding: 8px;
   border-radius: 12px;
   cursor: pointer;
-  color: #64748b;
   transition: 0.2s;
 }
 
@@ -55,6 +68,7 @@
   color: #ef4444;
 }
 
+/* --- Nội dung Body --- */
 .modal-body {
   padding: 32px;
 }
@@ -73,7 +87,7 @@
   gap: 20px;
 }
 
-.modal-avatar-img, .avatar.large {
+.modal-avatar-img {
   width: 80px;
   height: 80px;
   border-radius: 24px;
@@ -83,6 +97,7 @@
 .profile-text h4 {
   margin: 0 0 4px 0;
   font-size: 22px;
+  font-weight: 700;
   color: #0f172a;
 }
 
@@ -94,6 +109,7 @@
   font-size: 14px;
 }
 
+/* --- Bảng thông tin --- */
 .info-grid {
   display: flex;
   flex-direction: column;
@@ -106,7 +122,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 20px;
-  background: #fff;
+  background: white;
   border: 1px solid #f1f5f9;
   border-radius: 16px;
 }
@@ -126,48 +142,93 @@
   color: #1e293b;
 }
 
-.cv-link-btn {
+/* --- ĐỒNG BỘ 2 NÚT BẤM (QUAN TRỌNG) --- */
+.cv-link-btn,
+.preview-cv-btn {
+  /* Layout & Kích thước */
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  width: 100%;
+  height: 54px; /* Cố định chiều cao để bằng nhau tuyệt đối */
+  margin-bottom: 12px;
+  padding: 0;
+  
+  /* Style nền & bo góc */
   background: #6366f1;
   color: white;
-  text-decoration: none;
-  padding: 16px;
+  border: none;
   border-radius: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+
+  /* Phông chữ đồng nhất */
+  font-family: inherit; /* Sử dụng font chung của hệ thống */
+  font-size: 16px;
   font-weight: 700;
-  transition: 0.3s;
+  line-height: 1;
+  
+  /* Hiệu ứng */
+  transition: all 0.3s ease;
 }
 
-.cv-link-btn:hover {
+.cv-link-btn:hover,
+.preview-cv-btn:hover {
   background: #4f46e5;
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 8px 15px rgba(99, 102, 241, 0.2);
 }
 
+.cv-link-btn:active,
+.preview-cv-btn:active {
+  transform: translateY(0);
+}
+
+/* --- Footer --- */
 .modal-footer {
   padding: 24px 32px;
   background: #f8fafc;
   display: flex;
   gap: 12px;
+  margin-top: auto; /* Đẩy footer xuống dưới cùng của cột trái */
 }
 
 .btn-modal {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   height: 52px;
   border-radius: 14px;
-  font-weight: 700;
-  cursor: pointer;
   border: none;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
   transition: 0.2s;
 }
 
-.btn-modal-accept { background: #10b981; color: white; }
-.btn-modal-reject { background: #ef4444; color: white; }
-.btn-modal-accept:hover { background: #059669; }
-.btn-modal-reject:hover { background: #dc2626; }
+.btn-modal-accept {
+  background: #10b981;
+  color: white;
+}
+
+.btn-modal-reject {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-modal:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* --- CV Preview Right Side --- */
+.cv-preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.cv-placeholder {
+  color: #94a3b8;
+  font-size: 15px;
+  font-weight: 500;
+}

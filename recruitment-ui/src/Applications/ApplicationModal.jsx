@@ -1,110 +1,108 @@
-import React from "react";
-import { X, Check, XCircle, ExternalLink, Calendar, Mail, Briefcase } from "lucide-react";
-import "./ApplicationModal.css";
+import React, { useState, useEffect } from "react";
+import { Modal, Button, Spinner } from "react-bootstrap";
+import { toast } from "react-toastify";
 
-const ApplicationModal = ({ app, onClose, onAction }) => {
-  if (!app) return null;
+const ApplicationModal = ({ show, handleClose, applicationId }) => {
+  const [app, setApp] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
-  const getStatusLabel = (status) => {
-    const labels = {
-      0: { text: "Chờ duyệt", class: "status-0" },
-      1: { text: "Đã chấp nhận", class: "status-1" },
-      2: { text: "Đã từ chối", class: "status-2" },
-    };
-    return labels[status] || { text: "", class: "" };
+  useEffect(() => {
+    if (applicationId) {
+      fetchApplication();
+    }
+  }, [applicationId]);
+
+  const fetchApplication = async () => {
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        `https://localhost:7272/api/Application/${applicationId}/cv`
+      );
+
+      if (!res.ok) {
+        throw new Error("Không lấy được thông tin CV");
+      }
+
+      const data = await res.json();
+      setApp(data);
+    } catch (err) {
+      toast.error("Lỗi khi tải CV");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const statusInfo = getStatusLabel(app.status);
+  const handlePreview = () => {
+    if (!app?.cvId) {
+      toast.error("Ứng viên chưa upload CV");
+      return;
+    }
+
+    setShowPreview(!showPreview);
+  };
+
+  const handleViewCV = () => {
+    if (!app?.cvId) {
+      toast.error("Ứng viên chưa upload CV");
+      return;
+    }
+  };
+
+  if (!app && !loading) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="modal-header">
-          <h3>Thông tin ứng viên</h3>
-          <button className="close-btn" onClick={onClose}>
-            <X size={20} />
-          </button>
-        </div>
+    <Modal show={show} onHide={handleClose} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>Thông tin CV ứng viên</Modal.Title>
+      </Modal.Header>
 
-        {/* Profile Identity Section */}
-        <div className="modal-body">
-          <div className="modal-profile-card">
-            <div className="profile-main">
-              {app.candidateAvatar ? (
-                <img 
-                  src={app.candidateAvatar} 
-                  alt={app.candidateName} 
-                  className="modal-avatar-img"
-                  onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                />
-              ) : null}
-              <div className="avatar large" style={{ display: app.candidateAvatar ? 'none' : 'flex' }}>
-                {app.candidateName?.charAt(0).toUpperCase()}
-              </div>
-              <div className="profile-text">
-                <h4>{app.candidateName}</h4>
-                <div className="profile-subtext">
-                  <Mail size={14} />
-                  <span>{app.candidateEmail}</span>
-                </div>
-              </div>
-            </div>
+      <Modal.Body>
+        {loading ? (
+          <div style={{ textAlign: "center" }}>
+            <Spinner animation="border" />
           </div>
+        ) : (
+          <>
+            <div style={{ marginBottom: "15px" }}>
+              <Button variant="primary" onClick={handlePreview}>
+                {showPreview ? "Ẩn Preview CV" : "Preview CV"}
+              </Button>
 
-          {/* Details Section */}
-          <div className="info-grid">
-            <div className="info-row">
-              <label><Briefcase size={14} /> Vị trí ứng tuyển</label>
-              <span>{app.jobTitle}</span>
+              {"  "}
+
+              <a
+                href={`https://localhost:7272/api/Cvs/${app.cvId}/download`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-success"
+                onClick={handleViewCV}
+              >
+                Xem CV chi tiết
+              </a>
             </div>
 
-            <div className="info-row">
-              <label><Calendar size={14} /> Ngày nộp hồ sơ</label>
-              <span>{new Date(app.appliedAt).toLocaleDateString('vi-VN')}</span>
-            </div>
-
-            <div className="info-row">
-              <label>Trạng thái hiện tại</label>
-              <span className={`status ${statusInfo.class}`}>
-                {statusInfo.text}
-              </span>
-            </div>
-          </div>
-
-          {/* CV Button */}
-          <a
-            href={app.cvUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cv-link-btn"
-          >
-            <span>Xem CV chi tiết</span>
-            <ExternalLink size={18} />
-          </a>
-        </div>
-
-        {/* Action Buttons */}
-        {app.status === 0 && (
-          <div className="modal-footer">
-            <button 
-              className="btn-modal btn-modal-reject" 
-              onClick={() => onAction(app.applicationId, 2)}
-            >
-              <XCircle size={18} />
-              Từ chối
-            </button>
-            <button 
-              className="btn-modal btn-modal-accept" 
-              onClick={() => onAction(app.applicationId, 1)}
-            >
-              <Check size={18} />
-              Chấp nhận hồ sơ
-            </button>
-          </div>
+            {showPreview && (
+              <iframe
+                title="CV Preview"
+                src={`https://localhost:7272/api/Cvs/${app.cvId}/download`}
+                width="100%"
+                height="500px"
+                style={{ border: "1px solid #ccc" }}
+              />
+            )}
+          </>
         )}
-      </div>
-    </div>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Đóng
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 
