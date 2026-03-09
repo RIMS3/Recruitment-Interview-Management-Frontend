@@ -1,7 +1,7 @@
 import React from 'react';
 import './Template3.css';
 
-const Template3 = ({ cvData, handleTextChange, handleArrayChange }) => {
+const Template3 = ({ cvData, handleTextChange, handleArrayChange, onAvatarClick }) => {
   const displayExperiences = cvData.experiences?.length > 0 ? cvData.experiences : [{}];
   const displayEducations = cvData.educations?.length > 0 ? cvData.educations : [{}];
 
@@ -62,7 +62,14 @@ const Template3 = ({ cvData, handleTextChange, handleArrayChange }) => {
 
         <div className="t3-right-col">
           <div className="t3-avatar-wrapper">
-            <img src={cvData.fileUrl || "https://placehold.co/300x300/cccccc/ffffff?text=Avatar"} alt="Avatar" className="t3-avatar" />
+            <img 
+              src={cvData.fileUrl || "https://placehold.co/300x300/cccccc/ffffff?text=Avatar"} 
+              alt="Avatar" 
+              className="t3-avatar" 
+              onClick={onAvatarClick}
+              style={{ cursor: 'pointer' }}
+              title="Click để thay đổi ảnh đại diện"
+            />
           </div>
 
           <div className="t3-contact-list">

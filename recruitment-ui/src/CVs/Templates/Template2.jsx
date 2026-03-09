@@ -1,7 +1,7 @@
 import React from 'react';
 import './Template2.css';
 
-const Template2 = ({ cvData, handleTextChange, handleArrayChange }) => {
+const Template2 = ({ cvData, handleTextChange, handleArrayChange, onAvatarClick }) => {
   const displayExperiences = cvData.experiences?.length > 0 ? cvData.experiences : [{}];
   const displayEducations = cvData.educations?.length > 0 ? cvData.educations : [{}];
 
@@ -9,7 +9,14 @@ const Template2 = ({ cvData, handleTextChange, handleArrayChange }) => {
     <div className="a4-paper template-2">
       <div className="t2-header">
         <div className="t2-avatar-container">
-          <img src={cvData.fileUrl || "https://placehold.co/280x380/333/ccc?text=Avatar"} alt="Avatar" className="t2-avatar-img" />
+          <img 
+            src={cvData.fileUrl || "https://placehold.co/280x380/333/ccc?text=Avatar"} 
+            alt="Avatar" 
+            className="t2-avatar-img" 
+            onClick={onAvatarClick}
+            style={{ cursor: 'pointer' }}
+            title="Click để thay đổi ảnh đại diện"
+          />
           <div className="t2-tiktok-top">Following | <b>For you</b></div>
           <div className="t2-tiktok-right">
             <div className="t2-icon-group"><span className="t2-icon red-heart">❤️</span><span className="t2-icon-text">1M+</span></div>

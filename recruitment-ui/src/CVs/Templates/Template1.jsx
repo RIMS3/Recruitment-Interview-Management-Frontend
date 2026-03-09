@@ -1,8 +1,7 @@
 import React from 'react';
 import './Template1.css';
 
-const Template1 = ({ cvData, handleTextChange, handleArrayChange }) => {
-  // Bọc lót mảng rỗng: Nếu chưa có kinh nghiệm/học vấn nào thì hiển thị 1 ô trống để gõ
+const Template1 = ({ cvData, handleTextChange, handleArrayChange, onAvatarClick }) => {
   const displayExperiences = cvData.experiences?.length > 0 ? cvData.experiences : [{}];
   const displayEducations = cvData.educations?.length > 0 ? cvData.educations : [{}];
 
@@ -44,11 +43,17 @@ const Template1 = ({ cvData, handleTextChange, handleArrayChange }) => {
 
       <div className="t1-right-pane">
         <div className="t1-right-header">
-          <img src={cvData.fileUrl || "https://placehold.co/300x300/cccccc/ffffff?text=Avatar"} alt="Avatar" className="t1-avatar" />
+          <img 
+            src={cvData.fileUrl || "https://placehold.co/300x300/cccccc/ffffff?text=Avatar"} 
+            alt="Avatar" 
+            className="t1-avatar" 
+            onClick={onAvatarClick}
+            style={{ cursor: 'pointer' }}
+            title="Click để thay đổi ảnh đại diện"
+          />
         </div>
 
         <div className="t1-right-body">
-          {/* MỤC TIÊU NGHỀ NGHIỆP (Map vào trường summary của backend) */}
           <div className="t1-right-section">
             <div className="t1-right-title-wrap">
               <h2 className="t1-right-title">MỤC TIÊU NGHỀ NGHIỆP</h2>
@@ -59,7 +64,6 @@ const Template1 = ({ cvData, handleTextChange, handleArrayChange }) => {
             </p>
           </div>
 
-          {/* KINH NGHIỆM LÀM VIỆC (Map vào mảng experiences) */}
           <div className="t1-right-section">
             <div className="t1-right-title-wrap">
               <h2 className="t1-right-title">KINH NGHIỆM LÀM VIỆC</h2>
@@ -80,7 +84,6 @@ const Template1 = ({ cvData, handleTextChange, handleArrayChange }) => {
             ))}
           </div>
 
-          {/* HỌC VẤN (Map vào mảng educations) */}
           <div className="t1-right-section">
             <div className="t1-right-title-wrap">
               <h2 className="t1-right-title">HỌC VẤN</h2>

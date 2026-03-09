@@ -17,8 +17,8 @@ const CreateCV = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const cvRef = useRef(null); 
+  const fileInputRef = useRef(null); // Thêm ref cho thẻ input file
 
-  // 1. STATE CHUẨN ĐỂ PUT JSON LÊN BACKEND
   const [cvData, setCvData] = useState({
     cvId: cvId,
     candidateId: "",
@@ -35,6 +35,7 @@ const CreateCV = () => {
     educationSummary: "",
     currentSalary: "",
     experienceYears: "",
+    fileUrl: "", // Đảm bảo có state fileUrl
     educations: [],
     experiences: [],
     projects: [],
@@ -42,11 +43,9 @@ const CreateCV = () => {
     skills: []
   });
 
-  // 2. TẢI DỮ LIỆU TỪ DB LÊN (GET)
   useEffect(() => {
     const fetchCVData = async () => {
       try {
-        // Cập nhật: Sử dụng biến môi trường cho phương thức GET
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}`);
         if (response.ok) {
           const data = await response.json();
@@ -64,6 +63,7 @@ const CreateCV = () => {
             educationSummary: data.educationSummary || "",
             currentSalary: data.currentSalary || "",
             experienceYears: data.experienceYears || "",
+            fileUrl: data.fileUrl || "",
             educations: data.educations || [],
             experiences: data.experiences || [],
             projects: data.projects || [],
@@ -99,6 +99,47 @@ const CreateCV = () => {
     });
   };
 
+  // --- HÀM XỬ LÝ CLICK VÀ UPLOAD ẢNH ---
+  const handleAvatarClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 1. Hiển thị ảnh preview ngay lập tức
+    const previewUrl = URL.createObjectURL(file);
+    setCvData(prev => ({ ...prev, fileUrl: previewUrl }));
+
+    // 2. Gửi API lên backend
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}/avatar`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCvData(prev => ({ ...prev, fileUrl: data.fileUrl }));
+      } else {
+        alert("Lỗi khi upload ảnh lên server!");
+      }
+    } catch (error) {
+      console.error("Lỗi upload ảnh:", error);
+      alert("Đã xảy ra lỗi khi upload ảnh.");
+    }
+  };
+
   const handleExportPDF = () => {
     const element = cvRef.current; 
     if (!element) return;
@@ -118,7 +159,6 @@ const CreateCV = () => {
     html2pdf().set(opt).from(element).save();
   };
 
-  // 3. LƯU DỮ LIỆU BẰNG JSON (PUT /editor)
   const handleSaveCV = async () => {
     if (cvId.startsWith('mock-cv')) {
         alert("⚠️ Đang ở chế độ xem trước. Hãy quay lại chọn mẫu để tạo CV thật!");
@@ -127,7 +167,6 @@ const CreateCV = () => {
 
     setIsSaving(true);
     try {
-      // Logic xử lý safeGender và safeBirthday giữ nguyên
       let safeGender = null;
       if (cvData.gender !== null && cvData.gender !== undefined && cvData.gender !== "") {
           const gStr = String(cvData.gender).toLowerCase().trim();
@@ -215,7 +254,6 @@ const CreateCV = () => {
       };
 
       const token = localStorage.getItem("accessToken");
-      // Cập nhật: Sử dụng biến môi trường cho phương thức PUT (Lưu CV)
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}/editor`, {
         method: 'PUT',
         headers: {
@@ -242,16 +280,32 @@ const CreateCV = () => {
   const renderTemplate = () => {
     if (isLoading) return <div className="loading-spinner">Đang tải dữ liệu CV...</div>;
 
+    const templateProps = { 
+      cvData, 
+      handleTextChange, 
+      handleArrayChange, 
+      onAvatarClick: handleAvatarClick 
+    };
+
     switch (activeTemplateId) {
-      case 'tpl-1': return <Template1 cvData={cvData} handleTextChange={handleTextChange} handleArrayChange={handleArrayChange} />;
-      case 'tpl-2': return <Template2 cvData={cvData} handleTextChange={handleTextChange} handleArrayChange={handleArrayChange} />;
-      case 'tpl-3': return <Template3 cvData={cvData} handleTextChange={handleTextChange} handleArrayChange={handleArrayChange} />;
-      default: return <Template1 cvData={cvData} handleTextChange={handleTextChange} handleArrayChange={handleArrayChange} />;
+      case 'tpl-1': return <Template1 {...templateProps} />;
+      case 'tpl-2': return <Template2 {...templateProps} />;
+      case 'tpl-3': return <Template3 {...templateProps} />;
+      default: return <Template1 {...templateProps} />;
     }
   };
 
   return (
     <div className="create-cv-layout">
+      {/* Input file ẩn dùng để chọn ảnh */}
+      <input 
+        type="file" 
+        accept="image/*" 
+        style={{ display: 'none' }} 
+        ref={fileInputRef} 
+        onChange={handleAvatarChange} 
+      />
+
       <header className="workspace-header">
         <div className="header-container">
           <input 
