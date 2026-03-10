@@ -12,10 +12,6 @@ const ListAppliedJobs = () => {
     
     // CandidateId mẫu theo yêu cầu hệ thống của bạn
     const candidateId = "3BAA57EA-6C4E-4E8E-8B2E-4931E39F4026";
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     useEffect(() => {
         // Lấy candidateId động từ localStorage (đã được lưu khi đăng nhập hoặc ứng tuyển)
         const storedCandidateId = localStorage.getItem("candidateId");

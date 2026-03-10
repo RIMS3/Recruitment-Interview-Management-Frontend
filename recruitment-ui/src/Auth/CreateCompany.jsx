@@ -3,6 +3,7 @@ import "./CreateCompany.css";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
+const API = import.meta.env.VITE_API_BASE_URL;
 const CreateCompany = () => {
   const navigate = useNavigate();
 

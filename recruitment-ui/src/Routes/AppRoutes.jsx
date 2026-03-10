@@ -6,6 +6,7 @@ import ApplicationList from "../Applications/ApplicationList";
 import ProtectedRoute from "../Auth/ProtectedRoute";
 import SelectRole from "../Auth/SelectRole";
 import CreateCompany from "../Auth/CreateCompany";
+import CVViewer from "../CVs/CVViewer";
 
 const AppRoutes = () => {
   return (
@@ -42,6 +43,15 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/cv-preview/:cvId"
+        element={
+          <ProtectedRoute requiredRole={3}>
+            <CVViewer />
+          </ProtectedRoute>
+        }
+      />
+
       {/* TEST FRONTEND ONLY */}
       <Route path="/create-company" element={<CreateCompany />} />
 

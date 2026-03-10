@@ -1,108 +1,210 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Button, Spinner } from "react-bootstrap";
+import React from "react";
+import { X, Mail, Briefcase, Calendar } from "lucide-react";
 import { toast } from "react-toastify";
+import "./ApplicationModal.css";
+import { applicationApi } from "../Services/applicationApi";
+const ApplicationModal = ({ show, handleClose, application }) => {
+  if (!show || !application) return null;
 
-const ApplicationModal = ({ show, handleClose, applicationId }) => {
-  const [app, setApp] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
+  /* =========================
+     FIX DATA MAPPING
+  ========================== */
 
-  useEffect(() => {
-    if (applicationId) {
-      fetchApplication();
-    }
-  }, [applicationId]);
+  const appliedDate =
+    application.appliedDate ||
+    application.appliedAt ||
+    application.AppliedAt ||
+    application.createdAt ||
+    application.CreatedAt ||
+    null;
 
-  const fetchApplication = async () => {
-    try {
-      setLoading(true);
+  const candidateName =
+    application.candidateName ||
+    application.CandidateName ||
+    "Unknown";
 
-      const res = await fetch(
-        `https://localhost:7272/api/Application/${applicationId}/cv`
-      );
+  const candidateEmail =
+    application.candidateEmail ||
+    application.CandidateEmail ||
+    "Không có email";
 
-      if (!res.ok) {
-        throw new Error("Không lấy được thông tin CV");
-      }
+  const jobTitle =
+    application.jobTitle ||
+    application.JobTitle ||
+    "Chưa xác định";
 
-      const data = await res.json();
-      setApp(data);
-    } catch (err) {
-      toast.error("Lỗi khi tải CV");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const status = Number(
+    application.status ??
+    application.Status ??
+    0
+  );
+
+  const cvId =
+    application.cvId ||
+    application.CvId ||
+    null;
+
+  console.log("Application data:", application);
+
+  /* =========================
+     FORMAT DATE
+  ========================== */
+
+  const formatDate = (date) => {
+    if (!date) return "Chưa có dữ liệu";
+
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) return "Ngày không hợp lệ";
+
+    return d.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
-  const handlePreview = () => {
-    if (!app?.cvId) {
-      toast.error("Ứng viên chưa upload CV");
+  /* =========================
+     VIEW CV
+  ========================== */
+
+  const handleViewCV = async () => {
+
+  try {
+
+    const applicationId =
+      application.applicationId ||
+      application.ApplicationId;
+
+    if (!applicationId) {
+      toast.error("Không tìm thấy applicationId");
       return;
     }
 
-    setShowPreview(!showPreview);
-  };
+    const result = await applicationApi.getCvIdByApplication(applicationId);
 
-  const handleViewCV = () => {
-    if (!app?.cvId) {
-      toast.error("Ứng viên chưa upload CV");
+    const cvId = result.cvId || result;
+
+    if (!cvId) {
+      toast.error("Ứng viên chưa tạo CV");
       return;
     }
-  };
 
-  if (!app && !loading) return null;
+    const url = `/cv-preview/${cvId}`;
+
+    window.open(url, "_blank");
+
+  } catch (error) {
+
+    console.error(error);
+
+    toast.error("Không thể tải CV");
+
+  }
+};
+
+  /* =========================
+     STATUS TEXT
+  ========================== */
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 0:
+        return "Chờ duyệt";
+      case 1:
+        return "Đã chấp nhận";
+      case 2:
+        return "Đã từ chối";
+      default:
+        return "Không xác định";
+    }
+  };
 
   return (
-    <Modal show={show} onHide={handleClose} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Thông tin CV ứng viên</Modal.Title>
-      </Modal.Header>
+    <div className="modal-overlay">
+      <div className="modal-box single">
 
-      <Modal.Body>
-        {loading ? (
-          <div style={{ textAlign: "center" }}>
-            <Spinner animation="border" />
+        {/* LEFT */}
+        <div className="modal-left">
+
+          <div className="modal-header">
+            <h3>Thông tin ứng viên</h3>
+
+            <button className="close-btn" onClick={handleClose}>
+              <X size={18} />
+            </button>
           </div>
-        ) : (
-          <>
-            <div style={{ marginBottom: "15px" }}>
-              <Button variant="primary" onClick={handlePreview}>
-                {showPreview ? "Ẩn Preview CV" : "Preview CV"}
-              </Button>
 
-              {"  "}
+          <div className="modal-body">
 
-              <a
-                href={`https://localhost:7272/api/Cvs/${app.cvId}/download`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-success"
-                onClick={handleViewCV}
-              >
-                Xem CV chi tiết
-              </a>
+            {/* PROFILE */}
+            <div className="profile-card">
+
+              <div className="avatar">
+                {candidateName?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+
+              <div className="profile-info">
+
+                <h4>{candidateName}</h4>
+
+                <div className="email">
+                  <Mail size={14} />
+                  {candidateEmail}
+                </div>
+
+              </div>
+
             </div>
 
-            {showPreview && (
-              <iframe
-                title="CV Preview"
-                src={`https://localhost:7272/api/Cvs/${app.cvId}/download`}
-                width="100%"
-                height="500px"
-                style={{ border: "1px solid #ccc" }}
-              />
-            )}
-          </>
-        )}
-      </Modal.Body>
+            {/* JOB */}
+            <div className="info-item">
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Đóng
-        </Button>
-      </Modal.Footer>
-    </Modal>
+              <div className="info-label">
+                <Briefcase size={14} />
+                Vị trí ứng tuyển
+              </div>
+
+              <div className="info-value-row">
+
+                <span className="job-title">
+                  {jobTitle}
+                </span>
+
+                <span className={`status status-${status}`}>
+                  {getStatusText(status)}
+                </span>
+
+              </div>
+
+            </div>
+
+            {/* DATE */}
+            <div className="info-item">
+
+              <div className="info-label">
+                <Calendar size={14} />
+                Ngày nộp hồ sơ
+              </div>
+
+              <div className="info-value">
+                {formatDate(appliedDate)}
+              </div>
+
+            </div>
+
+            {/* BUTTON */}
+            <button
+              className="btn-primary"
+              onClick={handleViewCV}
+            >
+              Xem CV
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

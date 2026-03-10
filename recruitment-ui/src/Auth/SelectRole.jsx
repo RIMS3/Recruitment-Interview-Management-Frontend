@@ -5,6 +5,7 @@ import { User, Briefcase, Code2 } from "lucide-react";
 import { AuthContext } from "./AuthContext";
 import "./SelectRole.css";
 
+const API = import.meta.env.VITE_API_BASE_URL;
 export default function SelectRole() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(AuthContext);
@@ -20,7 +21,7 @@ export default function SelectRole() {
       }
 
       const res = await axios.post(
-        "https://localhost:7272/api/auth/select-role",
+  `${API}/auth/select-role`,
         { role }, // ✅ Gửi trực tiếp số (backend nhận int)
         {
           headers: {
