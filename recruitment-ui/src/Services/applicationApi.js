@@ -1,4 +1,4 @@
-// Thay đổi: Sử dụng biến môi trường và nối thêm endpoint cụ thể
+
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/employer-applications`;
 
 export const applicationApi = {
@@ -34,5 +34,18 @@ export const applicationApi = {
     });
 
     return response.ok;
+  },
+
+  getCvIdByApplication: async (applicationId) => {
+
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/Application/${applicationId}/cv`
+  );
+
+  if (!response.ok) {
+    throw new Error("Không lấy được CV ID");
   }
+
+  return response.json();
+}
 };

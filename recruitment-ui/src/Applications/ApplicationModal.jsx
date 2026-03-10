@@ -1,108 +1,208 @@
 import React from "react";
-import { X, Check, XCircle, ExternalLink, Calendar, Mail, Briefcase } from "lucide-react";
+import { X, Mail, Briefcase, Calendar } from "lucide-react";
+import { toast } from "react-toastify";
 import "./ApplicationModal.css";
+import { applicationApi } from "../Services/applicationApi";
+const ApplicationModal = ({ show, handleClose, application }) => {
+  if (!show || !application) return null;
 
-const ApplicationModal = ({ app, onClose, onAction }) => {
-  if (!app) return null;
+  /* =========================
+     FIX DATA MAPPING
+  ========================== */
 
-  const getStatusLabel = (status) => {
-    const labels = {
-      0: { text: "Chờ duyệt", class: "status-0" },
-      1: { text: "Đã chấp nhận", class: "status-1" },
-      2: { text: "Đã từ chối", class: "status-2" },
-    };
-    return labels[status] || { text: "", class: "" };
+  const appliedDate =
+    application.appliedDate ||
+    application.appliedAt ||
+    application.AppliedAt ||
+    application.createdAt ||
+    application.CreatedAt ||
+    null;
+
+  const candidateName =
+    application.candidateName ||
+    application.CandidateName ||
+    "Unknown";
+
+  const candidateEmail =
+    application.candidateEmail ||
+    application.CandidateEmail ||
+    "Không có email";
+
+  const jobTitle =
+    application.jobTitle ||
+    application.JobTitle ||
+    "Chưa xác định";
+
+  const status = Number(
+    application.status ??
+    application.Status ??
+    0
+  );
+
+  const cvId =
+    application.cvId ||
+    application.CvId ||
+    null;
+
+  console.log("Application data:", application);
+
+  /* =========================
+     FORMAT DATE
+  ========================== */
+
+  const formatDate = (date) => {
+    if (!date) return "Chưa có dữ liệu";
+
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) return "Ngày không hợp lệ";
+
+    return d.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
-  const statusInfo = getStatusLabel(app.status);
+  /* =========================
+     VIEW CV
+  ========================== */
+
+  const handleViewCV = async () => {
+
+  try {
+
+    const applicationId =
+      application.applicationId ||
+      application.ApplicationId;
+
+    if (!applicationId) {
+      toast.error("Không tìm thấy applicationId");
+      return;
+    }
+
+    const result = await applicationApi.getCvIdByApplication(applicationId);
+
+    const cvId = result.cvId || result;
+
+    if (!cvId) {
+      toast.error("Ứng viên chưa tạo CV");
+      return;
+    }
+
+    const url = `/cv-preview/${cvId}`;
+
+    window.open(url, "_blank");
+
+  } catch (error) {
+
+    console.error(error);
+
+    toast.error("Không thể tải CV");
+
+  }
+};
+
+  /* =========================
+     STATUS TEXT
+  ========================== */
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 0:
+        return "Chờ duyệt";
+      case 1:
+        return "Đã chấp nhận";
+      case 2:
+        return "Đã từ chối";
+      default:
+        return "Không xác định";
+    }
+  };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="modal-header">
-          <h3>Thông tin ứng viên</h3>
-          <button className="close-btn" onClick={onClose}>
-            <X size={20} />
-          </button>
-        </div>
+    <div className="modal-overlay">
+      <div className="modal-box single">
 
-        {/* Profile Identity Section */}
-        <div className="modal-body">
-          <div className="modal-profile-card">
-            <div className="profile-main">
-              {app.candidateAvatar ? (
-                <img 
-                  src={app.candidateAvatar} 
-                  alt={app.candidateName} 
-                  className="modal-avatar-img"
-                  onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                />
-              ) : null}
-              <div className="avatar large" style={{ display: app.candidateAvatar ? 'none' : 'flex' }}>
-                {app.candidateName?.charAt(0).toUpperCase()}
+        {/* LEFT */}
+        <div className="modal-left">
+
+          <div className="modal-header">
+            <h3>Thông tin ứng viên</h3>
+
+            <button className="close-btn" onClick={handleClose}>
+              <X size={18} />
+            </button>
+          </div>
+
+          <div className="modal-body">
+
+            {/* PROFILE */}
+            <div className="profile-card">
+
+              <div className="avatar">
+                {candidateName?.charAt(0)?.toUpperCase() || "U"}
               </div>
-              <div className="profile-text">
-                <h4>{app.candidateName}</h4>
-                <div className="profile-subtext">
+
+              <div className="profile-info">
+
+                <h4>{candidateName}</h4>
+
+                <div className="email">
                   <Mail size={14} />
-                  <span>{app.candidateEmail}</span>
+                  {candidateEmail}
                 </div>
+
               </div>
+
             </div>
+
+            {/* JOB */}
+            <div className="info-item">
+
+              <div className="info-label">
+                <Briefcase size={14} />
+                Vị trí ứng tuyển
+              </div>
+
+              <div className="info-value-row">
+
+                <span className="job-title">
+                  {jobTitle}
+                </span>
+
+                <span className={`status status-${status}`}>
+                  {getStatusText(status)}
+                </span>
+
+              </div>
+
+            </div>
+
+            {/* DATE */}
+            <div className="info-item">
+
+              <div className="info-label">
+                <Calendar size={14} />
+                Ngày nộp hồ sơ
+              </div>
+
+              <div className="info-value">
+                {formatDate(appliedDate)}
+              </div>
+
+            </div>
+
+            {/* BUTTON */}
+            <button
+              className="btn-primary"
+              onClick={handleViewCV}
+            >
+              Xem CV
+            </button>
+
           </div>
-
-          {/* Details Section */}
-          <div className="info-grid">
-            <div className="info-row">
-              <label><Briefcase size={14} /> Vị trí ứng tuyển</label>
-              <span>{app.jobTitle}</span>
-            </div>
-
-            <div className="info-row">
-              <label><Calendar size={14} /> Ngày nộp hồ sơ</label>
-              <span>{new Date(app.appliedAt).toLocaleDateString('vi-VN')}</span>
-            </div>
-
-            <div className="info-row">
-              <label>Trạng thái hiện tại</label>
-              <span className={`status ${statusInfo.class}`}>
-                {statusInfo.text}
-              </span>
-            </div>
-          </div>
-
-          {/* CV Button */}
-          <a
-            href={app.cvUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cv-link-btn"
-          >
-            <span>Xem CV chi tiết</span>
-            <ExternalLink size={18} />
-          </a>
         </div>
-
-        {/* Action Buttons */}
-        {app.status === 0 && (
-          <div className="modal-footer">
-            <button 
-              className="btn-modal btn-modal-reject" 
-              onClick={() => onAction(app.applicationId, 2)}
-            >
-              <XCircle size={18} />
-              Từ chối
-            </button>
-            <button 
-              className="btn-modal btn-modal-accept" 
-              onClick={() => onAction(app.applicationId, 1)}
-            >
-              <Check size={18} />
-              Chấp nhận hồ sơ
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

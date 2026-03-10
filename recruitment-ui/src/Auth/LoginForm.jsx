@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast'; // Import thư viện thông báo
 import './LoginStyles.css';
 import { AuthContext } from "./AuthContext";
 
+const API = import.meta.env.VITE_API_BASE_URL;
 const LoginForm = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
@@ -36,7 +37,7 @@ const LoginForm = () => {
     const toastId = toast.loading("Đang đăng nhập bằng Google...");
 
     try {
-      const res = await fetch("https://localhost:7272/api/Auth/google", {
+      const res = await fetch(`${API}/Auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken: response.credential }),
@@ -119,8 +120,8 @@ const LoginForm = () => {
 
     try {
       const url = isLogin
-        ? "https://localhost:7272/api/Auth/login"
-        : "https://localhost:7272/api/Auth/register";
+        ? `${API}/Auth/login`
+        : `${API}/Auth/register`;
 
       const body = isLogin
         ? { email, password }
@@ -177,7 +178,7 @@ const LoginForm = () => {
       } else {
   // REGISTER SUCCESS -> LOGIN LUÔN
 
-  const loginRes = await fetch("https://localhost:7272/api/Auth/login", {
+  const loginRes = await fetch(`${API}/Auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
