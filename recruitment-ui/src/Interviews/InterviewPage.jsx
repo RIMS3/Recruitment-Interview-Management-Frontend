@@ -12,6 +12,9 @@ const InterviewPage = () => {
     const { companyId } = useParams();
     const today = new Date().toISOString().split('T')[0];
     
+    // Lấy Base URL từ biến môi trường (Ví dụ: https://localhost:7272/api)
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    
     // States dữ liệu
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -38,8 +41,9 @@ const InterviewPage = () => {
         if (!companyId) return;
         try {
             setLoading(true);
-            const response = await axios.get(`https://localhost:7272/api/interview/slots`, {
-                params: { 
+            // SỬA: Dùng API_BASE_URL và bỏ /api
+            const response = await axios.get(`${API_BASE_URL}/interview/slots`, { 
+                params: {  
                     IdCompany: companyId, 
                     ChooesDate: selectedDate,
                     CurrentPage: currentPage 
@@ -51,7 +55,7 @@ const InterviewPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [companyId, selectedDate, currentPage]);
+    }, [companyId, selectedDate, currentPage, API_BASE_URL]);
 
     useEffect(() => {
         fetchData();
@@ -85,7 +89,8 @@ const InterviewPage = () => {
         if (!slotToDelete) return;
         try {
             setIsSubmitting(true);
-            const response = await axios.delete(`https://localhost:7272/api/interview/slots`, {
+            // SỬA: Dùng API_BASE_URL và bỏ /api
+            const response = await axios.delete(`${API_BASE_URL}/interview/slots`, {
                 data: { idCompany: companyId, idInterviewSlot: slotToDelete }
             });
 
@@ -125,9 +130,11 @@ const InterviewPage = () => {
             let response;
             if (editingSlotId) {
                 payload.idInterviewSlot = editingSlotId;
-                response = await axios.put(`https://localhost:7272/api/interview/slots`, payload);
+                // SỬA: Dùng API_BASE_URL và bỏ /api
+                response = await axios.put(`${API_BASE_URL}/interview/slots`, payload);
             } else {
-                response = await axios.post(`https://localhost:7272/api/interview/slots`, payload);
+                // SỬA: Dùng API_BASE_URL và bỏ /api
+                response = await axios.post(`${API_BASE_URL}/interview/slots`, payload);
             }
             
             if (response.data === true) {

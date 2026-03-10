@@ -15,7 +15,7 @@
     padding: 0;
 }
 
-.wrapper {
+.job-list-wrapper {
     background-color: var(--bg-light);
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
@@ -90,7 +90,7 @@
 
 .btn-find:hover { background: #009643; transform: translateY(-1px); }
 
-.main-content {
+.job-list-main-content {
     max-width: 1400px;
     width: 95%;
     margin: 30px auto;
@@ -98,7 +98,7 @@
     gap: 30px;
 }
 
-.sidebar {
+.job-list-sidebar {
     width: 250px;
     background: white;
     border-radius: 12px;
@@ -236,7 +236,6 @@
     transition: 0.3s ease;
 }
 
-/* Thêm class để báo hiệu card có thể click */
 .clickable-card {
     cursor: pointer;
 }
@@ -247,7 +246,6 @@
     transform: translateY(-2px);
 }
 
-/* Hiệu ứng cho title khi hover card */
 .job-card:hover .job-title {
     color: var(--primary-green);
 }
@@ -421,6 +419,6 @@
 }
 
 @media (max-width: 1024px) {
-    .main-content { flex-direction: column; }
-    .sidebar { width: 100%; position: static; }
+    .job-list-main-content { flex-direction: column; }
+    .job-list-sidebar { width: 100%; position: static; }
 }
