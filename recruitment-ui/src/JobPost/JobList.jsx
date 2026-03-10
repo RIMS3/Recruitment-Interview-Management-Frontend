@@ -161,7 +161,7 @@ const JobList = () => {
     };
 
     return (
-        <div className="wrapper">
+        <div className="job-list-wrapper">
             <header className="sticky-header">
                 <div className="search-container">
                     <div className="search-box">
@@ -189,8 +189,8 @@ const JobList = () => {
                 </div>
             </header>
 
-            <div className="main-content">
-                <aside className="sidebar">
+            <div className="job-list-main-content">
+                <aside className="job-list-sidebar">
                     <div className="filter-header">
                         <span className="filter-icon">⚡</span> Lọc nâng cao
                     </div>
