@@ -5,6 +5,29 @@ import { DEV_BYPASS_LOGIN_TO_SAVE, DEV_CANDIDATE_ID } from '../Services/candidat
 import { AuthContext } from '../Auth/AuthContext'; 
 import './JobList.css';
 
+// --- PHẦN THÊM MỚI: Mảng chứa logo các công ty lớn ---
+const COMPANY_LOGOS = [
+    // "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg", // Google
+    // "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",     // Microsoft
+    // "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",        // Amazon
+    "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",   // Apple
+    "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",  // Netflix
+    "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png",          // Tesla
+    "https://d3e6ckxkrs5ntg.cloudfront.net/artists/images/8636356/original/resize:248x186/crop:x0y29w245h183/hash:1755578318/avt-viet69.jpeg?1755578318",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Pornhub-logo.svg/3840px-Pornhub-logo.svg.png"
+];
+
+// --- PHẦN THÊM MỚI: Hàm lấy logo cố định theo ID của Job ---
+const getLogoForJob = (jobId) => {
+    if (!jobId) return COMPANY_LOGOS[0];
+    let hash = 0;
+    for (let i = 0; i < jobId.length; i++) {
+        hash = jobId.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % COMPANY_LOGOS.length;
+    return COMPANY_LOGOS[index];
+};
+
 const JobList = () => {
     const navigate = useNavigate();
     
@@ -39,7 +62,6 @@ const JobList = () => {
         PageSize: 6
     });
 
-    // CẬP NHẬT: Sử dụng biến môi trường để lấy dữ liệu khởi tạo bộ lọc
     useEffect(() => {
         const initData = async () => {
             try {
@@ -78,7 +100,6 @@ const JobList = () => {
         }
     }, [candidateId]);
 
-    // CẬP NHẬT: Sử dụng biến môi trường cho API lọc công việc
     const fetchJobs = useCallback(async () => {
         setLoading(true);
         try {
@@ -240,6 +261,9 @@ const JobList = () => {
                     {jobs.map((job) => {
                         const jobId = String(job.idJobPost || job.jobId || job.id);
                         const isSaved = savedJobIds.has(jobId);
+                        
+                        // --- PHẦN THÊM MỚI: Lấy logo tương ứng cho job này ---
+                        const jobLogo = getLogoForJob(jobId);
 
                         return (
                             <div 
@@ -248,7 +272,8 @@ const JobList = () => {
                                 onClick={() => navigate(`/jobpostdetail/${jobId}`)}
                             >
                                 <div className="logo-box">
-                                    <img src="https://static.topcv.vn/company_logo/default-company-logo.png" alt="logo" />
+                                    {/* --- PHẦN THÊM MỚI: Truyền biến jobLogo vào thẻ img --- */}
+                                    <img src={jobLogo} alt="company logo" />
                                 </div>
                                 <div className="job-info">
                                     <div className="job-top">
@@ -303,19 +328,17 @@ const JobList = () => {
                 </main>
             </div>
 
-            {/* Nút mới: Danh sách ứng tuyển (Người dấu cộng) */}
             <button 
-    className="floating-applied-list" 
-    title="Danh sách ứng tuyển"
-    onClick={() => navigate('/applied-jobs')}
->
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M7 12C9.21 12 11 10.21 11 8C11 5.79 9.21 4 7 4C4.79 4 3 5.79 3 8C3 10.21 4.79 12 7 12ZM7 14C4.33 14 0 15.34 0 18V20H14V18C14 15.34 9.67 14 7 14Z" fill="#00b14f"/>
-        <path d="M21 9V6H19V9H16V11H19V14H21V11H24V9H21Z" fill="#00b14f"/>
-    </svg>
-</button>
+                className="floating-applied-list" 
+                title="Danh sách ứng tuyển"
+                onClick={() => navigate('/applied-jobs')}
+            >
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 12C9.21 12 11 10.21 11 8C11 5.79 9.21 4 7 4C4.79 4 3 5.79 3 8C3 10.21 4.79 12 7 12ZM7 14C4.33 14 0 15.34 0 18V20H14V18C14 15.34 9.67 14 7 14Z" fill="#00b14f"/>
+                    <path d="M21 9V6H19V9H16V11H19V14H21V11H24V9H21Z" fill="#00b14f"/>
+                </svg>
+            </button>
 
-            {/* Nút Trái tim hiện tại */}
             <div className="saved-jobs-floating" onClick={() => navigate('/saved-jobs')}>
                 <svg viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
