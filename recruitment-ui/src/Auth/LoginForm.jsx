@@ -33,7 +33,6 @@ const LoginForm = () => {
 
   // ================= GOOGLE LOGIN (GIỮ NGUYÊN) =================
   async function handleCredentialResponse(response) {
-
     const toastId = toast.loading("Đang đăng nhập bằng Google...");
 
     try {
@@ -50,16 +49,7 @@ const LoginForm = () => {
         return;
       }
 
-    // 🔥 ĐIỀU HƯỚNG: Role 0 là chưa chọn vai trò
-    if (data.role === 0) {
-      navigate("/select-role");
-    } else if (data.role === 1) {
-        navigate("/admin/dashboard"); // Admin -> Dashboardelse {
-      navigate("/");
-    }
-  } catch (err) {
-    console.error("Google login error:", err);
-      alert("Không thể kết nối server");
+      // --- Cần đưa toàn bộ phần lưu trữ vào ĐÂY (trước khi navigate) ---
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("email", data.email);
       localStorage.setItem("fullName", data.fullName);
@@ -76,16 +66,19 @@ const LoginForm = () => {
 
       toast.success("Đăng nhập Google thành công!", { id: toastId });
 
+      // Sau đó mới điều hướng
       if (data.role === 0) {
         navigate("/select-role");
+      } else if (data.role === 1) {
+        navigate("/admin/dashboard");
       } else {
         navigate("/");
       }
 
-    } //catch (err) {
-      //console.error("Google login error:", err);
-     // toast.error("Không thể kết nối server", { id: toastId });
-    //}
+    } catch (err) {
+      console.error("Google login error:", err);
+      toast.error("Không thể kết nối server", { id: toastId });
+    }
   }
 
   useEffect(() => {
@@ -153,7 +146,7 @@ const LoginForm = () => {
         localStorage.setItem("userId", data.userId);
 
         if (data.candidateId) {
-            localStorage.setItem("candidateId", data.candidateId);
+          localStorage.setItem("candidateId", data.candidateId);
         }
 
         setUser({
@@ -176,48 +169,48 @@ const LoginForm = () => {
 
 
       } else {
-  // REGISTER SUCCESS -> LOGIN LUÔN
+        // REGISTER SUCCESS -> LOGIN LUÔN
 
-  const loginRes = await fetch(`${API}/Auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
+        const loginRes = await fetch(`${API}/Auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
 
-  const loginData = await loginRes.json();
+        const loginData = await loginRes.json();
 
-  if (!loginRes.ok) {
-    toast.success("Đăng ký thành công! Hãy đăng nhập.", { id: toastId });
-    setIsLogin(true);
-    return;
-  }
+        if (!loginRes.ok) {
+          toast.success("Đăng ký thành công! Hãy đăng nhập.", { id: toastId });
+          setIsLogin(true);
+          return;
+        }
 
-  // LƯU TOKEN
-  localStorage.setItem("accessToken", loginData.accessToken);
-  localStorage.setItem("email", loginData.email);
-  localStorage.setItem("fullName", loginData.fullName);
-  localStorage.setItem("role", loginData.role);
-  localStorage.setItem("userId", loginData.userId);
+        // LƯU TOKEN
+        localStorage.setItem("accessToken", loginData.accessToken);
+        localStorage.setItem("email", loginData.email);
+        localStorage.setItem("fullName", loginData.fullName);
+        localStorage.setItem("role", loginData.role);
+        localStorage.setItem("userId", loginData.userId);
 
-  setUser({
-    id: loginData.userId,
-    candidateId: loginData.candidateId,
-    cvId: loginData.cvId,
-    token: loginData.accessToken,
-    email: loginData.email,
-    fullName: loginData.fullName,
-    role: loginData.role,
-  });
+        setUser({
+          id: loginData.userId,
+          candidateId: loginData.candidateId,
+          cvId: loginData.cvId,
+          token: loginData.accessToken,
+          email: loginData.email,
+          fullName: loginData.fullName,
+          role: loginData.role,
+        });
 
-  toast.success("Đăng ký và đăng nhập thành công!", { id: toastId });
+        toast.success("Đăng ký và đăng nhập thành công!", { id: toastId });
 
-  // ĐIỀU HƯỚNG
-  if (loginData.role === 0) {
-    navigate("/select-role");
-  } else {
-    navigate("/");
-  }
-}
+        // ĐIỀU HƯỚNG
+        if (loginData.role === 0) {
+          navigate("/select-role");
+        } else {
+          navigate("/");
+        }
+      }
 
     } catch (err) {
       console.error("Server error:", err);
