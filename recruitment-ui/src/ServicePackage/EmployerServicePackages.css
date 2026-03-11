@@ -1,0 +1,156 @@
+.pricing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  text-align: center;
+}
+
+.pricing-header h2 {
+  font-size: 2.5rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.pricing-header p {
+  color: #6b7280;
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.pricing-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover đổi viền sang xanh lá */
+.pricing-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: #10b981; 
+}
+
+.pkg-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+/* Giá tiền màu xanh lá đậm */
+.pkg-price {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #10b981; 
+  margin-bottom: 0.5rem;
+}
+
+.pkg-currency {
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.pkg-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 1.5rem 0;
+}
+
+.pkg-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  text-align: left;
+  flex-grow: 1;
+}
+
+.pkg-features li {
+  padding: 0.5rem 0;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+}
+
+/* Dấu tick màu xanh lá */
+.pkg-features li::before {
+  content: '✓';
+  color: #10b981; 
+  font-weight: bold;
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.pkg-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Nút Mua ngay: Nền xanh lá */
+.btn-buy {
+  background-color: #10b981; 
+  color: white;
+  border: none;
+  padding: 0.875rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+/* Hover nút mua: Xanh lá tối hơn */
+.btn-buy:hover {
+  background-color: #059669; 
+}
+
+/* Nút Chi tiết: Viền xanh lá, chữ xanh lá */
+.btn-details {
+  background-color: transparent;
+  color: #10b981; 
+  border: 1px solid #10b981; 
+  padding: 0.875rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+/* Hover nút chi tiết: Nền xanh lá cực nhạt */
+.btn-details:hover {
+  background-color: #ecfdf5; 
+}
+
+/* Modal Chi tiết */
+.detail-modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.detail-modal-content {
+  background: white; padding: 2rem; border-radius: 12px; max-width: 500px; width: 90%; text-align: left;
+}
+.detail-modal-close {
+  background: #f3f4f6; color: #374151; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; float: right; transition: background 0.2s;
+}
+.detail-modal-close:hover {
+  background: #e5e7eb;
+}
