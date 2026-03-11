@@ -26,7 +26,8 @@ import BannerManager from "./Banner/BannerManager";
 import CVViewer from "./CVs/CVViewer";
 import JobManager from "./CRUDJobpost/JobManager"
 import AdvertisementManager from "./Advertisement/AdvertisementManager";
-
+import ServicePackage from './ServicePackage/ServicePackage';
+import EmployerServicePackages from './ServicePackage/EmployerServicePackages';
 
 
 const Navbar = () => {
@@ -75,6 +76,18 @@ const Navbar = () => {
             </li>
           )}
 
+          {user && String(user.role) === "1" && (
+            <li onClick={() => navigate("/admin/service-packages")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
+              Gói Dịch Vụ
+            </li>
+          )}
+
+         {user && String(user.role) === "3" && (
+            <li onClick={() => navigate("/employer/buy-services")} style={{ cursor: "pointer", fontWeight: "bold", color: "#10b981" }}>
+              Mua Dịch Vụ
+            </li>
+          )}
+
           <li>Việc làm</li>
           <li
             onClick={handleProfileClick}
@@ -82,7 +95,6 @@ const Navbar = () => {
           >
             Hồ sơ & CV
           </li>
-          <li>Công cụ</li>
           <li>Cẩm nang</li>
           <li onClick={() => navigate("/employer/manage-jobs")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
             Đăng tin
@@ -276,6 +288,24 @@ function App() {
               element={
                 <ProtectedRoute requiredRole={1}>
                   <AdvertisementManager />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/service-packages"
+              element={
+                <ProtectedRoute requiredRole={1}>
+                  <ServicePackage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/employer/buy-services"
+              element={
+                <ProtectedRoute requiredRole={3}>
+                  <EmployerServicePackages />
                 </ProtectedRoute>
               }
             />
