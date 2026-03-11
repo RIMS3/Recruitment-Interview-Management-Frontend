@@ -17,7 +17,7 @@ import CVTemplates from "./CVs/CVTemplates";
 import CreateCV from "./CVs/CreateCV";
 import ApplicationList from "./Applications/ApplicationList";
 import AdminDashboard from './Dashboard/AdminDashboard';
-import CandidateProfile from "./CandidateProfile"; 
+import CandidateProfile from "./CandidateProfile";
 import EmployerProfile from "./EmployerProfile";
 import UserProfile from "./UserProfile";
 import ListAppliedJobs from './AppliJobs/ListAppliedJobs';
@@ -25,6 +25,7 @@ import { Toaster } from "react-hot-toast";
 import BannerManager from "./Banner/BannerManager";
 import CVViewer from "./CVs/CVViewer";
 import JobManager from "./CRUDJobpost/JobManager"
+import AdvertisementManager from "./Advertisement/AdvertisementManager";
 
 
 
@@ -64,8 +65,16 @@ const Navbar = () => {
 
         <ul className="nav-menu">
           <li onClick={() => navigate("/admin/dashboard")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
-      Quản trị hệ thống
-    </li>
+            Quản trị hệ thống
+          </li>
+
+          {/* MỤC QUẢNG CÁO CHỈ HIỆN CHO ADMIN (ROLE = 1) */}
+          {user && String(user.role) === "1" && (
+            <li onClick={() => navigate("/admin/advertisements")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
+              Quảng Cáo
+            </li>
+          )}
+
           <li>Việc làm</li>
           <li
             onClick={handleProfileClick}
@@ -76,23 +85,23 @@ const Navbar = () => {
           <li>Công cụ</li>
           <li>Cẩm nang</li>
           <li onClick={() => navigate("/employer/manage-jobs")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
-      Đăng tin
-      </li>
+            Đăng tin
+          </li>
         </ul>
 
         <div className="nav-auth">
           {user ? (
             <>
-              <div 
+              <div
                 className="user-profile-nav blue-theme"
-                style={{ cursor: "pointer" }} 
+                style={{ cursor: "pointer" }}
                 onClick={() => {
                   if (user.role === 2) {
                     navigate("/candidate-profile"); // Ứng viên
                   } else if (user.role === 3) {
                     navigate("/employer-profile"); // Nhà tuyển dụng
                   }
-                
+
                 }}
               >
                 <div className="nav-avatar">
@@ -101,8 +110,8 @@ const Navbar = () => {
                       src={user.avatarUrl}
                       alt="avatar"
                       onError={(e) => {
-                        e.target.style.display = 'none'; 
-                        e.target.nextSibling.style.display = 'flex'; 
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
                       }}
                     />
                   ) : null}
@@ -191,14 +200,14 @@ function App() {
             <Route path="/candidate-profile" element={<CandidateProfile />} />
             <Route path="/employer-profile" element={<EmployerProfile />} />
             <Route path="/user-profile" element={<UserProfile />} />
-<Route 
-  path="/admin/dashboard" 
-  element={
-    <ProtectedRoute requiredRole={1}> {/* Giả sử Admin là Role 1 */}
-      <AdminDashboard />
-    </ProtectedRoute>
-  } 
-/>
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute requiredRole={1}> {/* Giả sử Admin là Role 1 */}
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/applied-jobs" element={<ListAppliedJobs />} />
 
 
@@ -252,16 +261,25 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
-  path="/employer/manage-jobs"
-  element={
-    <ProtectedRoute requiredRole={3}>
-      <JobManager />
-    </ProtectedRoute>
-  }
-  />
-            
+              path="/employer/manage-jobs"
+              element={
+                <ProtectedRoute requiredRole={3}>
+                  <JobManager />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/advertisements"
+              element={
+                <ProtectedRoute requiredRole={1}>
+                  <AdvertisementManager />
+                </ProtectedRoute>
+              }
+            />
+
           </Routes>
         </main>
       </div>

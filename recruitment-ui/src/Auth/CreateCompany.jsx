@@ -34,8 +34,7 @@ const CreateCompany = () => {
     const toastId = toast.loading("Đang tạo công ty...");
 
     try {
-      const response = await fetch("https://localhost:7272/api/companies", {
-        method: "POST",
+      const response = await fetch(`${API}/companies`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`

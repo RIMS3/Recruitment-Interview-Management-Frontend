@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Search, MapPin, ChevronRight, ChevronLeft, Zap, Facebook, 
   Linkedin, Mail, Phone, TrendingUp, Award, 
-  Users, ArrowRight, Loader2 
+  Users, ArrowRight, Loader2, X 
 } from 'lucide-react';
 import './HomePage.css';
 
@@ -46,20 +46,28 @@ const HomePage = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [banners, setBanners] = useState([]);
+  
+  // --- STATE QUẢN LÝ QUẢNG CÁO ---
+  const [popupAds, setPopupAds] = useState([]);       // Quảng cáo giữa màn hình
+  const [showPopup, setShowPopup] = useState(false);  
+  
+  const [leftAds, setLeftAds] = useState([]);         // Cột quảng cáo bên Trái
+  const [rightAds, setRightAds] = useState([]);       // Cột quảng cáo bên Phải
 
-  // --- LẤY ROLE CỦA USER HIỆN TẠI ---
+  // LẤY ROLE CỦA USER HIỆN TẠI
   const userRole = localStorage.getItem("role");
 
-  // CALL API
+ // CALL API
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-        const [jobsRes, bannersRes] = await Promise.all([
+        const [jobsRes, bannersRes, adsRes] = await Promise.all([
           fetch(`${baseUrl}/jobs`),
-          fetch(`${baseUrl}/Banners`)
+          fetch(`${baseUrl}/Banners`),
+          fetch(`${baseUrl}/Advertisements`) 
         ]);
 
         if (jobsRes.ok) {
@@ -72,6 +80,32 @@ const HomePage = () => {
           setBanners(bannersData || []); 
         }
 
+        if (adsRes.ok) {
+          const adsData = await adsRes.json();
+          const validAds = adsData || [];
+          
+          // 1. Lọc ra danh sách quảng cáo dành riêng cho Popup (Lấy tối đa 4 cái)
+          const popupAdList = validAds.filter(ad => ad.isPopup);
+          setPopupAds(popupAdList.slice(0, 4));
+          
+          if (popupAdList.length > 0) {
+            // Kiểm tra xem session đã lưu cờ 'hasSeenPopup' chưa
+            const hasSeenPopup = sessionStorage.getItem("hasSeenPopup");
+            
+            // Nếu chưa có (nghĩa là mới vào web) thì mới hiện
+            if (!hasSeenPopup) {
+              setShowPopup(true);
+              // Lưu lại cờ để lần sau quay lại không hiện nữa
+              sessionStorage.setItem("hasSeenPopup", "true"); 
+            }
+          }
+
+          // 2. Lọc ra danh sách quảng cáo dành cho 2 bên đảo (Những cái KHÔNG phải Popup)
+          const floatingAdList = validAds.filter(ad => !ad.isPopup);
+          setLeftAds(floatingAdList.filter((_, i) => i % 2 === 0)); // Các ảnh chẵn sang trái
+          setRightAds(floatingAdList.filter((_, i) => i % 2 !== 0)); // Các ảnh lẻ sang phải
+        }
+
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
       } finally {
@@ -81,36 +115,32 @@ const HomePage = () => {
     fetchData();
   }, []);
 
-  // Logic tự động chuyển Slide Banner theo thời gian cài đặt
+  // Logic tự động chuyển Slide Banner
   useEffect(() => {
     if (banners.length <= 1) return;
-
     const currentDuration = (banners[currentBanner]?.duration || 5) * 1000;
     const timer = setTimeout(() => {
       setCurrentBanner((prev) => (prev + 1) % banners.length);
     }, currentDuration);
-
     return () => clearTimeout(timer);
   }, [banners, currentBanner]);
 
-  // Hàm chuyển ảnh thủ công
-  const nextBanner = () => {
-    setCurrentBanner((prev) => (prev + 1) % banners.length);
+  // Các hàm tiện ích
+  const nextBanner = () => setCurrentBanner((prev) => (prev + 1) % banners.length);
+  const prevBanner = () => setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
+  const handleBannerClick = () => { if (userRole === "1") navigate("/admin/banners"); };
+  const formatSalary = (min, max) => `$${min.toLocaleString()} - $${max.toLocaleString()}`;
+
+  // Tắt từng quảng cáo bên trái
+  const handleCloseLeftAd = (id, e) => {
+    e.preventDefault();
+    setLeftAds(prev => prev.filter(ad => ad.id !== id));
   };
 
-  const prevBanner = () => {
-    setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
-  };
-
-  // --- HÀM XỬ LÝ KHI CLICK VÀO BANNER ---
-  const handleBannerClick = () => {
-    if (userRole === "1") {
-      navigate("/admin/banners");
-    }
-  };
-
-  const formatSalary = (min, max) => {
-    return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
+  // Tắt từng quảng cáo bên phải
+  const handleCloseRightAd = (id, e) => {
+    e.preventDefault();
+    setRightAds(prev => prev.filter(ad => ad.id !== id));
   };
 
   return (
@@ -153,11 +183,8 @@ const HomePage = () => {
                 <div 
                   key={banner.id || index} 
                   className={`banner-slide ${index === currentBanner ? 'active' : ''}`}
-                  style={{ 
-                    backgroundImage: `url(${banner.imageUrl})`,
-                    cursor: userRole === "1" ? "pointer" : "default" // Chỉ hiện bàn tay nếu là Admin
-                  }}
-                  onClick={handleBannerClick} // Gắn sự kiện click
+                  style={{ backgroundImage: `url(${banner.imageUrl})`, cursor: userRole === "1" ? "pointer" : "default" }}
+                  onClick={handleBannerClick}
                 >
                   <div className="banner-text-overlay">
                     <h2>{banner.title}</h2>
@@ -165,17 +192,10 @@ const HomePage = () => {
                 </div>
               ))}
 
-              {/* Mũi tên điều hướng trái/phải */}
               {banners.length > 1 && (
                 <>
-                  <button className="banner-nav-btn prev" onClick={prevBanner}>
-                    <ChevronLeft size={28} />
-                  </button>
-                  <button className="banner-nav-btn next" onClick={nextBanner}>
-                    <ChevronRight size={28} />
-                  </button>
-
-                  {/* Thanh gạch báo vị trí banner hiện tại */}
+                  <button className="banner-nav-btn prev" onClick={prevBanner}><ChevronLeft size={28} /></button>
+                  <button className="banner-nav-btn next" onClick={nextBanner}><ChevronRight size={28} /></button>
                   <div className="banner-indicators">
                     {banners.map((_, index) => (
                       <button
@@ -190,14 +210,10 @@ const HomePage = () => {
               )}
             </>
           ) : (
-            // Fallback khi không có banner
             <div 
               className="banner-slide active"
-              style={{ 
-                backgroundImage: `url(https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1200)`,
-                cursor: userRole === "1" ? "pointer" : "default" // Chỉ hiện bàn tay nếu là Admin
-              }}
-              onClick={handleBannerClick} // Gắn sự kiện click cho cả ảnh mặc định
+              style={{ backgroundImage: `url(https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1200)`, cursor: userRole === "1" ? "pointer" : "default" }}
+              onClick={handleBannerClick} 
             >
               <div className="banner-text-overlay">
                 <h2>Hãy thêm Banner từ trang Admin</h2>
@@ -206,6 +222,63 @@ const HomePage = () => {
           )}
         </div>
       </div>
+
+      {/* =========================================
+          LOẠI 1: QUẢNG CÁO POPUP (GIỮA MÀN HÌNH - 1 NÚT X)
+      ========================================= */}
+      {showPopup && popupAds.length > 0 && (
+        <div className="popup-ad-overlay" onClick={() => setShowPopup(false)}>
+          <div className={`popup-ad-content grid-${popupAds.length}`} onClick={(e) => e.stopPropagation()} >
+            <button className="close-popup-ad-btn" onClick={() => setShowPopup(false)} title="Đóng toàn bộ quảng cáo">
+              <X size={24} strokeWidth={3} />
+            </button>
+            {popupAds.map(ad => (
+              <a 
+                key={ad.id} href={ad.linkUrl || '#'} target={ad.linkUrl ? "_blank" : "_self"} rel="noopener noreferrer"
+                className="popup-ad-link"
+              >
+                <img src={ad.imageUrl} alt={ad.title} className="popup-ad-img" />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* =========================================
+          LOẠI 2: QUẢNG CÁO NỔI 2 CỘT (TẮT TỪNG CÁI)
+      ========================================= */}
+      
+      {/* CỘT TRÁI */}
+      {leftAds.length > 0 && (
+        <div className="floating-sidebar left-sidebar">
+          {leftAds.map((ad) => (
+            <div key={ad.id} className="floating-ad-item">
+              <button className="close-single-ad-btn" onClick={(e) => handleCloseLeftAd(ad.id, e)} title="Tắt quảng cáo này">
+                <X size={14} strokeWidth={3} />
+              </button>
+              <a href={ad.linkUrl || '#'} target={ad.linkUrl ? "_blank" : "_self"} rel="noopener noreferrer">
+                <img src={ad.imageUrl} alt={ad.title} className="floating-ad-img" />
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* CỘT PHẢI */}
+      {rightAds.length > 0 && (
+        <div className="floating-sidebar right-sidebar">
+          {rightAds.map((ad) => (
+            <div key={ad.id} className="floating-ad-item">
+              <button className="close-single-ad-btn" onClick={(e) => handleCloseRightAd(ad.id, e)} title="Tắt quảng cáo này">
+                <X size={14} strokeWidth={3} />
+              </button>
+              <a href={ad.linkUrl || '#'} target={ad.linkUrl ? "_blank" : "_self"} rel="noopener noreferrer">
+                <img src={ad.imageUrl} alt={ad.title} className="floating-ad-img" />
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Stats Section */}
       <section className="stats-section container">

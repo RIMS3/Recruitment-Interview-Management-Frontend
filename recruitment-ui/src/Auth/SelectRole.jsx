@@ -21,7 +21,7 @@ export default function SelectRole() {
       }
 
       const res = await axios.post(
-  `${API}/auth/select-role`,
+        `${API}/auth/select-role`,
         { role }, // ✅ Gửi trực tiếp số (backend nhận int)
         {
           headers: {
@@ -41,10 +41,10 @@ export default function SelectRole() {
       // ✅ Lưu role (ưu tiên backend trả về, nếu không thì dùng role vừa chọn)
       const newRole = res.data?.role ?? role;
       localStorage.setItem("role", newRole);
-      
+
       if (res.data?.candidateId) {
-      localStorage.setItem("candidateId", res.data.candidateId);
-}
+        localStorage.setItem("candidateId", res.data.candidateId);
+      }
 
       // ✅ Update AuthContext an toàn
       setUser((prev) => ({
