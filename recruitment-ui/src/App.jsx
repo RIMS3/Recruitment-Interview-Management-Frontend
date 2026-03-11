@@ -24,6 +24,7 @@ import ListAppliedJobs from './AppliJobs/ListAppliedJobs';
 import { Toaster } from "react-hot-toast";
 import BannerManager from "./Banner/BannerManager";
 import CVViewer from "./CVs/CVViewer";
+import JobManager from "./CRUDJobpost/JobManager"
 
 
 
@@ -74,6 +75,9 @@ const Navbar = () => {
           </li>
           <li>Công cụ</li>
           <li>Cẩm nang</li>
+          <li onClick={() => navigate("/employer/manage-jobs")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
+      Đăng tin
+      </li>
         </ul>
 
         <div className="nav-auth">
@@ -248,6 +252,16 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            
+            <Route
+  path="/employer/manage-jobs"
+  element={
+    <ProtectedRoute requiredRole={3}>
+      <JobManager />
+    </ProtectedRoute>
+  }
+  />
+            
           </Routes>
         </main>
       </div>
