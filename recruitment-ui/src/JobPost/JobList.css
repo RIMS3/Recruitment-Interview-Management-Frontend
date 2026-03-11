@@ -422,3 +422,34 @@
     .job-list-main-content { flex-direction: column; }
     .job-list-sidebar { width: 100%; position: static; }
 }
+
+.floating-applied-list {
+    position: fixed !important;
+    bottom: 110px !important; /* Cao hơn nút trái tim */
+    right: 30px !important;
+    width: 55px !important;  /* Thu nhỏ lại một chút cho thanh thoát */
+    height: 55px !important;
+    background-color: white !important;
+    border: 2px solid #00b14f !important;
+    border-radius: 50% !important; /* Ép nó phải tròn */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 1001 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+}
+
+.floating-applied-list:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 15px rgba(0,177,79,0.2) !important;
+}
+
+/* Chỉnh icon bên trong nhỏ lại cho cân đối */
+.floating-applied-list svg {
+    width: 28px !important;
+    height: 28px !important;
+}
