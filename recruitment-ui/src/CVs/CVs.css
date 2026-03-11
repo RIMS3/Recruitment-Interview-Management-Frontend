@@ -343,6 +343,30 @@
   width: 14px; height: 14px;
 }
 
+/* --- NÚT XÓA CV --- */
+.btn-delete-cv {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.btn-delete-cv svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-delete-cv:hover {
+  background-color: #fee2e2;
+  transform: scale(1.05);
+}
+
 /* --- SIDEBAR --- */
 .box-shadow {
   background: var(--card-bg);
@@ -497,7 +521,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     grid-template-columns: 1fr;
   }
   .sidebar {
-    order: -1; /* Đưa sidebar lên trên ở màn hình nhỏ */
+    order: -1; 
   }
 }
 

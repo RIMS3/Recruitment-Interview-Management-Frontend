@@ -28,7 +28,7 @@ import JobManager from "./CRUDJobpost/JobManager"
 import AdvertisementManager from "./Advertisement/AdvertisementManager";
 import ServicePackage from './ServicePackage/ServicePackage';
 import EmployerServicePackages from './ServicePackage/EmployerServicePackages';
-
+import ServicePackageCheckout from './ServicePackage/ServicePackageCheckout';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -306,6 +306,15 @@ function App() {
               element={
                 <ProtectedRoute requiredRole={3}>
                   <EmployerServicePackages />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/employer/checkout"
+              element={
+                <ProtectedRoute requiredRole={3}>
+                  <ServicePackageCheckout />
                 </ProtectedRoute>
               }
             />

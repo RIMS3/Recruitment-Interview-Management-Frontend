@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Import thêm useNavigate
 import toast from 'react-hot-toast';
 import './EmployerServicePackages.css';
 
@@ -8,6 +9,9 @@ const EmployerServicePackages = () => {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState(null);
+  
+  // 2. Khởi tạo hàm navigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchActivePackages();
@@ -27,8 +31,10 @@ const EmployerServicePackages = () => {
     }
   };
 
+  // 3. Cập nhật hàm xử lý khi bấm nút "Sở hữu ngay"
   const handleBuy = (pkg) => {
-    toast.success(`Đang xử lý giao dịch cho: ${pkg.name}`);
+    // Chuyển hướng sang route checkout và truyền dữ liệu gói được chọn theo state
+    navigate('/employer/checkout', { state: { selectedPackage: pkg } });
   };
 
   return (
