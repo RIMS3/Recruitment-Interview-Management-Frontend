@@ -1,5 +1,12 @@
 import React, { useContext } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import HomePage from "./Home/HomePage";
 import LoginPage from "./Auth/LoginForm";
 import "./App.css";
@@ -16,21 +23,21 @@ import CVs from "./CVs/CVs";
 import CVTemplates from "./CVs/CVTemplates";
 import CreateCV from "./CVs/CreateCV";
 import ApplicationList from "./Applications/ApplicationList";
-import AdminDashboard from './Dashboard/AdminDashboard';
+import AdminDashboard from "./Dashboard/AdminDashboard";
 import CandidateProfile from "./CandidateProfile";
 import EmployerProfile from "./EmployerProfile";
 import UserProfile from "./UserProfile";
-import ListAppliedJobs from './AppliJobs/ListAppliedJobs';
+import ListAppliedJobs from "./AppliJobs/ListAppliedJobs";
 import { Toaster } from "react-hot-toast";
 import BannerManager from "./Banner/BannerManager";
 import CVViewer from "./CVs/CVViewer";
-import JobManager from "./CRUDJobpost/JobManager"
+import JobManager from "./CRUDJobpost/JobManager";
 import AdvertisementManager from "./Advertisement/AdvertisementManager";
-import ServicePackage from './ServicePackage/ServicePackage';
-import EmployerServicePackages from './ServicePackage/EmployerServicePackages';
-import ServicePackageCheckout from './ServicePackage/ServicePackageCheckout';
-import EmployerOrders from './Orders/EmployerOrders';
-import OrderDetail from './Orders/OrderDetail';
+import ServicePackage from "./ServicePackage/ServicePackage";
+import EmployerServicePackages from "./ServicePackage/EmployerServicePackages";
+import ServicePackageCheckout from "./ServicePackage/ServicePackageCheckout";
+import EmployerOrders from "./Orders/EmployerOrders";
+import OrderDetail from "./Orders/OrderDetail";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -41,14 +48,11 @@ const Navbar = () => {
 
     if (role === "2") {
       navigate("/manage-cv"); // Candidate
-    }
-    else if (role === "3") {
+    } else if (role === "3") {
       navigate("/employer/applications"); // Employer
-    }
-    else if (role === "1") {
+    } else if (role === "1") {
       navigate("/admin/cvs"); // Admin
-    }
-    else {
+    } else {
       navigate("/login");
     }
   };
@@ -67,45 +71,75 @@ const Navbar = () => {
         </Link>
 
         <ul className="nav-menu">
-          <li onClick={() => navigate("/admin/dashboard")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
-            Quản trị hệ thống
-          </li>
-
-          {/* MỤC QUẢNG CÁO CHỈ HIỆN CHO ADMIN (ROLE = 1) */}
           {user && String(user.role) === "1" && (
-            <li onClick={() => navigate("/admin/advertisements")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
-              Quảng Cáo
-            </li>
-          )}
-
-          {user && String(user.role) === "1" && (
-            <li onClick={() => navigate("/admin/service-packages")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
-              Gói Dịch Vụ
-            </li>
-          )}
-
-         {user && String(user.role) === "3" && (
             <>
-              <li onClick={() => navigate("/employer/buy-services")} style={{ cursor: "pointer", fontWeight: "bold", color: "#10b981" }}>
-                Mua Dịch Vụ
+              <li
+                className={location.pathname === "/admin/dashboard" ? "active" : ""}
+                onClick={() => navigate("/admin/dashboard")}
+                style={{ cursor: "pointer", fontWeight: "bold" }}
+              >
+                Quản trị hệ thống
               </li>
-              <li onClick={() => navigate("/employer/orders")} style={{ cursor: "pointer", fontWeight: "bold", color: "#f59e0b" }}>
-                Lịch sử giao dịch
+              <li
+                className={location.pathname === "/admin/advertisements" ? "active" : ""}
+                onClick={() => navigate("/admin/advertisements")}
+                style={{ cursor: "pointer", fontWeight: "bold" }}
+              >
+                Quảng Cáo
+              </li>
+              <li
+                className={location.pathname === "/admin/service-packages" ? "active" : ""}
+                onClick={() => navigate("/admin/service-packages")}
+                style={{ cursor: "pointer", fontWeight: "bold" }}
+              >
+                Gói Dịch Vụ
               </li>
             </>
           )}
 
-          <li>Việc làm</li>
-          <li
-            onClick={handleProfileClick}
-            style={{ cursor: "pointer" }}
-          >
-            Hồ sơ & CV
-          </li>
+          {user && String(user.role) === "3" && (
+            <>
+              <li
+                className={location.pathname === "/employer/buy-services" ? "active" : ""}
+                onClick={() => navigate("/employer/buy-services")}
+                style={{
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                Dịch Vụ
+              </li>
+              <li
+                className={location.pathname === "/employer/orders" ? "active" : ""}
+                onClick={() => navigate("/employer/orders")}
+                style={{
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                Hóa đơn
+              </li>
+              <li
+                className={location.pathname === "/employer/manage-jobs" ? "active" : ""}
+                onClick={() => navigate("/employer/manage-jobs")}
+                style={{ cursor: "pointer", fontWeight: "bold" }}
+              >
+                Đăng tin
+              </li>
+            </>
+          )}
+
+          {user && String(user.role) !== "1" && (
+            <li 
+              className={["/manage-cv", "/employer/applications", "/admin/cvs"].includes(location.pathname) ? "active" : ""}
+              onClick={handleProfileClick} 
+              style={{ cursor: "pointer" }}
+            >
+              Hồ sơ & CV
+            </li>
+          )}
+
           <li>Cẩm nang</li>
-          <li onClick={() => navigate("/employer/manage-jobs")} style={{ cursor: "pointer", fontWeight: "bold", color: "blue" }}>
-            Đăng tin
-          </li>
         </ul>
 
         <div className="nav-auth">
@@ -120,7 +154,6 @@ const Navbar = () => {
                   } else if (user.role === 3) {
                     navigate("/employer-profile"); // Nhà tuyển dụng
                   }
-
                 }}
               >
                 <div className="nav-avatar">
@@ -129,12 +162,15 @@ const Navbar = () => {
                       src={user.avatarUrl}
                       alt="avatar"
                       onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "flex";
                       }}
                     />
                   ) : null}
-                  <div className="avatar-fallback" style={{ display: user.avatarUrl ? 'none' : 'flex' }}>
+                  <div
+                    className="avatar-fallback"
+                    style={{ display: user.avatarUrl ? "none" : "flex" }}
+                  >
                     {user.fullName?.charAt(0).toUpperCase()}
                   </div>
                 </div>
@@ -156,7 +192,10 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <button className="navbar-btn-login" onClick={() => navigate("/login")}>
+              <button
+                className="navbar-btn-login"
+                onClick={() => navigate("/login")}
+              >
                 Đăng nhập
               </button>
               <button className="navbar-btn-post">Đăng tuyển ngay</button>
@@ -174,14 +213,14 @@ function App() {
       <Toaster
         position="top-center"
         containerStyle={{
-          zIndex: 99999
+          zIndex: 99999,
         }}
         toastOptions={{
           duration: 3000,
           style: {
             fontSize: "16px",
-            padding: "16px 24px"
-          }
+            padding: "16px 24px",
+          },
         }}
       />
       <div className="app-container">
@@ -189,9 +228,13 @@ function App() {
 
         <main className="app-main-content">
           <Routes>
-            <Route path="/" element={<RoleGuard><HomePage />
-            </RoleGuard>
-            }
+            <Route
+              path="/"
+              element={
+                <RoleGuard>
+                  <HomePage />
+                </RoleGuard>
+              }
             />
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -222,26 +265,25 @@ function App() {
             <Route
               path="/admin/dashboard"
               element={
-                <ProtectedRoute requiredRole={1}> {/* Giả sử Admin là Role 1 */}
+                <ProtectedRoute requiredRole={1}>
                   <AdminDashboard />
                 </ProtectedRoute>
               }
             />
             <Route path="/applied-jobs" element={<ListAppliedJobs />} />
 
-
-            <Route path="/saved-jobs" element={
-
-              <ProtectedRoute>
-                <SavedJobs />
-              </ProtectedRoute>
-            }
+            <Route
+              path="/saved-jobs"
+              element={
+                <ProtectedRoute>
+                  <SavedJobs />
+                </ProtectedRoute>
+              }
             />
             <Route path="/create-company" element={<CreateCompany />} />
             <Route
               path="/manage-cv"
               element={
-
                 <ProtectedRoute>
                   <CVs />
                 </ProtectedRoute>
@@ -276,7 +318,6 @@ function App() {
               element={
                 <ProtectedRoute requiredRole={3}>
                   <CVViewer />
-
                 </ProtectedRoute>
               }
             />
@@ -335,16 +376,12 @@ function App() {
               }
             />
 
-            <Route 
-            path="/order-details/:id" 
-            element={<OrderDetail />} />
-
+            <Route path="/order-details/:id" element={<OrderDetail />} />
           </Routes>
         </main>
       </div>
     </Router>
   );
 }
-
 
 export default App;

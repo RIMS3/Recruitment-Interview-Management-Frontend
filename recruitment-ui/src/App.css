@@ -74,12 +74,13 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  color: var(--secondary);
+  color: gray; /* Đã sửa thành màu xám mặc định */
   transition: color 0.2s;
 }
 
-.nav-menu li:hover {
-  color: var(--primary);
+.nav-menu li:hover,
+.nav-menu li.active {
+  color: #10b981; /* Đã sửa thành màu xanh lá cây khi hover hoặc active */
 }
 
 /* 5. AUTH SECTION (Nút bấm & Profile) */
