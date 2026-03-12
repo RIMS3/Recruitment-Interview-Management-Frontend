@@ -38,6 +38,7 @@ import EmployerServicePackages from "./ServicePackage/EmployerServicePackages";
 import ServicePackageCheckout from "./ServicePackage/ServicePackageCheckout";
 import EmployerOrders from "./Orders/EmployerOrders";
 import OrderDetail from "./Orders/OrderDetail";
+import ITBlog from "./Blog/ITBlog";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -141,7 +142,13 @@ const Navbar = () => {
             </li>
           )}
 
-          <li style={{ cursor: "pointer" }}>Cẩm nang</li>
+          <li 
+            className={location.pathname === "/it-blog" ? "active" : ""}
+            onClick={() => navigate("/it-blog")}
+            style={{ cursor: "pointer" }}
+          >
+            Cẩm nang
+          </li>
           
           {/* Đã thêm link và active class cho nút Việc làm */}
           <li 
@@ -283,6 +290,7 @@ function App() {
             <Route path="/candidate-profile" element={<CandidateProfile />} />
             <Route path="/employer-profile" element={<EmployerProfile />} />
             <Route path="/user-profile" element={<UserProfile />} />
+            <Route path="/it-blog" element={<ITBlog />} />
             <Route
               path="/admin/dashboard"
               element={
