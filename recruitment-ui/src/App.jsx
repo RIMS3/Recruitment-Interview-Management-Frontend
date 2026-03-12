@@ -29,6 +29,8 @@ import AdvertisementManager from "./Advertisement/AdvertisementManager";
 import ServicePackage from './ServicePackage/ServicePackage';
 import EmployerServicePackages from './ServicePackage/EmployerServicePackages';
 import ServicePackageCheckout from './ServicePackage/ServicePackageCheckout';
+import EmployerOrders from './Orders/EmployerOrders';
+import OrderDetail from './Orders/OrderDetail';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -83,9 +85,14 @@ const Navbar = () => {
           )}
 
          {user && String(user.role) === "3" && (
-            <li onClick={() => navigate("/employer/buy-services")} style={{ cursor: "pointer", fontWeight: "bold", color: "#10b981" }}>
-              Mua Dịch Vụ
-            </li>
+            <>
+              <li onClick={() => navigate("/employer/buy-services")} style={{ cursor: "pointer", fontWeight: "bold", color: "#10b981" }}>
+                Mua Dịch Vụ
+              </li>
+              <li onClick={() => navigate("/employer/orders")} style={{ cursor: "pointer", fontWeight: "bold", color: "#f59e0b" }}>
+                Lịch sử giao dịch
+              </li>
+            </>
           )}
 
           <li>Việc làm</li>
@@ -318,6 +325,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/employer/orders"
+              element={
+                <ProtectedRoute requiredRole={3}>
+                  <EmployerOrders />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route 
+            path="/order-details/:id" 
+            element={<OrderDetail />} />
 
           </Routes>
         </main>
