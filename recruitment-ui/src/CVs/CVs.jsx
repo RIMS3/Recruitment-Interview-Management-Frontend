@@ -131,7 +131,6 @@ const CVManagement = () => {
         
         if (response.ok) {
           const data = await response.json();
-          // Cập nhật lại state dựa trên cấu trúc payload mới
           setCvs(data.cvs || []); 
           setCanCreateNew(data.canCreateNew);
           setCvCountInfo({ current: data.currentCvCount, isPro: data.isCvPro });
@@ -178,12 +177,10 @@ const CVManagement = () => {
         const data = await response.json();
         alert(data.message || "Xóa CV thành công!");
         
-        // Cập nhật state để loại bỏ CV vừa xóa, đồng thời cập nhật lại số lượng CV
         setCvs((prevCvs) => {
             const updatedCvs = prevCvs.filter((cv) => cv.id !== cvId);
             const newCount = updatedCvs.length;
             
-            // Tự động mở khóa nút nếu số lượng giảm xuống dưới 2 (đối với tài khoản thường)
             if (!cvCountInfo.isPro && newCount < 2) {
                 setCanCreateNew(true);
             }
@@ -221,12 +218,12 @@ const CVManagement = () => {
               <p className="section-subtitle">Quản lý và chỉnh sửa các bản CV của bạn</p>
             </div>
             
-            {/* KHU VỰC NÚT TẠO CV MỚI VÀ CẢNH BÁO */}
+            {/* KHU VỰC NÚT TẠO CV MỚI VÀ CẢNH BÁO/NÂNG CẤP */}
             <div className="header-actions">
               <button 
                 className="btn-create-cv" 
                 onClick={handleCreateCV}
-                disabled={!canCreateNew} // Disable khi không cho tạo mới
+                disabled={!canCreateNew} 
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -236,8 +233,16 @@ const CVManagement = () => {
               </button>
               
               {!canCreateNew && (
-                <div className="limit-warning">
-                  Bạn đang có {cvCountInfo.current} CV. Hãy nâng cấp CV Pro để tạo không giới hạn!
+                <div className="limit-warning-container">
+                  <span className="limit-warning-text">
+                    Bạn đang có {cvCountInfo.current} CV. Hãy nâng cấp CV Pro để tạo không giới hạn!
+                  </span>
+                  <button 
+                    className="btn-upgrade-pro" 
+                    onClick={() => alert("Chức năng nâng cấp/thanh toán đang được phát triển!")}
+                  >
+                    ⭐ Nâng cấp ngay
+                  </button>
                 </div>
               )}
             </div>
