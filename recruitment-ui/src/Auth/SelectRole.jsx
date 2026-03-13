@@ -6,9 +6,10 @@ import { AuthContext } from "./AuthContext";
 import "./SelectRole.css";
 
 const API = import.meta.env.VITE_API_BASE_URL;
+
 export default function SelectRole() {
   const navigate = useNavigate();
-  const { user, setUser } = useContext(AuthContext);
+  const { setUser } = useContext(AuthContext);
 
   const handleSelect = async (role) => {
     try {
@@ -22,7 +23,7 @@ export default function SelectRole() {
 
       const res = await axios.post(
         `${API}/auth/select-role`,
-        { role }, // ✅ Gửi trực tiếp số (backend nhận int)
+        { role },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -33,27 +34,33 @@ export default function SelectRole() {
 
       console.log("SelectRole Response:", res.data);
 
-      // ✅ Nếu backend trả token mới thì lưu
+      // 1. Lưu token mới (đã cập nhật Role bên trong Claim)
       if (res.data?.accessToken) {
         localStorage.setItem("accessToken", res.data.accessToken);
       }
 
-      // ✅ Lưu role (ưu tiên backend trả về, nếu không thì dùng role vừa chọn)
+      // 2. Lưu Role và các ID liên quan vào Local Storage
       const newRole = res.data?.role ?? role;
       localStorage.setItem("role", newRole);
+      
+      // Lưu userId để sử dụng khi tạo công ty
+      if (res.data?.userId) {
+        localStorage.setItem("userId", res.data.userId);
+      }
 
       if (res.data?.candidateId) {
         localStorage.setItem("candidateId", res.data.candidateId);
       }
 
-      // ✅ Update AuthContext an toàn
+      // 3. Cập nhật AuthContext để đồng bộ UI
       setUser((prev) => ({
         ...prev,
         role: newRole,
         token: res.data?.accessToken ?? prev?.token,
       }));
 
-      // ✅ Điều hướng
+      // 4. Điều hướng
+      // Nếu là Nhà tuyển dụng (3), sang trang tạo công ty để hoàn tất hồ sơ
       if (newRole === 3) {
         navigate("/create-company");
       } else {
@@ -62,7 +69,7 @@ export default function SelectRole() {
 
     } catch (error) {
       console.error("Select role error:", error.response || error);
-      alert("Có lỗi xảy ra khi chọn vai trò");
+      alert(error.response?.data || "Có lỗi xảy ra khi chọn vai trò");
     }
   };
 
