@@ -112,16 +112,46 @@
   align-items: flex-end;
 }
 
-.limit-warning {
+/* --- WARNING LIMIT & UPGRADE BUTTON --- */
+.limit-warning-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.limit-warning-text {
   color: #ef4444;
   font-size: 13px;
-  margin-top: 6px;
   font-style: italic;
-  max-width: 250px;
-  text-align: right;
   line-height: 1.4;
 }
 
+.btn-upgrade-pro {
+  background: linear-gradient(90deg, #f59e0b, #ea580c);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-upgrade-pro:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  background: linear-gradient(90deg, #ea580c, #c2410c);
+}
+
+/* --- BUTTON TẠO CV MỚI --- */
 .btn-create-cv {
   display: flex;
   align-items: center;
@@ -149,7 +179,6 @@
   box-shadow: 0 6px 16px rgba(0, 177, 79, 0.3);
 }
 
-/* CSS CHO TRẠNG THÁI DISABLED CỦA NÚT TẠO CV */
 .btn-create-cv:disabled {
   background-color: #9ca3af;
   box-shadow: none;
@@ -565,7 +594,10 @@ input:checked + .slider:before { transform: translateX(22px); }
   .header-actions {
     align-items: flex-start;
   }
-  .limit-warning {
+  .limit-warning-container {
+    justify-content: flex-start;
+  }
+  .limit-warning-text {
     text-align: left;
   }
   .banner {
