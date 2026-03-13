@@ -327,7 +327,12 @@ const HomePage = () => {
         ) : (
           <div className="job-grid-modern">
             {jobs.slice(0, 9).map(job => (
-              <div key={job.idJobPost} className={`job-card-modern ${job.salaryMax >= 3000 ? 'hot-border' : ''}`}>
+              <div
+                key={job.idJobPost}
+                className={`job-card-modern ${job.salaryMax >= 3000 ? 'hot-border' : ''}`}
+                style={{ cursor: 'pointer' }}
+                onClick={() => navigate(`/jobpostdetail/${String(job.idJobPost)}`)}
+              >
                 {job.salaryMax >= 3000 && <span className="hot-tag"><Zap size={12} fill="currentColor"/> HOT</span>}
                 <div className="card-top">
                   <div className="company-logo-modern">{job.title.charAt(0)}</div>

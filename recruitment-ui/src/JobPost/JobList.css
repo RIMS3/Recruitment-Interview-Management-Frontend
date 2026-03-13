@@ -423,7 +423,7 @@
     .job-list-sidebar { width: 100%; position: static; }
 }
 
-.floating-applied-list {
+.floating-user-add-btn {
     position: fixed !important;
     bottom: 110px !important; /* Cao hơn nút trái tim */
     right: 30px !important;
@@ -443,13 +443,13 @@
     transition: all 0.2s ease-in-out;
 }
 
-.floating-applied-list:hover {
+.floating-user-add-btn:hover {
     transform: translateY(-3px) !important;
     box-shadow: 0 6px 15px rgba(0,177,79,0.2) !important;
 }
 
 /* Chỉnh icon bên trong nhỏ lại cho cân đối */
-.floating-applied-list svg {
+.floating-user-add-btn svg {
     width: 28px !important;
     height: 28px !important;
 }

@@ -124,6 +124,18 @@
     transform: scale(1.05);
 }
 
+.btn-unapply:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    border-color: #fca5a5;
+    color: #fca5a5;
+}
+
+.btn-unapply:disabled:hover {
+    background: white;
+    transform: none;
+}
+
 /* --- EMPTY STATE (KHI CHƯA CÓ VIỆC) --- */
 .empty-state-wrapper {
     background: white;

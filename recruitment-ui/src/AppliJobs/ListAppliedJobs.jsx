@@ -17,7 +17,7 @@ const ListAppliedJobs = () => {
         // Kiểm tra quyền truy cập
         if (!storedCandidateId) {
             alert("Vui lòng đăng nhập với vai trò ứng viên để xem danh sách này!");
-            navigate('/login'); 
+            navigate('/login');
             return;
         }
 
@@ -30,7 +30,7 @@ const ListAppliedJobs = () => {
             setLoading(true);
             // Sử dụng template literal để nối API_BASE_URL
             const response = await fetch(`${API_BASE_URL}/ViewListJobApply/candidate/${candidateId}`);
-            
+
             if (!response.ok) {
                 throw new Error("Không thể kết nối đến máy chủ.");
             }
@@ -47,15 +47,15 @@ const ListAppliedJobs = () => {
     // 3. Hàm hủy ứng tuyển
     const handleUnapply = async (applicationId) => {
         if (!window.confirm("Bạn có chắc chắn muốn hủy ứng tuyển công việc này?")) return;
-        
+
         try {
             const response = await fetch(`${API_BASE_URL}/ViewListJobApply/unapply/${applicationId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             });
-            
+
             const result = await response.json();
-            
+
             if (result.isSuccess) {
                 alert(result.message || "Đã hủy ứng tuyển thành công.");
                 // Cập nhật lại UI bằng cách lọc bỏ item vừa xóa
@@ -94,7 +94,7 @@ const ListAppliedJobs = () => {
                     <h2 className="main-title">Việc làm đã ứng tuyển</h2>
                     <span className="job-count">Tổng cộng: <strong>{appliedList.length}</strong> hồ sơ</span>
                 </header>
-                
+
                 {appliedList.length === 0 ? (
                     <div className="empty-state-wrapper">
                         <div className="empty-state-content">
@@ -121,8 +121,8 @@ const ListAppliedJobs = () => {
 
                             return (
                                 <div key={item.applicationId} className="job-item-card">
-                                    <div 
-                                        className="job-info-left" 
+                                    <div
+                                        className="job-info-left"
                                         onClick={() => navigate(`/jobpostdetail/${targetJobId}`)}
                                     >
                                         <h3 className="job-name">{item.jobTitle}</h3>
@@ -133,18 +133,19 @@ const ListAppliedJobs = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="job-action-right">
                                         <div className={`status-tag ${status.class}`}>
                                             {status.text}
                                         </div>
-                                        <button 
-                                            className="btn-unapply" 
+                                        <button
+                                            className="btn-unapply"
                                             onClick={(e) => {
-                                                e.stopPropagation(); // Tránh kích hoạt sự kiện onClick của thẻ cha
+                                                e.stopPropagation();
                                                 handleUnapply(item.applicationId);
                                             }}
-                                            title="Hủy ứng tuyển"
+                                            disabled={item.status === 2}
+                                            title={item.status === 2 ? 'Không thể hủy hồ sơ đã bị từ chối' : 'Hủy ứng tuyển'}
                                         >
                                             <svg viewBox="0 0 24 24" width="18" fill="currentColor">
                                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
@@ -160,15 +161,15 @@ const ListAppliedJobs = () => {
             </div>
 
             {/* Nút quay lại trang trước đó */}
-            <button 
-                className="floating-exit-btn" 
+            <button
+                className="floating-exit-btn"
                 title="Quay lại"
-                onClick={() => navigate(-1)} 
+                onClick={() => navigate(-1)}
             >
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
                     <path d="M11 16L7 12M7 12L11 8M7 12H17M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#00b14f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-            </button>         
+            </button>
         </div>
     );
 };
