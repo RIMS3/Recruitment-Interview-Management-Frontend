@@ -36,9 +36,11 @@ import AdvertisementManager from "./Advertisement/AdvertisementManager";
 import ServicePackage from "./ServicePackage/ServicePackage";
 import EmployerServicePackages from "./ServicePackage/EmployerServicePackages";
 import ServicePackageCheckout from "./ServicePackage/ServicePackageCheckout";
-import EmployerOrders from "./Orders/EmployerOrders";
+// Đã cập nhật Import Component dùng chung
+import OrderHistory from "./Orders/OrderHistory"; 
 import OrderDetail from "./Orders/OrderDetail";
 import ITBlog from "./Blog/ITBlog";
+import UpgradeCvPro from './CVs/UpgradeCvPro';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -74,6 +76,7 @@ const Navbar = () => {
         </Link>
 
         <ul className="nav-menu">
+          {/* MENU DÀNH CHO ADMIN */}
           {user && String(user.role) === "1" && (
             <>
               <li
@@ -100,6 +103,7 @@ const Navbar = () => {
             </>
           )}
 
+          {/* MENU DÀNH CHO NHÀ TUYỂN DỤNG */}
           {user && String(user.role) === "3" && (
             <>
               <li
@@ -132,6 +136,17 @@ const Navbar = () => {
             </>
           )}
 
+          {/* MENU DÀNH CHO ỨNG VIÊN */}
+          {user && String(user.role) === "2" && (
+            <li
+              className={location.pathname === "/candidate/orders" ? "active" : ""}
+              onClick={() => navigate("/candidate/orders")}
+              style={{ cursor: "pointer", fontWeight: "bold" }}
+            >
+              Lịch sử giao dịch
+            </li>
+          )}
+
           {user && String(user.role) !== "1" && (
             <li 
               className={["/manage-cv", "/employer/applications", "/admin/cvs"].includes(location.pathname) ? "active" : ""}
@@ -150,7 +165,6 @@ const Navbar = () => {
             Cẩm nang
           </li>
           
-          {/* Đã thêm link và active class cho nút Việc làm */}
           <li 
             className={location.pathname === "/joblist" ? "active" : ""}
             onClick={() => navigate("/joblist")}
@@ -158,16 +172,6 @@ const Navbar = () => {
           >
             Việc làm
           </li>
-
-          {user && String(user.role) === "3" && (
-            <li
-              className={location.pathname === "/employer/manage-jobs" ? "active" : ""}
-              onClick={() => navigate("/employer/manage-jobs")}
-              style={{ cursor: "pointer", fontWeight: "bold" }}
-            >
-              Đăng tin
-            </li>
-          )}
         </ul>
 
         <div className="nav-auth">
@@ -178,9 +182,9 @@ const Navbar = () => {
                 style={{ cursor: "pointer" }}
                 onClick={() => {
                   if (user.role === 2) {
-                    navigate("/candidate-profile"); // Ứng viên
+                    navigate("/candidate-profile"); 
                   } else if (user.role === 3) {
-                    navigate("/employer-profile"); // Nhà tuyển dụng
+                    navigate("/employer-profile"); 
                   }
                 }}
               >
@@ -291,6 +295,7 @@ function App() {
             <Route path="/employer-profile" element={<EmployerProfile />} />
             <Route path="/user-profile" element={<UserProfile />} />
             <Route path="/it-blog" element={<ITBlog />} />
+            <Route path="/upgrade-cv-pro" element={<UpgradeCvPro />} />
             <Route
               path="/admin/dashboard"
               element={
@@ -397,16 +402,34 @@ function App() {
               }
             />
 
+            {/* ROUTE DÀNH CHO LỊCH SỬ GIAO DỊCH (Tái sử dụng Component) */}
             <Route
               path="/employer/orders"
               element={
                 <ProtectedRoute requiredRole={3}>
-                  <EmployerOrders />
+                  <OrderHistory />
                 </ProtectedRoute>
               }
             />
 
-            <Route path="/order-details/:id" element={<OrderDetail />} />
+            <Route
+              path="/candidate/orders"
+              element={
+                <ProtectedRoute requiredRole={2}>
+                  <OrderHistory />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* ROUTE DÀNH CHO CHI TIẾT ĐƠN HÀNG (Đã bọc ProtectedRoute) */}
+            <Route 
+              path="/order-details/:id" 
+              element={
+                <ProtectedRoute>
+                  <OrderDetail />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </main>
       </div>

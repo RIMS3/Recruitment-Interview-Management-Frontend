@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
-import "./EmployerOrders.css";
+import "./OrderHistory.css";
 
-const EmployerOrders = () => {
+const OrderHistory = () => {
   const [data, setData] = useState({ items: [], totalPages: 1, totalCount: 0 });
   const [loading, setLoading] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
@@ -180,4 +180,4 @@ const EmployerOrders = () => {
   );
 };
 
-export default EmployerOrders;
+export default OrderHistory;
