@@ -89,6 +89,10 @@ const CVManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSearchingJob, setIsSearchingJob] = useState(false);
 
+  // --- STATE MỚI QUẢN LÝ GIỚI HẠN TẠO CV ---
+  const [canCreateNew, setCanCreateNew] = useState(true);
+  const [cvCountInfo, setCvCountInfo] = useState({ current: 0, isPro: false });
+
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -127,7 +131,10 @@ const CVManagement = () => {
         
         if (response.ok) {
           const data = await response.json();
-          setCvs(data); 
+          // Cập nhật lại state dựa trên cấu trúc payload mới
+          setCvs(data.cvs || []); 
+          setCanCreateNew(data.canCreateNew);
+          setCvCountInfo({ current: data.currentCvCount, isPro: data.isCvPro });
         }
       } catch (error) {
         console.error("Lỗi:", error);
@@ -171,8 +178,19 @@ const CVManagement = () => {
         const data = await response.json();
         alert(data.message || "Xóa CV thành công!");
         
-        // Cập nhật state để loại bỏ CV vừa xóa khỏi giao diện
-        setCvs((prevCvs) => prevCvs.filter((cv) => cv.id !== cvId));
+        // Cập nhật state để loại bỏ CV vừa xóa, đồng thời cập nhật lại số lượng CV
+        setCvs((prevCvs) => {
+            const updatedCvs = prevCvs.filter((cv) => cv.id !== cvId);
+            const newCount = updatedCvs.length;
+            
+            // Tự động mở khóa nút nếu số lượng giảm xuống dưới 2 (đối với tài khoản thường)
+            if (!cvCountInfo.isPro && newCount < 2) {
+                setCanCreateNew(true);
+            }
+            setCvCountInfo(prev => ({ ...prev, current: newCount }));
+            
+            return updatedCvs;
+        });
       } else {
         alert("Có lỗi xảy ra khi xóa CV. Vui lòng thử lại sau.");
       }
@@ -202,13 +220,27 @@ const CVManagement = () => {
               <h2 className="section-title">CV đã tạo trên hệ thống</h2>
               <p className="section-subtitle">Quản lý và chỉnh sửa các bản CV của bạn</p>
             </div>
-            <button className="btn-create-cv" onClick={handleCreateCV}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Tạo CV mới
-            </button>
+            
+            {/* KHU VỰC NÚT TẠO CV MỚI VÀ CẢNH BÁO */}
+            <div className="header-actions">
+              <button 
+                className="btn-create-cv" 
+                onClick={handleCreateCV}
+                disabled={!canCreateNew} // Disable khi không cho tạo mới
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Tạo CV mới
+              </button>
+              
+              {!canCreateNew && (
+                <div className="limit-warning">
+                  Bạn đang có {cvCountInfo.current} CV. Hãy nâng cấp CV Pro để tạo không giới hạn!
+                </div>
+              )}
+            </div>
           </div>
 
           {isLoading ? (
