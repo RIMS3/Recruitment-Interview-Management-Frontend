@@ -34,6 +34,12 @@ const JobPostDetails = () => {
     // State ứng viên (để ứng tuyển)
     const [applyingCandidateId, setApplyingCandidateId] = useState(null);
 
+    // State Modal chọn CV
+    const [showCvModal, setShowCvModal] = useState(false);
+    const [cvList, setCvList] = useState([]);
+    const [canCreateNew, setCanCreateNew] = useState(false);
+    const [isFetchingCvs, setIsFetchingCvs] = useState(false);
+
     // State Toast thông báo
     const [showToast, setShowToast] = useState(false);
     const [toastMsg, setToastMsg] = useState('');
@@ -115,7 +121,7 @@ const JobPostDetails = () => {
         }
     }, [candidateId, id, savingMap]);
 
-    // 6. Xử lý Ứng tuyển
+    // 6. Xử lý Ứng tuyển – bước 1: lấy danh sách CV và mở Modal
     const handleApply = async () => {
         if (!localStorage.getItem('userId')) {
             showNotify(true, 'Vui lòng đăng nhập để thực hiện ứng tuyển!');
@@ -126,54 +132,40 @@ const JobPostDetails = () => {
             return;
         }
 
-        setIsApplying(true);
-
+        setIsFetchingCvs(true);
         try {
-            let currentCvId = localStorage.getItem('cvId');
+            const res = await fetch(`${API_BASE_URL}/Cvs/candidate/${applyingCandidateId}`);
+            if (!res.ok) throw new Error('Không thể lấy danh sách CV.');
+            // API trả về CandidateCvOverviewDto: { isCvPro, currentCvCount, canCreateNew, cvs: [...] }
+            const data = await res.json();
+            const list = data.cvs ?? data.Cvs ?? [];
+            setCvList(list);
+            setCanCreateNew(data.canCreateNew ?? data.CanCreateNew ?? false);
+            setShowCvModal(true);
+        } catch (err) {
+            console.error('Lỗi lấy danh sách CV:', err);
+            showNotify(true, err.message || 'Không thể lấy danh sách CV.');
+        } finally {
+            setIsFetchingCvs(false);
+        }
+    };
 
-            if (!currentCvId || currentCvId === 'undefined' || currentCvId === 'null') {
-                const cvFormData = new FormData();
-                cvFormData.append('CandidateId', applyingCandidateId);
-                cvFormData.append('Title', 'Hồ sơ ứng tuyển mặc định');
-                cvFormData.append('FullName', 'Ứng viên RIMS');
-
-                const cvResponse = await fetch(`${API_BASE_URL}/Cvs`, {
-                    method: 'POST',
-                    body: cvFormData
-                });
-
-                const contentType = cvResponse.headers.get('content-type');
-                let cvResult;
-
-                if (contentType && contentType.includes('application/json')) {
-                    cvResult = await cvResponse.json();
-                } else {
-                    const errorText = await cvResponse.text();
-                    throw new Error(errorText || 'Lỗi khi tạo hồ sơ mặc định.');
-                }
-
-                if (cvResponse.ok && cvResult.id) {
-                    currentCvId = cvResult.id;
-                    localStorage.setItem('cvId', currentCvId);
-                } else {
-                    throw new Error(cvResult.message || 'Tạo CV thất bại.');
-                }
-            }
-
+    // 7. Xử lý sau khi chọn CV – bước 2: gọi API ứng tuyển
+    const handleSelectCv = async (cvId) => {
+        setShowCvModal(false);
+        setIsApplying(true);
+        try {
             const applyPayload = {
                 jobId: id,
                 candidateId: applyingCandidateId,
-                cvId: currentCvId
+                cvId
             };
-
             const response = await fetch(`${API_BASE_URL}/Application/apply`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(applyPayload)
             });
-
             const result = await response.json();
-
             if (result.isSuccess) {
                 showNotify(false, result.message || 'Ứng tuyển thành công!');
             } else {
@@ -181,7 +173,7 @@ const JobPostDetails = () => {
             }
         } catch (err) {
             console.error('Lỗi xử lý ứng tuyển:', err);
-            showNotify(true, err.message);
+            showNotify(true, err.message || 'Có lỗi xảy ra khi ứng tuyển.');
         } finally {
             setIsApplying(false);
         }
@@ -215,6 +207,86 @@ const JobPostDetails = () => {
 
     return (
         <div className="job-page-wrapper">
+
+            {/* ===== MODAL CHỌN CV ===== */}
+            {showCvModal && (
+                <div className="cv-modal-overlay" onClick={() => setShowCvModal(false)}>
+                    <div className="cv-modal-box" onClick={e => e.stopPropagation()}>
+                        <div className="cv-modal-header">
+                            <h3 className="cv-modal-title">📄 Chọn hồ sơ ứng tuyển</h3>
+                            <button className="cv-modal-close" onClick={() => setShowCvModal(false)} aria-label="Đóng">✕</button>
+                        </div>
+
+                        {cvList.length === 0 ? (
+                            <div className="cv-modal-empty">
+                                <span className="cv-modal-empty-icon">📭</span>
+                                <p>Bạn chưa có CV nào, vui lòng tạo CV trước khi ứng tuyển.</p>
+                                {canCreateNew && (
+                                    <p className="cv-modal-hint">💡 Bạn có thể tạo CV mới trong phần quản lý hồ sơ.</p>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                <p className="cv-modal-subtitle">
+                                    Bạn có <strong>{cvList.length}</strong> CV.
+                                    {canCreateNew && (
+                                        <span className="cv-modal-can-create"> ✅ Bạn vẫn có thể tạo thêm CV mới.</span>
+                                    )}
+                                </p>
+                                <ul className="cv-modal-list">
+                                    {cvList.map((cv, idx) => (
+                                        <li key={cv.id ?? idx} className="cv-modal-item">
+                                            <div className="cv-item-info">
+                                                <span className="cv-item-icon">📋</span>
+                                                <div>
+                                                    <p className="cv-item-title">
+                                                        {cv.fullName || cv.title || `CV #${idx + 1}`}
+                                                    </p>
+                                                    {cv.title && cv.fullName && (
+                                                        <p className="cv-item-subtitle">{cv.title}</p>
+                                                    )}
+                                                    {cv.createdAt && (
+                                                        <p className="cv-item-date">Ngày tạo: {new Date(cv.createdAt).toLocaleDateString('vi-VN')}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="cv-item-actions">
+                                                <button
+                                                    type="button"
+                                                    className="btn-preview-cv"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        console.log('🔍 Kiểm tra ID CV gửi đi:', cv.id);
+                                                        if (!cv.id) {
+                                                            showNotify(true, 'Không tìm thấy ID của CV này.');
+                                                            return;
+                                                        }
+                                                        window.open(`/cv-preview/${cv.id}`, '_blank');
+                                                    }}
+                                                    title="Xem chi tiết CV"
+                                                >
+                                                    🔍 Xem chi tiết
+                                                </button>
+                                                <button
+                                                    className="btn-select-cv"
+                                                    onClick={() => handleSelectCv(cv.id)}
+                                                >
+                                                    Chọn hồ sơ này
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+
+                        <div className="cv-modal-footer">
+                            <button className="btn-cv-modal-close" onClick={() => setShowCvModal(false)}>Đóng</button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Toast thông báo */}
             {showToast && (
                 <div className={`custom-toast ${isError ? 'toast-error' : ''}`}>
@@ -268,9 +340,9 @@ const JobPostDetails = () => {
                             <button
                                 className="btn-apply-now"
                                 onClick={handleApply}
-                                disabled={isApplying}
+                                disabled={isApplying || isFetchingCvs}
                             >
-                                {isApplying ? 'Đang xử lý...' : 'Ứng tuyển ngay'}
+                                {isFetchingCvs ? 'Đang tải CV...' : isApplying ? 'Đang xử lý...' : 'Ứng tuyển ngay'}
                             </button>
                             <button
                                 className={`btn-save-job ${isSaved ? 'saved' : ''}`}
@@ -337,7 +409,7 @@ const JobPostDetails = () => {
                 onClick={() => navigate('/joblist')}
             >
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#00b14f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#00b14f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             </button>
 
@@ -348,8 +420,8 @@ const JobPostDetails = () => {
                 onClick={() => navigate('/applied-jobs')}
             >
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7 12C9.21 12 11 10.21 11 8C11 5.79 9.21 4 7 4C4.79 4 3 5.79 3 8C3 10.21 4.79 12 7 12ZM7 14C4.33 14 0 15.34 0 18V20H14V18C14 15.34 9.67 14 7 14Z" fill="#00b14f"/>
-                    <path d="M21 9V6H19V9H16V11H19V14H21V11H24V9H21Z" fill="#00b14f"/>
+                    <path d="M7 12C9.21 12 11 10.21 11 8C11 5.79 9.21 4 7 4C4.79 4 3 5.79 3 8C3 10.21 4.79 12 7 12ZM7 14C4.33 14 0 15.34 0 18V20H14V18C14 15.34 9.67 14 7 14Z" fill="#00b14f" />
+                    <path d="M21 9V6H19V9H16V11H19V14H21V11H24V9H21Z" fill="#00b14f" />
                 </svg>
             </button>
 
@@ -360,7 +432,7 @@ const JobPostDetails = () => {
                 title="Xem tin đã lưu"
             >
                 <svg viewBox="0 0 24 24">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
                 {savedJobIds.size > 0 && (
                     <span className="saved-badge">{savedJobIds.size}</span>
