@@ -239,7 +239,7 @@ const CVManagement = () => {
                   </span>
                   <button 
                     className="btn-upgrade-pro" 
-                    onClick={() => alert("Chức năng nâng cấp/thanh toán đang được phát triển!")}
+                   onClick={() => navigate('/upgrade-cv-pro')}
                   >
                     ⭐ Nâng cấp ngay
                   </button>
