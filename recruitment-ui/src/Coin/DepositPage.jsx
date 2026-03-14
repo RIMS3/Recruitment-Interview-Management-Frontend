@@ -7,15 +7,17 @@ const DepositPage = () => {
   const [amount, setAmount] = useState('');
   const [qrString, setQrString] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [paymentStatus, setPaymentStatus] = useState('idle'); // idle | pending | success
+  const [paymentStatus, setPaymentStatus] = useState('idle'); // idle, pending, success
+
+  const [giftcode, setGiftcode] = useState('');
+  const [giftcodeLoading, setGiftcodeLoading] = useState(false);
+  const [giftcodeMessage, setGiftcodeMessage] = useState({ text: '', isError: false });
 
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("accessToken");
 
   useEffect(() => {
     if (!token) return;
-
     const connection = new signalR.HubConnectionBuilder()
       .withUrl("https://localhost:7272/paymentHub", {
         accessTokenFactory: () => token
@@ -25,34 +27,23 @@ const DepositPage = () => {
 
     connection.start()
       .then(() => {
-        console.log("Connected to SignalR Hub");
-        connection.on("PaidOrder", (message) => {
-          console.log("Server notification:", message);
-          setPaymentStatus('success'); // Kích hoạt hiệu ứng thành công
+        connection.on("PaidOrder", () => {
+          setPaymentStatus('success');
           setQrString('');
+          setAmount('');
         });
       })
-      .catch(err => console.error("SignalR Connection Error: ", err));
+      .catch(err => console.error("SignalR Error: ", err));
 
-    return () => {
-      if (connection) connection.stop();
-    };
+    return () => { if (connection) connection.stop(); };
   }, [token]);
 
   const handleDeposit = async () => {
-    if (!userId) {
-      setError("Không tìm thấy thông tin người dùng.");
-      return;
-    }
     if (!amount || Number(amount) < 5000) {
       alert("Số tiền nạp tối thiểu là 5.000đ");
       return;
     }
-
     setLoading(true);
-    setError(null);
-    setPaymentStatus('pending');
-
     try {
       const response = await fetch('https://localhost:7272/api/refill', {
         method: 'POST',
@@ -62,129 +53,145 @@ const DepositPage = () => {
         },
         body: JSON.stringify({ IdUser: userId, amount: amount.toString() }),
       });
-
       const data = await response.json();
       if (data.isSuccess) {
         setQrString(data.qrCode);
-      } else {
-        setError(data.message || "Có lỗi xảy ra.");
-        setPaymentStatus('idle');
+        setPaymentStatus('pending');
       }
     } catch (err) {
-      setError("Lỗi kết nối máy chủ.");
-      setPaymentStatus('idle');
-    } finally {
-      setLoading(false);
-    }
+      alert("Lỗi kết nối máy chủ");
+    } finally { setLoading(false); }
+  };
+
+  const handleApplyGiftcode = async () => {
+    if (!giftcode) return;
+    setGiftcodeLoading(true);
+    try {
+      const response = await fetch('https://localhost:7272/api/refill/gift-code', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ IdUser: userId, Code: giftcode }),
+      });
+      const data = await response.json();
+      setGiftcodeMessage({ text: data.message, isError: !response.ok });
+      if(response.ok) setGiftcode('');
+    } catch (err) {
+      setGiftcodeMessage({ text: "Lỗi kết nối", isError: true });
+    } finally { setGiftcodeLoading(false); }
   };
 
   return (
     <div className="deposit-wrapper">
-      {/* HIỆU ỨNG SUCCESS OVERLAY */}
+      {/* HIỆU ỨNG SAO BĂNG NỀN */}
+      <div className="star-container">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="shooting-star"></div>
+        ))}
+      </div>
+
+      {/* MODAL THÔNG BÁO THÀNH CÔNG */}
       {paymentStatus === 'success' && (
         <div className="success-overlay">
-          <div className="success-checkmark-container">
-            <div className="check-icon">
-              <span className="icon-line line-tip"></span>
-              <span className="icon-line line-long"></span>
-              <div className="icon-circle"></div>
-              <div className="icon-fix"></div>
+          <div className="success-card">
+            <div className="checkmark-wrapper">
+              <div className="checkmark-circle">
+                <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
             </div>
-            <h2>Nạp tiền thành công!</h2>
-            <p>Hệ thống đã cập nhật số dư của bạn.</p>
-            <button className="done-btn" onClick={() => setPaymentStatus('idle')}>
-              Tuyệt vời
-            </button>
+            <h2>Nạp Tiền Thành Công!</h2>
+            <p>Số dư của bạn đã được cập nhật tự động.</p>
+            <button className="done-btn" onClick={() => setPaymentStatus('idle')}>Tuyệt vời</button>
           </div>
         </div>
       )}
 
-      {/* Hiệu ứng Sao Băng */}
-      <div className="shooting-star"></div>
-      <div className="shooting-star"></div>
-      <div className="shooting-star"></div>
-
       <div className="deposit-card">
         <header className="deposit-header">
-          <div className="header-content">
-            <h1>Nạp Tiền Hệ Thống</h1>
-            <p>Thanh toán an toàn qua cổng VietQR</p>
+          <div>
+            <h1>Nạp Ngân Lượng</h1>
+            <p className="subtitle">Nâng tầm trải nghiệm  - Nạp liền tay vận may sẽ tìm đến !</p>
           </div>
           <div className="user-badge">PTD Corporation</div>
         </header>
 
         <div className="deposit-body">
-          <div className="deposit-column form-column">
-            <div className="input-group">
-              <label>Số tiền muốn nạp (VND)</label>
-              <input 
-                type="number" 
-                className="amount-input"
-                placeholder="Ví dụ: 50000" 
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-              <div className="quick-amounts-grid">
-                {[5000, 20000, 50000, 100000, 200000, 500000].map(val => (
-                  <button 
-                    key={val} 
-                    className={`amount-chip ${Number(amount) === val ? 'active' : ''}`}
-                    onClick={() => setAmount(val)}
-                  >
-                    {val.toLocaleString()}đ
-                  </button>
-                ))}
-              </div>
+          <div className="deposit-column">
+            <label className="input-label">Số tiền muốn nạp (VND)</label>
+            <input 
+              type="number" className="amount-input" 
+              value={amount} onChange={(e) => setAmount(e.target.value)}
+              placeholder="Ví dụ: 50,000"
+            />
+            <div className="quick-amounts-grid">
+              {[5000, 10000, 20000, 50000, 100000, 200000].map(val => (
+                <button 
+                  key={val} className={`amount-chip ${Number(amount) === val ? 'active' : ''}`}
+                  onClick={() => setAmount(val)}
+                >
+                  {val.toLocaleString()}
+                </button>
+              ))}
             </div>
-
-            <button 
-              className={`submit-button ${loading ? 'is-loading' : ''}`} 
-              onClick={handleDeposit}
-              disabled={loading}
-            >
-              {loading ? 'Đang xử lý...' : 'Tạo mã QR thanh toán'}
+            <button className="submit-button" onClick={handleDeposit} disabled={loading}>
+              {loading ? 'Đang tạo mã...' : 'Tạo mã QR thanh toán'}
             </button>
-
-            {error && <div className="error-message">{error}</div>}
-
             <div className="guide-box">
-              <h3>Hướng dẫn:</h3>
-              <ul>
-                <li>Quét mã QR bằng ứng dụng ngân hàng.</li>
-                <li>Hệ thống tự động duyệt sau khi nhận tiền.</li>
-              </ul>
+              <p>• Quét mã bằng App Ngân hàng (VietQR).</p>
+              <p>• Tiền sẽ vào tài khoản sau 30s - 1 phút.</p>
+              <p>• Vui lòng không sửa nội dung chuyển khoản.</p>
             </div>
           </div>
 
-          <div className="deposit-column qr-column">
+          <div className="deposit-column">
             <div className="qr-preview-box">
               {qrString ? (
-                <div className="qr-result animate-fade-in">
+                <div className="qr-container animate-fade-in">
                   <div className="qr-wrapper">
-                    <QRCodeCanvas value={qrString} size={240} level="H" />
-                  </div>
-                  <div className="qr-status-info">
-                    <div className="dot-flashing"></div>
-                    <span>Đang chờ thanh toán...</span>
+                    <QRCodeCanvas value={qrString} size={220} />
                   </div>
                 </div>
               ) : (
                 <div className="qr-placeholder">
-                  <div className="placeholder-icon">🏦</div>
-                  <p>Chọn mệnh giá để tạo mã</p>
+                  <div className="empty-icon">💸</div>
+                  <p>Chọn số tiền để hiển thị QR</p>
                 </div>
+              )}
+            </div>
+
+            <div className="giftcode-section">
+              <h3 className="gift-title">🎁 Nhập Giftcode</h3>
+              <div className="giftcode-input-group">
+                <input 
+                  className="giftcode-input" value={giftcode}
+                  onChange={(e) => setGiftcode(e.target.value.toUpperCase())}
+                  placeholder="Gift Code Tân Thủ ..."
+                />
+                <button className="giftcode-apply-btn" onClick={handleApplyGiftcode} disabled={giftcodeLoading}>
+                  {giftcodeLoading ? '...' : 'Áp dụng'}
+                </button>
+              </div>
+              {giftcodeMessage.text && (
+                <p className={`gift-msg ${giftcodeMessage.isError ? 'err' : 'ok'}`}>
+                  {giftcodeMessage.text}
+                </p>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="marquee-container footer-marquee">
+      <footer className="footer-marquee">
         <div className="marquee-inner">
-          <span className="marquee-text">⚠️ Nạp tiền tự động 24/7 • Bảo mật tuyệt đối • Hỗ trợ trực tuyến • </span>
-          <span className="marquee-text">⚠️ Nạp tiền tự động 24/7 • Bảo mật tuyệt đối • Hỗ trợ trực tuyến • </span>
+          <span className="marquee-text">
+        99% người chơi bỏ cuộc ngay trước khi họ chiến thắng | Có thể lần tiếp theo sẽ là của bạn — nạp thêm và tiếp tục chơi ngay!  - Hệ thống nạp tiền VietQR & Giftcode của PTD Corporation luôn sẵn sàng phục vụ bạn!
+          </span>
         </div>
-      </div>
+      </footer>
     </div>
   );
 };
