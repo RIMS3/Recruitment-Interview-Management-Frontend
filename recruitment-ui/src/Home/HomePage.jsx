@@ -40,6 +40,10 @@ const CountUpNumber = ({ end, duration = 2000 }) => {
   return <h4 ref={elementRef}>{formatNumber(count)}+</h4>;
 };
 
+
+ const  mytoken = localStorage.getItem("accessToken");
+ console.log("Token của bạn là gì:", mytoken);
+
 const HomePage = () => {
   const navigate = useNavigate();
   const [currentBanner, setCurrentBanner] = useState(0);

@@ -1,0 +1,431 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #0066ff;
+  --success-color: #10b981;
+  --bg-color: #050509;
+  --text-dark: #e2e8f0;
+  --text-gray: #a0aec0;
+  --border-color: #2d3748;
+  --card-bg: #111119;
+}
+
+/* --- WRAPPER & NỀN SAO --- */
+.deposit-wrapper {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 20px 75px 20px;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Các lớp sao nền và hiệu ứng twinkle */
+.deposit-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+    radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px);
+  background-size: 550px 550px, 350px 350px;
+  background-position: 0 0, 40px 60px;
+  z-index: 1;
+  opacity: 0.6;
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* --- HIỆU ỨNG SAO BĂNG --- */
+.shooting-star {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  width: 2px;
+  height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,1);
+  animation: shoot 5s linear infinite;
+  opacity: 0;
+  z-index: 2;
+}
+
+.shooting-star::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 150px;
+  height: 1px;
+  background: linear-gradient(90deg, #fff, transparent);
+}
+
+.shooting-star:nth-child(1) { left: 80%; animation-delay: 0s; }
+.shooting-star:nth-child(2) { left: 40%; animation-delay: 2s; }
+.shooting-star:nth-child(3) { left: 60%; animation-delay: 4s; }
+.shooting-star:nth-child(4) { left: 20%; animation-delay: 7s; }
+.shooting-star:nth-child(5) { left: 95%; animation-delay: 1.5s; }
+
+@keyframes shoot {
+  0% { transform: rotate(315deg) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: rotate(315deg) translateX(-1200px); opacity: 0; }
+}
+
+/* --- CARD NẠP TIỀN --- */
+.deposit-card {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 900px;
+  border-radius: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+  position: relative;
+  border: 1px solid var(--border-color);
+}
+
+.deposit-header {
+  padding: 30px 40px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deposit-header h1 { font-size: 24px; color: var(--text-dark); margin: 0; }
+.deposit-header p { color: var(--text-gray); font-size: 14px; margin: 5px 0 0; }
+
+.user-badge {
+  background: #2d3748;
+  color: var(--text-dark);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.deposit-body { display: flex; padding: 40px; gap: 50px; }
+.deposit-column { flex: 1; }
+
+/* INPUT & BUTTON */
+.input-group label { color: var(--text-dark); display: block; margin-bottom: 8px; }
+
+.amount-input {
+  width: 100%;
+  padding: 16px;
+  font-size: 22px;
+  font-weight: 700;
+  border: 2px solid var(--border-color);
+  background-color: #1a1a2e;
+  color: var(--text-dark);
+  border-radius: 12px;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.3s;
+}
+.amount-input:focus { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(0, 102, 255, 0.2); }
+
+.quick-amounts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.amount-chip {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  background: #1a1a2e;
+  color: var(--text-gray);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.amount-chip:hover { border-color: var(--primary-color); }
+.amount-chip.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+
+.submit-button {
+  width: 100%;
+  padding: 18px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 25px;
+  transition: 0.3s;
+}
+.submit-button:hover { filter: brightness(1.2); }
+.submit-button:disabled { background: #4a5568; cursor: not-allowed; }
+
+.error-message { color: #f56565; margin-top: 15px; font-size: 14px; text-align: center; }
+
+.guide-box {
+  margin-top: 30px;
+  background: #1a1a2e;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  border: 1px solid var(--border-color);
+  color: var(--text-gray);
+}
+.guide-box li { margin-bottom: 5px; }
+
+/* QR SECTION & STATUS */
+.qr-preview-box {
+  background: #1a1a2e;
+  min-height: 400px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed var(--border-color);
+}
+
+.qr-result { text-align: center; }
+.qr-wrapper {
+  background: #fff;
+  padding: 15px;
+  border-radius: 16px;
+  display: inline-block;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.qr-status-info {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #f6ad55;
+  font-weight: 600;
+}
+
+/* Success Box */
+.payment-status-box.success {
+  text-align: center;
+  padding: 20px;
+}
+.status-icon { font-size: 60px; margin-bottom: 15px; }
+.payment-status-box h3 { color: var(--success-color); margin-bottom: 10px; }
+.payment-status-box p { color: var(--text-gray); font-size: 14px; }
+.reset-btn {
+  margin-top: 20px;
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.qr-placeholder { text-align: center; color: var(--text-gray); }
+.placeholder-icon { font-size: 50px; opacity: 0.3; margin-bottom: 10px; }
+
+/* MARQUEE */
+.marquee-container.footer-marquee {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #000;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  z-index: 1000;
+  border-top: 1px solid #1a1a2e;
+}
+
+.marquee-inner {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 30s linear infinite;
+}
+
+.marquee-text {
+  padding-left: 50px;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #cbd5e0;
+  text-transform: uppercase;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .deposit-body { flex-direction: column; padding: 20px; gap: 30px; }
+  .deposit-card { border-radius: 0; margin-top: 0; }
+  .deposit-wrapper { padding: 0 0 75px 0; }
+}
+
+/* --- SUCCESS OVERLAY --- */
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease;
+}
+
+.success-checkmark-container {
+  background: #111119;
+  padding: 40px;
+  border-radius: 24px;
+  text-align: center;
+  border: 1px solid #2d3748;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.success-checkmark-container h2 {
+  color: #10b981;
+  margin: 20px 0 10px;
+}
+
+.success-checkmark-container p {
+  color: #a0aec0;
+  margin-bottom: 30px;
+}
+
+.done-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.done-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* --- ANIMATED CHECKMARK --- */
+/** Thiết kế dựa trên kiểu của SweetAlert2 **/
+.check-icon {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  border-radius: 50%;
+  box-sizing: content-box;
+  border: 4px solid rgba(16, 185, 129, .2);
+  margin: 0 auto;
+}
+
+.check-icon::before, .check-icon::after {
+  content: '';
+  position: absolute;
+  background: #111119; /* Phải trùng màu với background container */
+  height: 100px;
+  width: 40px;
+  transform: rotate(45deg);
+}
+
+.check-icon::before {
+  top: 3px;
+  left: -2px;
+  transform-origin: 100% 50%;
+  border-radius: 100px 0 0 100px;
+}
+
+.check-icon::after {
+  top: 0;
+  left: 30px;
+  transform-origin: 0 50%;
+  border-radius: 0 100px 100px 0;
+  animation: rotatePlaceholder 4.25s ease-in;
+}
+
+.icon-circle {
+  top: -4px;
+  left: -4px;
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 4px solid #10b981;
+  border-radius: 50%;
+  box-sizing: content-box;
+  z-index: 2;
+}
+
+.icon-fix {
+  top: 8px;
+  width: 5px;
+  left: 28px;
+  position: absolute;
+  height: 70px;
+  background-color: #111119;
+  z-index: 1;
+  transform: rotate(-45deg);
+}
+
+.icon-line {
+  height: 5px;
+  background-color: #10b981;
+  display: block;
+  border-radius: 2px;
+  position: absolute;
+  z-index: 10;
+}
+
+.line-tip {
+  top: 46px;
+  left: 14px;
+  width: 25px;
+  transform: rotate(45deg);
+  animation: animateSuccessTip 0.75s;
+}
+
+.line-long {
+  top: 38px;
+  right: 8px;
+  width: 47px;
+  transform: rotate(-45deg);
+  animation: animateSuccessLong 0.75s;
+}
+
+@keyframes animateSuccessTip {
+  0% { width: 0; left: 1px; top: 19px; }
+  54% { width: 0; left: 1px; top: 19px; }
+  70% { width: 50px; left: -8px; top: 37px; }
+  84% { width: 17px; left: 21px; top: 48px; }
+  100% { width: 25px; left: 14px; top: 46px; }
+}
+
+@keyframes animateSuccessLong {
+  0% { width: 0; right: 46px; top: 54px; }
+  65% { width: 0; right: 46px; top: 54px; }
+  84% { width: 55px; right: 0px; top: 35px; }
+  100% { width: 47px; right: 8px; top: 38px; }
+}
