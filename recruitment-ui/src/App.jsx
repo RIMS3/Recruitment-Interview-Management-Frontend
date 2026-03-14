@@ -44,7 +44,7 @@ import OrderDetail from "./Orders/OrderDetail";
 import ITBlog from "./Blog/ITBlog";
 import UpgradeCvPro from "./CVs/UpgradeCvPro";
 import DepositPage from "./Coin/DepositPage";
-
+import TaiXiuGame from "./Game/TaiXiuGame";
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -160,7 +160,9 @@ const Navbar = () => {
           <li className={location.pathname === "/joblist" ? "active" : ""} onClick={() => navigate("/joblist")}>
             Việc làm
           </li>
-
+          <li className={location.pathname === "/game" ? "active" : ""} onClick={() => navigate("/game")}>
+            Game
+          </li>
           {/* PHẦN NẠP TIỀN & SỐ DƯ */}
           {user && (
             <>
@@ -266,7 +268,7 @@ function App() {
             <Route path="/naptien" element={<DepositPage />} />
             <Route path="/applied-jobs" element={<ListAppliedJobs />} />
             <Route path="/create-company" element={<CreateCompany />} />
-
+             <Route path="/game" element={<TaiXiuGame />} />
             {/* Protected Routes */}
             <Route path="/manage-cv" element={<ProtectedRoute requiredRole={2}><CVs /></ProtectedRoute>} />
             <Route path="/employer/applications" element={<ProtectedRoute requiredRole={3}><ApplicationList /></ProtectedRoute>} />
