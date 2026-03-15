@@ -1,5 +1,5 @@
 /* ==========================================================================
-   GAME CONTAINER & TABLE
+   GAME CONTAINER & LAYOUT
    ========================================================================== */
 .game-container {
     background: radial-gradient(circle, #1a3022 0%, #000 100%);
@@ -8,8 +8,10 @@
     justify-content: center;
     align-items: center;
     color: white;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    overflow: hidden;
+    font-family: 'Roboto', 'Segoe UI', Tahoma, sans-serif;
+    overflow-x: hidden;
+    gap: 30px;
+    padding: 20px 40px;
 }
 
 .game-table {
@@ -24,10 +26,11 @@
         0 0 20px rgba(0,0,0,0.5);
     position: relative;
     text-align: center;
+    flex-shrink: 0;
 }
 
 /* ==========================================================================
-   USER INFO BAR (SỐ DƯ & ONLINE COUNT)
+   USER INFO BAR (SỐ DƯ & ONLINE)
    ========================================================================== */
 .user-info-bar {
     position: absolute;
@@ -51,6 +54,7 @@
     gap: 8px;
     border: 1px solid rgba(46, 204, 113, 0.3);
     backdrop-filter: blur(4px);
+    white-space: nowrap;
 }
 
 .dot-online {
@@ -147,7 +151,7 @@
 .timer-red { color: #e74c3c; text-shadow: 0 0 25px #e74c3c; }
 
 /* ==========================================================================
-   MAIN GAME AREA (TAI - BAT/DIA - XIU)
+   MAIN GAME AREA (CẤU TRÚC MỚI)
    ========================================================================== */
 .game-main-display {
     display: flex;
@@ -161,15 +165,39 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 220px;
+    width: 250px;
+    position: relative;
+    padding-top: 50px; /* Khoảng trống cho box Tổng phía trên */
 }
 
+/* BOX TỔNG PHÍA TRÊN */
+.system-total-bet.top-display {
+    position: absolute;
+    top: 0;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 4px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    z-index: 5;
+    min-width: 140px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+}
+
+.xiu-text ~ .top-display { border-color: #3498db; color: #3498db; text-shadow: 0 0 8px #3498db; }
+.tai-text ~ .top-display { border-color: #e74c3c; color: #e74c3c; text-shadow: 0 0 8px #e74c3c; }
+
+/* CHỮ LỚN NỀN */
 .big-side-text {
-    font-size: 7rem;
+    font-size: 8rem;
     font-weight: 900;
-    opacity: 0.1;
+    opacity: 0.15;
     transition: all 0.4s ease;
     user-select: none;
+    line-height: 1;
+    margin: 10px 0;
 }
 
 .winner-active {
@@ -182,23 +210,26 @@
 
 @keyframes winJump {
     from { transform: scale(1); }
-    to { transform: scale(1.15); }
+    to { transform: scale(1.1); }
 }
 
+/* BOX CƯỢC CÁ NHÂN */
 .user-bet-val {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    color: rgba(255, 255, 255, 0.15);
-    background: rgba(0, 0, 0, 0.2);
-    padding: 5px 20px;
+    color: #888;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px 20px;
     border-radius: 10px;
-    min-width: 100px;
+    min-width: 130px;
+    margin-top: -10px;
+    border: 1px solid transparent;
 }
 
 .user-bet-val.has-bet {
     color: #f1c40f;
     background: rgba(0, 0, 0, 0.5);
-    border: 1px solid #f1c40f66;
+    border-color: #f1c40f;
 }
 
 /* ==========================================================================
@@ -232,14 +263,6 @@
     0% { transform: translate(0,0); }
     25% { transform: translate(3px, -2px); }
     75% { transform: translate(-3px, 2px); }
-}
-
-.score-badge {
-    position: absolute; z-index: 15;
-    background: #000; color: #f1c40f;
-    padding: 10px 25px; border-radius: 40px;
-    font-size: 2rem; font-weight: 900;
-    border: 3px solid #f1c40f;
 }
 
 .hint-text { 
@@ -322,13 +345,14 @@
 .history-list { display: flex; justify-content: center; gap: 8px; }
 
 .history-item {
-    width: 30px; height: 30px; border-radius: 50%;
+    width: 32px; height: 32px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.8rem; font-weight: bold; position: relative;
+    font-size: 0.9rem; font-weight: bold; position: relative;
     cursor: help; transition: 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-.history-item:hover { transform: scale(1.2); }
+.history-item:hover { transform: scale(1.2); z-index: 10; }
 .h-xiu { background: #fff; color: #333; }
 .h-tai { background: #333; color: #fff; border: 1px solid #555; }
 
@@ -336,12 +360,140 @@
     visibility: hidden; background: #222; color: #f1c40f;
     padding: 5px 10px; border-radius: 5px; position: absolute;
     bottom: 140%; left: 50%; transform: translateX(-50%);
-    white-space: nowrap; font-size: 0.7rem; opacity: 0;
+    white-space: nowrap; font-size: 0.75rem; opacity: 0;
+    z-index: 1000;
 }
 
 .history-item:hover .h-tooltip { visibility: visible; opacity: 1; }
 
 /* ==========================================================================
-   OTHERS
+   LIVE STREAM CHAT (YOUTUBE STYLE)
    ========================================================================== */
+.chat-sidebar {
+    width: 400px;
+    height: 720px;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+}
+
+.chat-header {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: white;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.live-dot {
+    color: #ff0000;
+    font-size: 1.2rem;
+    animation: blink 1s infinite;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 8px 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-row {
+    display: flex;
+    padding: 6px 16px;
+    gap: 12px;
+    transition: background 0.2s;
+    align-items: flex-start;
+}
+
+.chat-row:hover { background: rgba(255, 255, 255, 0.05); }
+
+/* Dòng hệ thống (Warning) */
+.system-row {
+    background: rgba(255, 0, 0, 0.05);
+}
+.system-row .chat-username { color: #ff4d4d !important; font-weight: bold; }
+.system-row .chat-text-msg { color: #ffcccc; font-style: italic; font-size: 0.85rem; }
+
+.chat-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #5a5a5a;
+    display: flex;
+    align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: bold; color: white;
+    flex-shrink: 0; margin-top: 2px;
+}
+
+.chat-content { display: flex; flex-direction: column; }
+
+.chat-username {
+    font-size: 0.85rem;
+    color: #f1c40f; /* Tên màu vàng */
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.chat-text-msg {
+    font-size: 0.95rem;
+    color: #f1f1f1;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.chat-footer {
+    padding: 16px;
+    border-top: 1px solid #333;
+    background: #0f0f0f;
+}
+
+.chat-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: #272727;
+    border-radius: 20px;
+    padding: 4px 4px 4px 16px;
+}
+
+.chat-input-wrapper input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 0.9rem;
+    outline: none;
+    height: 32px;
+}
+
+.send-btn {
+    background: transparent;
+    border: none;
+    color: #3ea6ff;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px;
+}
+
+/* Scrollbar */
+.chat-messages::-webkit-scrollbar { width: 6px; }
+.chat-messages::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+/* ERROR SCREEN */
 .error-screen { color: #e74c3c; text-align: center; padding: 100px; font-size: 1.5rem; }
+
+/* RESPONSIVE */
+@media (max-width: 1400px) {
+    .game-container { flex-direction: column; height: auto; padding: 40px; }
+    .game-table { width: 920px; transform: scale(1); }
+    .chat-sidebar { width: 920px; height: 400px; }
+}
