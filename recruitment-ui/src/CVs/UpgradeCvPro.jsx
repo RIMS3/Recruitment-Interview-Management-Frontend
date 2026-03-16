@@ -30,7 +30,7 @@ const UpgradeCvPro = () => {
   // Khởi tạo SignalR
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7272/paymentHub", {
+      .withUrl("https://itlocak.xyz/paymentHub", {
          accessTokenFactory: () => localStorage.getItem("accessToken")
       })
       .withAutomaticReconnect()
@@ -64,7 +64,7 @@ const UpgradeCvPro = () => {
     const fetchPackageData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('https://localhost:7272/api/Cvs/cvpro/24A8F863-35CD-47F1-9FD9-CCBA90CFFDA0');
+        const response = await axios.get('https://itlocak.xyz/api/Cvs/cvpro/24A8F863-35CD-47F1-9FD9-CCBA90CFFDA0');
         setPackageInfo(response.data);
       } catch (error) {
         toast.error('Không thể kết nối đến máy chủ!');
@@ -82,7 +82,7 @@ const UpgradeCvPro = () => {
     if (paymentMethod === 'bank') {
       try {
         setIsProcessing(true);
-        const response = await axios.post('https://localhost:7272/api/payment', {
+        const response = await axios.post('https://itlocak.xyz/api/payment', {
           IdUser: userId,
           IdService: packageInfo.idService
         });

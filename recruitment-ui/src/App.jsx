@@ -58,7 +58,7 @@ const Navbar = () => {
       if (user && userId) {
         try {
           // Gọi API theo đúng endpoint bạn cung cấp
-          const response = await axios.get(`https://localhost:7272/api/refill/${userId}`);
+          const response = await axios.get(`https://itlocak.xyz/api/refill/${userId}`);
           
           // Kiểm tra cấu trúc dữ liệu trả về (giả định trả về số hoặc object {amount: ...})
           const amount = typeof response.data === 'number' ? response.data : (response.data.amount || 0);
