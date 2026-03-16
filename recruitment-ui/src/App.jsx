@@ -45,6 +45,7 @@ import ITBlog from "./Blog/ITBlog";
 import UpgradeCvPro from "./CVs/UpgradeCvPro";
 import DepositPage from "./Coin/DepositPage";
 import TaiXiuGame from "./Game/TaiXiuGame";
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -139,9 +140,18 @@ const Navbar = () => {
 
           {/* MENU DÀNH CHO ỨNG VIÊN */}
           {user && String(user.role) === "2" && (
-            <li className={location.pathname === "/candidate/orders" ? "active" : ""} onClick={() => navigate("/candidate/orders")}>
-              Lịch sử giao dịch
-            </li>
+           <>
+              <li className={location.pathname === "/candidate/orders" ? "active" : ""} onClick={() => navigate("/candidate/orders")}>
+                Lịch sử giao dịch
+              </li>
+              {/* NÚT NÂNG CẤP NGAY ĐÃ ĐƯỢC LÀM GỌN */}
+              <li 
+                onClick={() => navigate('/upgrade-cv-pro')}
+                className="btn-upgrade-nav"
+              >
+                ⭐ Nâng cấp ngay
+              </li>
+            </>
           )}
 
           {user && String(user.role) !== "1" && (

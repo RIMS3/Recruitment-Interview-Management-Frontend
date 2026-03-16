@@ -1,13 +1,13 @@
-:root {
+/* 1. ĐƯA BIẾN VÀO CLASS CHA THAY VÌ :ROOT */
+/* Các biến này giờ chỉ có tác dụng bên trong .deposit-wrapper */
+.deposit-wrapper {
   --primary-color: #0066ff;
   --success-color: #10b981;
   --bg-color: #050509;
   --text-gray: #a0aec0;
   --border-color: #2d3748;
   --card-bg: #111119;
-}
 
-.deposit-wrapper {
   background-color: var(--bg-color);
   min-height: 100vh;
   display: flex; justify-content: center; align-items: center;
@@ -15,14 +15,15 @@
   position: relative; overflow: hidden;
 }
 
-/* --- SAO BĂNG (Giữ nguyên từ code cũ của bạn) --- */
-.star-container { position: absolute; inset: 0; }
-.shooting-star {
+/* 2. THÊM TIỀN TỐ .deposit-wrapper VÀO TRƯỚC TẤT CẢ CÁC CLASS */
+/* --- SAO BĂNG --- */
+.deposit-wrapper .star-container { position: absolute; inset: 0; }
+.deposit-wrapper .shooting-star {
   position: absolute; top: 0; right: 0; width: 2px; height: 2px;
   background: linear-gradient(90deg, #fff, transparent);
   border-radius: 50%; opacity: 0; animation: star-animation 4s linear infinite;
 }
-.shooting-star::before {
+.deposit-wrapper .shooting-star::before {
   content: ''; position: absolute; top: 50%; transform: translateY(-50%);
   width: 150px; height: 1px; background: linear-gradient(90deg, #fff, transparent);
 }
@@ -31,12 +32,12 @@
   10% { opacity: 1; }
   100% { transform: rotate(315deg) translateX(-1500px); opacity: 0; }
 }
-.shooting-star:nth-child(1) { top: 0%; right: 10%; animation-delay: 0s; }
-.shooting-star:nth-child(2) { top: 10%; right: 40%; animation-delay: 1s; }
-.shooting-star:nth-child(3) { top: 20%; right: -5%; animation-delay: 2s; }
+.deposit-wrapper .shooting-star:nth-child(1) { top: 0%; right: 10%; animation-delay: 0s; }
+.deposit-wrapper .shooting-star:nth-child(2) { top: 10%; right: 40%; animation-delay: 1s; }
+.deposit-wrapper .shooting-star:nth-child(3) { top: 20%; right: -5%; animation-delay: 2s; }
 
 /* --- CARD STYLE --- */
-.gift-card-only {
+.deposit-wrapper .gift-card-only {
   background: var(--card-bg);
   width: 100%; max-width: 480px;
   border-radius: 28px; border: 1px solid var(--border-color);
@@ -44,52 +45,54 @@
   box-shadow: 0 30px 80px rgba(0,0,0,0.6);
 }
 
-.deposit-header {
+.deposit-wrapper .deposit-header {
   padding: 25px 30px; border-bottom: 1px solid var(--border-color);
   display: flex; justify-content: space-between; align-items: center;
   background: linear-gradient(to right, #111119, #1a1a2e);
 }
 
-.deposit-header h1 { font-size: 20px; color: white; margin: 0; }
-.subtitle { color: var(--text-gray); font-size: 12px; margin-top: 4px; }
-.user-badge {
+.deposit-wrapper .deposit-header h1 { font-size: 20px; color: white; margin: 0; }
+.deposit-wrapper .subtitle { color: var(--text-gray); font-size: 12px; margin-top: 4px; }
+.deposit-wrapper .user-badge {
   background: rgba(0, 102, 255, 0.1); color: var(--primary-color);
   padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 12px;
   border: 1px solid var(--primary-color);
 }
 
-.gift-body-centered { padding: 30px; }
+.deposit-wrapper .gift-body-centered { padding: 30px; }
 
-.input-label { color: #e2e8f0; display: block; margin-bottom: 12px; font-weight: 500; }
-.gift-input-field {
+.deposit-wrapper .input-label { color: #e2e8f0; display: block; margin-bottom: 12px; font-weight: 500; }
+.deposit-wrapper .gift-input-field {
   width: 100%; padding: 18px; font-size: 20px; font-weight: 700;
   background: #000; border: 2px solid var(--border-color);
   border-radius: 15px; color: white; text-align: center;
   letter-spacing: 1px; transition: 0.3s;
 }
-.gift-input-field:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 15px rgba(0, 102, 255, 0.2); }
+.deposit-wrapper .gift-input-field:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 15px rgba(0, 102, 255, 0.2); }
 
-.submit-button {
+.deposit-wrapper .submit-button {
   width: 100%; padding: 16px; background: var(--primary-color);
   color: white; border: none; border-radius: 15px; font-weight: 700;
   margin-top: 20px; cursor: pointer; transition: 0.3s; font-size: 16px;
 }
-.submit-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 102, 255, 0.3); }
+.deposit-wrapper .submit-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 102, 255, 0.3); }
 
-.gift-status-msg {
+.deposit-wrapper .gift-status-msg {
   margin-top: 20px; padding: 12px; border-radius: 10px; text-align: center; font-size: 14px;
 }
-.gift-status-msg.ok { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid var(--success-color); }
-.gift-status-msg.err { background: rgba(255, 75, 75, 0.1); color: #ff4b4b; border: 1px solid #ff4b4b; }
+.deposit-wrapper .gift-status-msg.ok { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid var(--success-color); }
+.deposit-wrapper .gift-status-msg.err { background: rgba(255, 75, 75, 0.1); color: #ff4b4b; border: 1px solid #ff4b4b; }
 
-.guide-box { margin-top: 25px; background: #0a0a14; padding: 20px; border-radius: 15px; color: var(--text-gray); font-size: 12px; line-height: 1.6; }
+.deposit-wrapper .guide-box { margin-top: 25px; background: #0a0a14; padding: 20px; border-radius: 15px; color: var(--text-gray); font-size: 12px; line-height: 1.6; }
 
 /* FOOTER MARQUEE */
-.footer-marquee { 
+/* Đã thêm tiền tố riêng để chắc chắn không trùng với các marquee khác trên web */
+.deposit-wrapper-footer-marquee { 
   position: fixed; bottom: 0; left: 0; width: 100%; background: #000; 
   height: 35px; display: flex; align-items: center; border-top: 1px solid var(--border-color); overflow: hidden;
+  z-index: 100;
 }
-.marquee-inner { display: flex; animation: scroll-left 30s linear infinite; }
-.marquee-text { white-space: nowrap; padding-left: 100vw; color: var(--text-gray); font-size: 11px; text-transform: uppercase; }
+.deposit-wrapper-footer-marquee .marquee-inner { display: flex; animation: scroll-left 30s linear infinite; }
+.deposit-wrapper-footer-marquee .marquee-text { white-space: nowrap; padding-left: 100vw; color: var(--text-gray); font-size: 11px; text-transform: uppercase; }
 
 @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }

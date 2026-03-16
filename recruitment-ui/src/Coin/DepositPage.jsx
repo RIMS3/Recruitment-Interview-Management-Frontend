@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './DepositPage.css';
+import './DepositPage.css'; // Đảm bảo bạn đã dán đoạn CSS mới vào file này nhé
 
 const DepositPage = () => {
   const [giftcode, setGiftcode] = useState('');
@@ -91,7 +91,8 @@ const DepositPage = () => {
         </div>
       </div>
 
-      <footer className="footer-marquee">
+      {/* ĐÃ SỬA CLASS Ở ĐÂY ĐỂ TRÁNH XUNG ĐỘT MARQUEE */}
+      <footer className="deposit-wrapper-footer-marquee">
         <div className="marquee-inner">
           <span className="marquee-text">
             Hệ thống nạp Giftcode PTD Corporation luôn sẵn sàng phục vụ bạn! - Chúc bạn chơi game vui vẻ!

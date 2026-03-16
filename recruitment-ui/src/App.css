@@ -23,7 +23,7 @@
 
 /* 3. NAVBAR LAYOUT */
 .main-navbar {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
   height: 72px;
   display: flex;
@@ -32,10 +32,11 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Thêm bóng mờ cho đẹp */
 }
 
 .nav-content {
-  max-width: 1240px;
+  max-width: 1400px; /* Nới rộng container để đủ chỗ cho menu dài của candidate */
   width: 100%;
   margin: 0 auto;
   display: flex;
@@ -46,36 +47,42 @@
 
 /* 4. LOGO & MENU */
 .logo-text {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--primary);
   display: flex;
   align-items: center;
   gap: 8px;
   text-decoration: none;
+  white-space: nowrap; /* Ép logo không rớt dòng */
 }
 
 .navbar-logo-box {
   background: var(--primary);
   color: var(--white);
-  padding: 2px 10px;
-  border-radius: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
   font-family: serif;
 }
 
 .nav-menu {
   display: flex;
-  gap: 25px;
+  gap: 20px; /* Thu hẹp khoảng cách một chút cho vừa vặn */
   list-style: none;
   align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-menu li {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  color: #64748b;
+  color: #4b5563;
   transition: color 0.2s;
+  white-space: nowrap; /* BẮT BUỘC: Ép tất cả menu chữ không rớt dòng */
+  display: flex;
+  align-items: center;
 }
 
 .nav-menu li:hover,
@@ -83,15 +90,33 @@
   color: var(--success);
 }
 
+/* NÚT NÂNG CẤP PRO XỊN XÒ */
+.btn-upgrade-nav {
+  background: linear-gradient(90deg, #f59e0b, #ea580c);
+  color: white !important;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+  transition: all 0.2s;
+}
+
+.btn-upgrade-nav:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(234, 88, 12, 0.35);
+  opacity: 0.95;
+}
+
 /* 5. STYLE RIÊNG CHO SỐ DƯ */
 .nav-balance-item {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
-  padding: 6px 12px;
+  padding: 0 12px;
   border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  height: 38px; /* Cố định chiều cao đồng đều với Auth */
 }
 
 .balance-label {
@@ -110,19 +135,21 @@
 .nav-auth {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
+  white-space: nowrap;
 }
 
 .user-profile-nav {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 16px;
+  gap: 8px;
+  padding: 4px 14px 4px 4px;
   background: var(--primary-light);
   border: 1.5px solid var(--primary);
   border-radius: 99px;
   cursor: pointer;
   transition: all 0.3s ease;
+  height: 38px; /* Cố định chiều cao đồng đều */
 }
 
 .user-profile-nav:hover {
@@ -131,15 +158,16 @@
 }
 
 .nav-avatar {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   background: var(--primary);
   color: var(--white);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
+  font-weight: 700;
+  font-size: 14px;
   overflow: hidden;
 }
 
@@ -150,12 +178,13 @@
 }
 
 .welcome-text {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--secondary);
 }
 
 .navbar-btn-login {
-  padding: 10px 24px;
+  height: 38px;
+  padding: 0 24px;
   border-radius: 8px;
   border: 1.5px solid var(--primary);
   color: var(--primary);
@@ -165,13 +194,16 @@
 }
 
 .navbar-btn-logout {
-  padding: 8px 16px;
+  height: 38px; /* Cố định chiều cao đồng đều */
+  padding: 0 16px;
   border-radius: 8px;
   background: #fff1f2;
   color: var(--danger);
   border: 1px solid #fee2e2;
   font-weight: 600;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .navbar-btn-logout:hover {
