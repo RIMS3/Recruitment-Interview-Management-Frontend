@@ -12,7 +12,9 @@ import './InterviewPage.css';
 const InterviewPage = () => {
     const { companyId } = useParams();
     const today = new Date().toISOString().split('T')[0];
-    const API_BASE_URL = "https://localhost:7272/api";
+    
+    // Lấy URL từ biến môi trường Vite
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; 
     
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -28,22 +30,30 @@ const InterviewPage = () => {
     const [startTime, setStartTime] = useState("09:00");
     const [endTime, setEndTime] = useState("10:00");
 
+    // Hàm gọi API dùng chung
     const fetchData = useCallback(async () => {
         if (!companyId) return;
         try {
             setLoading(true);
             const response = await axios.get(`${API_BASE_URL}/interview/slots`, { 
-                params: { IdCompany: companyId, ChooesDate: selectedDate, CurrentPage: currentPage }
+                params: { 
+                    IdCompany: companyId, 
+                    ChooesDate: selectedDate, 
+                    CurrentPage: currentPage 
+                }
             });
             setData(response.data);
         } catch (err) {
-            toast.error("Không thể tải dữ liệu.");
+            console.error("Fetch Error:", err);
+            toast.error("Không thể tải dữ liệu từ hệ thống.");
         } finally {
             setLoading(false);
         }
     }, [companyId, selectedDate, currentPage, API_BASE_URL]);
 
-    useEffect(() => { fetchData(); }, [fetchData]);
+    useEffect(() => { 
+        fetchData(); 
+    }, [fetchData]);
 
     const handleOpenCreate = () => {
         setEditingSlotId(null);
@@ -57,7 +67,10 @@ const InterviewPage = () => {
         setEditingSlotId(slot.idInterviewSlot);
         const sDate = new Date(slot.startTime);
         const eDate = new Date(slot.endTime);
+        
+        // Format YYYY-MM-DD
         setModalDate(sDate.toISOString().split('T')[0]);
+        // Format HH:mm
         setStartTime(sDate.toTimeString().substring(0, 5));
         setEndTime(eDate.toTimeString().substring(0, 5));
         setShowModal(true);
@@ -70,16 +83,21 @@ const InterviewPage = () => {
                 data: { idCompany: companyId, idInterviewSlot: slotToDelete }
             });
             if (response.data) {
-                toast.success("Đã xóa khung giờ");
+                toast.success("Đã xóa khung giờ thành công");
                 fetchData();
             }
-        } catch (err) { toast.error("Lỗi khi xóa"); }
-        finally { setIsSubmitting(false); setShowDeleteModal(false); }
+        } catch (err) { 
+            toast.error("Lỗi khi xóa khung giờ"); 
+        } finally { 
+            setIsSubmitting(false); 
+            setShowDeleteModal(false); 
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (startTime >= endTime) return toast.error("Giờ kết thúc phải sau giờ bắt đầu");
+        
         try {
             setIsSubmitting(true);
             const payload = {
@@ -88,17 +106,21 @@ const InterviewPage = () => {
                 endTime: `${modalDate}T${endTime}:00`,
                 ...(editingSlotId && { idInterviewSlot: editingSlotId })
             };
+
             const res = editingSlotId 
                 ? await axios.put(`${API_BASE_URL}/interview/slots`, payload)
                 : await axios.post(`${API_BASE_URL}/interview/slots`, payload);
             
             if (res.data) {
-                toast.success("Thành công");
+                toast.success(editingSlotId ? "Cập nhật thành công" : "Tạo mới thành công");
                 setShowModal(false);
                 fetchData();
             }
-        } catch (err) { toast.error("Lỗi hệ thống"); }
-        finally { setIsSubmitting(false); }
+        } catch (err) { 
+            toast.error("Lỗi hệ thống khi lưu dữ liệu"); 
+        } finally { 
+            setIsSubmitting(false); 
+        }
     };
 
     return (
@@ -111,7 +133,7 @@ const InterviewPage = () => {
                     <div className="icon-badge"><Calendar size={24} /></div>
                     <div>
                         <h1>Quản lý khung giờ phỏng vấn</h1>
-                        <p>{data?.nameCompany} • {data?.address}</p>
+                        <p>{data?.nameCompany || 'Đang tải...'} • {data?.address || 'Địa chỉ'}</p>
                     </div>
                 </div>
                 <button className="btn-add-main" onClick={handleOpenCreate}>
@@ -139,22 +161,25 @@ const InterviewPage = () => {
 
             {/* List Hiển thị Chi Tiết */}
             <div className="feature-content">
-                {loading ? <div className="loader-box"><div className="spinner"></div></div> : (
+                {loading ? (
+                    <div className="loader-box"><div className="spinner"></div></div>
+                ) : (
                     <div className="slots-list">
                         {data?.interviewSlotItems?.length > 0 ? (
                             data.interviewSlotItems.map((slot, idx) => {
                                 const start = new Date(slot.startTime);
                                 const end = new Date(slot.endTime);
-                                const duration = (end - start) / 60000;
+                                const duration = Math.round((end - start) / 60000);
+                                
                                 return (
-                                    <div key={idx} className={`slot-item-row ${slot.isBooked ? 'booked' : ''}`}>
+                                    <div key={slot.idInterviewSlot || idx} className={`slot-item-row ${slot.isBooked ? 'booked' : ''}`}>
                                         <div className="slot-main-info">
                                             <div className="time-block">
                                                 <Clock size={18} />
                                                 <span className="time-range">
-                                                    {start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} 
+                                                    {start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false})} 
                                                     - 
-                                                    {end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                    {end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false})}
                                                 </span>
                                             </div>
                                             <div className="date-block">
@@ -174,8 +199,12 @@ const InterviewPage = () => {
                                         <div className="slot-actions">
                                             {!slot.isBooked ? (
                                                 <>
-                                                    <button className="btn-icon edit" onClick={() => handleOpenEdit(slot)}><Edit2 size={16} /></button>
-                                                    <button className="btn-icon delete" onClick={() => {setSlotToDelete(slot.idInterviewSlot); setShowDeleteModal(true);}}><Trash2 size={16} /></button>
+                                                    <button className="btn-icon edit" onClick={() => handleOpenEdit(slot)} title="Chỉnh sửa">
+                                                        <Edit2 size={16} />
+                                                    </button>
+                                                    <button className="btn-icon delete" onClick={() => {setSlotToDelete(slot.idInterviewSlot); setShowDeleteModal(true);}} title="Xóa">
+                                                        <Trash2 size={16} />
+                                                    </button>
                                                 </>
                                             ) : (
                                                 <button className="btn-view-candidate">Chi tiết ứng viên</button>
@@ -197,13 +226,17 @@ const InterviewPage = () => {
             {/* Phân trang */}
             {data?.numberOfPages > 1 && (
                 <div className="pagination-minimal">
-                    <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}><ChevronLeft size={20}/></button>
+                    <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>
+                        <ChevronLeft size={20}/>
+                    </button>
                     <span>Trang {currentPage} / {data.numberOfPages}</span>
-                    <button disabled={currentPage === data.numberOfPages} onClick={() => setCurrentPage(p => p + 1)}><ChevronRight size={20}/></button>
+                    <button disabled={currentPage === data.numberOfPages} onClick={() => setCurrentPage(p => p + 1)}>
+                        <ChevronRight size={20}/>
+                    </button>
                 </div>
             )}
 
-            {/* Modals giữ nguyên logic nhưng dùng Style mới */}
+            {/* Modal Thêm/Sửa */}
             {showModal && (
                 <div className="overlay-modern">
                     <div className="modal-modern">
@@ -224,13 +257,16 @@ const InterviewPage = () => {
                             </div>
                             <div className="modal-foot">
                                 <button type="button" className="btn-text" onClick={() => setShowModal(false)}>Hủy</button>
-                                <button type="submit" className="btn-submit" disabled={isSubmitting}>{isSubmitting ? "Đang lưu..." : "Xác nhận"}</button>
+                                <button type="submit" className="btn-submit" disabled={isSubmitting}>
+                                    {isSubmitting ? "Đang lưu..." : "Xác nhận"}
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
 
+            {/* Modal Xóa */}
             {showDeleteModal && (
                 <div className="overlay-modern">
                     <div className="modal-confirm-modern">
@@ -239,7 +275,9 @@ const InterviewPage = () => {
                         <p>Dữ liệu sẽ bị xóa vĩnh viễn và ứng viên sẽ không thể tìm thấy khung giờ này nữa.</p>
                         <div className="modal-foot">
                             <button className="btn-text" onClick={() => setShowDeleteModal(false)}>Quay lại</button>
-                            <button className="btn-danger-final" onClick={handleDelete}>{isSubmitting ? "Đang xóa..." : "Xác nhận xóa"}</button>
+                            <button className="btn-danger-final" onClick={handleDelete} disabled={isSubmitting}>
+                                {isSubmitting ? "Đang xóa..." : "Xác nhận xóa"}
+                            </button>
                         </div>
                     </div>
                 </div>
