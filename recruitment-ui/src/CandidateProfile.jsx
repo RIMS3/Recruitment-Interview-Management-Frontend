@@ -13,7 +13,9 @@ const CandidateProfile = () => {
     const { user, setUser } = useContext(AuthContext); 
 
     const currentUserId = localStorage.getItem("userId"); 
-    const apiUrl = "https://localhost:7272/api/candidateprofiles";
+    
+    // SỬ DỤNG BIẾN MÔI TRƯỜNG TỪ VITE TẠI ĐÂY
+    const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/candidateprofiles`;
 
     // 2. TẠO MÀNG BẢO VỆ: CHẶN NGƯỜI CHƯA ĐĂNG NHẬP
     if (!currentUserId) {
