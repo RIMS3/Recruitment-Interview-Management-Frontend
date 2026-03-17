@@ -61,11 +61,14 @@ const Navbar = () => {
       const token = localStorage.getItem("accessToken");
       const role = localStorage.getItem("role");
 
+      // Khai báo Base URL từ file môi trường Vite
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
       if (!userId) return;
 
       try {
         // A. Lấy Số Dư
-        const resBalance = await axios.get(`https://itlocak.xyz/api/refill/${userId}`);
+        const resBalance = await axios.get(`${apiUrl}/refill/${userId}`);
         if (isMounted) {
           const amount = typeof resBalance.data === 'number' ? resBalance.data : (resBalance.data.amount || 0);
           setBalance(amount);
@@ -73,7 +76,7 @@ const Navbar = () => {
 
         // B. Lấy thông tin Profile để ép Navbar Đen Vàng (Nếu là Ứng viên)
         if (String(role) === "2" && token) {
-          const resProfile = await axios.get(`https://localhost:7272/api/candidateprofiles/user/${userId}`, {
+          const resProfile = await axios.get(`${apiUrl}/candidateprofiles/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           
@@ -126,7 +129,6 @@ const Navbar = () => {
 
    const idCompanyEmployer = localStorage.getItem("IdCompany");
 
-
   return (
     <nav className={`main-navbar ${user?.isCvPro ? 'navbar-pro' : ''}`}>
       <div className="nav-content">
@@ -170,9 +172,6 @@ const Navbar = () => {
           {/* MENU DÀNH CHO ỨNG VIÊN */}
           {user && String(user.role) === "2" && (
            <>
-              <li className={location.pathname === "/candidate/orders" ? "active" : ""} onClick={() => navigate("/candidate/orders")}>
-                Lịch sử giao dịch
-              </li>
               {!user?.isCvPro ? (
                 <li 
                   onClick={() => navigate('/upgrade-cv-pro')}
@@ -185,6 +184,9 @@ const Navbar = () => {
                   IT LOCAK Pro
                 </li>
               )}
+              <li className={location.pathname === "/candidate/orders" ? "active" : ""} onClick={() => navigate("/candidate/orders")}>
+                Lịch sử giao dịch
+              </li>
             </>
           )}
 
