@@ -24,10 +24,10 @@
 }
 
 .app-wrapper {
-  padding: 30px 5% 60px;
+  padding: 30px 10% 60px; /* Giảm padding hai bên xuống còn 2% để tận dụng không gian */
   flex: 1;
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: 100%;       /* Thay 1400px bằng 100% để tràn màn hình */
+  margin: 0;             /* Loại bỏ căn giữa tự động */
   width: 100%;
 }
 
@@ -123,10 +123,26 @@
 }
 
 /* Grid Layout */
+/* Tìm và thay thế đoạn .card-grid cũ của bạn bằng đoạn này */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+  /* Chia cố định 4 cột bằng nhau */
+  grid-template-columns: repeat(4, 1fr); 
+  gap: 20px;
+}
+
+/* Thêm đoạn này để trên các màn hình nhỏ hơn (như laptop nhỏ hoặc tablet) 
+   giao diện vẫn tự nhảy hàng cho đẹp, tránh bị nát layout */
+@media (max-width: 1200px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr); /* Laptop nhỏ/Tablet: 2 cột */
+  }
+}
+
+@media (max-width: 600px) {
+  .card-grid {
+    grid-template-columns: 1fr; /* Điện thoại: 1 cột */
+  }
 }
 
 /* Candidate Card - Clean & Modern */
