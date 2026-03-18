@@ -48,6 +48,8 @@ import UpgradeCvPro from "./CVs/UpgradeCvPro";
 import DepositPage from "./Coin/DepositPage";
 import TaiXiuGame from "./Game/TaiXiuGame";
 
+const idCompanyEmployer = localStorage.getItem("IdCompany");
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -191,8 +193,12 @@ const Navbar = () => {
                 <li className={location.pathname === "/employer/manage-jobs" ? "active" : ""} onClick={() => navigate("/employer/manage-jobs")}>
                   Đăng tin
                 </li>
+                 <li className={location.pathname === `/scheduled/${idCompanyEmployer}` ? "active" : ""} onClick={() => navigate(`/scheduled/${idCompanyEmployer}`)}>
+                   Quản lý lịch Phỏng Vấn 
+                   </li>
               </>
             )}
+        
 
             {/* MENU DÀNH CHO ỨNG VIÊN */}
             {user && String(user.role) === "2" && (
@@ -372,7 +378,6 @@ function App() {
             <Route path="/employer/orders" element={<ProtectedRoute requiredRole={3}><OrderHistory /></ProtectedRoute>} />
             <Route path="/candidate/orders" element={<ProtectedRoute requiredRole={2}><OrderHistory /></ProtectedRoute>} />
             <Route path="/order-details/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
- 
           </Routes>
         </main>
       </div>
