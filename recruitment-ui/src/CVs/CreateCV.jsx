@@ -17,7 +17,7 @@ const CreateCV = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const cvRef = useRef(null); 
-  const fileInputRef = useRef(null); // Thêm ref cho thẻ input file
+  const fileInputRef = useRef(null); 
 
   const [cvData, setCvData] = useState({
     cvId: cvId,
@@ -35,7 +35,7 @@ const CreateCV = () => {
     educationSummary: "",
     currentSalary: "",
     experienceYears: "",
-    fileUrl: "", // Đảm bảo có state fileUrl
+    fileUrl: "", 
     educations: [],
     experiences: [],
     projects: [],
@@ -57,12 +57,12 @@ const CreateCV = () => {
             phoneNumber: data.phoneNumber || "",
             address: data.address || "",
             birthday: data.birthday ? data.birthday.split('T')[0] : "",
-            gender: data.gender || "",
+            gender: data.gender !== null ? String(data.gender) : "",
             nationality: data.nationality || "",
             field: data.field || "",
             educationSummary: data.educationSummary || "",
             currentSalary: data.currentSalary || "",
-            experienceYears: data.experienceYears || "",
+            experienceYears: data.experienceYears !== null ? String(data.experienceYears) : "",
             fileUrl: data.fileUrl || "",
             educations: data.educations || [],
             experiences: data.experiences || [],
@@ -99,7 +99,6 @@ const CreateCV = () => {
     });
   };
 
-  // --- HÀM XỬ LÝ CLICK VÀ UPLOAD ẢNH ---
   const handleAvatarClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -110,11 +109,9 @@ const CreateCV = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // 1. Hiển thị ảnh preview ngay lập tức
     const previewUrl = URL.createObjectURL(file);
     setCvData(prev => ({ ...prev, fileUrl: previewUrl }));
 
-    // 2. Gửi API lên backend
     const formData = new FormData();
     formData.append('file', file);
 
@@ -122,9 +119,7 @@ const CreateCV = () => {
       const token = localStorage.getItem("accessToken");
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}/avatar`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
 
@@ -165,40 +160,73 @@ const CreateCV = () => {
         return;
     }
 
+    // ==========================================
+    // FRONTEND VALIDATION
+    // ==========================================
+    if (!cvData.fullName || cvData.fullName.trim() === "") {
+        alert("❌ Vui lòng nhập Họ và tên!");
+        return; 
+    }
+
+    // Kiểm tra định dạng ngày sinh
+    if (cvData.birthday && cvData.birthday.trim() !== "") {
+        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/; // Chuẩn DD/MM/YYYY
+        const dateRegexDB = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/; // Chuẩn YYYY-MM-DD
+        const bStr = cvData.birthday.trim();
+        
+        if (!dateRegex.test(bStr) && !dateRegexDB.test(bStr)) {
+            alert("❌ Định dạng Ngày sinh không hợp lệ!\nVui lòng nhập đúng định dạng: DD/MM/YYYY (Ví dụ: 26/05/1996)");
+            return;
+        }
+    }
+
+    if (cvData.experienceYears && Number(cvData.experienceYears) >= 100) {
+        alert("❌ Số năm kinh nghiệm phải nhỏ hơn 100!");
+        return;
+    }
+
+    if (cvData.email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(cvData.email.trim())) {
+            alert("❌ Định dạng Email không hợp lệ!");
+            return;
+        }
+    }
+
+    if (cvData.phoneNumber) {
+        const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+        if (!phoneRegex.test(cvData.phoneNumber.replace(/\s+/g, ''))) {
+            alert("❌ Số điện thoại không hợp lệ (Phải là số ĐT Việt Nam 10 số)!");
+            return;
+        }
+    }
+
+    for (let i = 0; i < (cvData.experiences || []).length; i++) {
+        const exp = cvData.experiences[i];
+        if ((exp.position || exp.description) && (!exp.companyName || exp.companyName.trim() === "")) {
+            alert(`❌ Kinh nghiệm làm việc #${i + 1}: Vui lòng nhập Tên Công ty/Tổ chức!`);
+            return;
+        }
+    }
+
     setIsSaving(true);
     try {
-      let safeGender = null;
-      if (cvData.gender !== null && cvData.gender !== undefined && cvData.gender !== "") {
-          const gStr = String(cvData.gender).toLowerCase().trim();
-          if (gStr === "nam" || gStr === "0") safeGender = 0;
-          else if (gStr === "nữ" || gStr === "nu" || gStr === "1") safeGender = 1;
-          else if (!isNaN(gStr)) safeGender = parseInt(gStr);
-      }
+      let safeSalary = (cvData.currentSalary === "" || cvData.currentSalary === undefined) ? null : Number(cvData.currentSalary);
+      let safeExpYears = (cvData.experienceYears === "" || cvData.experienceYears === undefined) ? null : Number(cvData.experienceYears);
 
+      // XỬ LÝ ĐỊNH DẠNG NGÀY CHO BACKEND (Ép về chuẩn YYYY-MM-DD)
       let safeBirthday = null;
       if (cvData.birthday && cvData.birthday.trim() !== "") {
           let bStr = cvData.birthday.trim();
           if (bStr.includes('/')) {
               let parts = bStr.split('/');
-              if (parts.length === 3) {
-                  let day = parts[0].padStart(2, '0');
-                  let month = parts[1].padStart(2, '0');
-                  let year = parts[2];
-                  safeBirthday = `${year}-${month}-${day}`;
-              } else { safeBirthday = bStr; }
-          } 
-          else if (bStr.includes('-') && bStr.split('-')[0].length < 4) {
-              let parts = bStr.split('-');
-              let day = parts[0].padStart(2, '0');
-              let month = parts[1].padStart(2, '0');
-              let year = parts[2];
-              safeBirthday = `${year}-${month}-${day}`;
+              // parts[0] là DD, parts[1] là MM, parts[2] là YYYY -> Đổi sang YYYY-MM-DD
+              safeBirthday = `${parts[2]}-${parts[1]}-${parts[0]}`; 
+          } else {
+              // Trường hợp load từ DB lên mà user chưa sửa, nó vẫn là YYYY-MM-DD
+              safeBirthday = bStr;
           }
-          else { safeBirthday = bStr; }
       }
-
-      let safeSalary = (cvData.currentSalary === "" || cvData.currentSalary === undefined) ? null : Number(cvData.currentSalary);
-      let safeExpYears = (cvData.experienceYears === "" || cvData.experienceYears === undefined) ? null : Number(cvData.experienceYears);
 
       const payload = {
         cvId: cvId,
@@ -212,8 +240,8 @@ const CreateCV = () => {
         address: cvData.address || "",
         nationality: cvData.nationality || "",
         field: cvData.field || "",
-        gender: safeGender,
-        birthday: safeBirthday,
+        gender: cvData.gender !== "" ? Number(cvData.gender) : null,
+        birthday: safeBirthday, // <-- TRUYỀN NGÀY ĐÃ CONVERT Ở ĐÂY
         currentSalary: safeSalary,
         experienceYears: safeExpYears,
         educations: (cvData.educations || []).map(item => ({
@@ -266,12 +294,25 @@ const CreateCV = () => {
       if (response.ok) {
         alert("🎉 Đã lưu CV thành công!");
       } else {
-        const err = await response.text();
-        throw new Error(`API báo lỗi: ${response.status} - ${err}`);
+        // Bắt lỗi Validation từ Backend C#
+        let errorMsg = "Lỗi không xác định từ server.";
+        try {
+            const errorData = await response.json(); 
+            if (errorData.errors) {
+                errorMsg = Object.values(errorData.errors).flat().join('\n');
+            } else if (errorData.message) {
+                errorMsg = errorData.message;
+            } else {
+                errorMsg = JSON.stringify(errorData);
+            }
+        } catch (e) {
+            errorMsg = await response.text(); 
+        }
+        throw new Error(errorMsg); 
       }
     } catch (error) {
       console.error("Lỗi khi lưu CV:", error);
-      alert("❌ Lưu thất bại! Hãy kiểm tra lại Console (F12).");
+      alert(`❌ Lưu thất bại!\n\nChi tiết lỗi:\n${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -297,7 +338,6 @@ const CreateCV = () => {
 
   return (
     <div className="create-cv-layout">
-      {/* Input file ẩn dùng để chọn ảnh */}
       <input 
         type="file" 
         accept="image/*" 
@@ -322,16 +362,9 @@ const CreateCV = () => {
               className="btn-export" 
               onClick={handleExportPDF}
               style={{
-                backgroundColor: '#ef4444', 
-                color: 'white', 
-                border: 'none', 
-                padding: '10px 24px', 
-                borderRadius: '6px', 
-                fontSize: '15px', 
-                fontWeight: '600', 
-                cursor: 'pointer',
-                boxShadow: '0 4px 6px rgba(239, 68, 68, 0.2)',
-                transition: 'all 0.2s ease'
+                backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '10px 24px', 
+                borderRadius: '6px', fontSize: '15px', fontWeight: '600', cursor: 'pointer',
+                boxShadow: '0 4px 6px rgba(239, 68, 68, 0.2)', transition: 'all 0.2s ease'
               }}
               onMouseOver={(e) => { e.target.style.backgroundColor = '#dc2626'; e.target.style.transform = 'translateY(-1px)'; }}
               onMouseOut={(e) => { e.target.style.backgroundColor = '#ef4444'; e.target.style.transform = 'translateY(0)'; }}

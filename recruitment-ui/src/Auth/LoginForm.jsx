@@ -222,7 +222,7 @@ const LoginForm = () => {
     <div className="login-container">
       <div className="marquee-wrapper">
         <div className="marquee-text">
-          <span>Bùi Xuân Huấn</span> - Ra xã hội làm ăn bươn trải...
+          <span>Bùi Xuân Huấn</span> - Ra xã hội làm ăn bươn trải chỉ có làm, chịu khó, cần bù thì bù siêng năng, chỉ có làm thì mới có ăn, không làm mà đòi có ăn thì ăn đầu buồi ăn cứt!
         </div>
       </div>
 
