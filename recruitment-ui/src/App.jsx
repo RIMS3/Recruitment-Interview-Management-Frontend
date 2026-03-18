@@ -16,6 +16,8 @@ import LoginPage from "./Auth/LoginForm";
 import "./App.css";
 import JobList from "./JobPost/JobList";
 import InterviewPage from "./Interviews/InterviewPage";
+// CHÚ Ý: Đảm bảo đường dẫn import này khớp với cấu trúc thư mục thực tế của bạn
+import InterviewSchedule from "./ScheduleCandidate/InterviewSchedule";
 import { AuthContext } from "./Auth/AuthContext";
 import JobPostDetails from "./JobPostDetails/JobPostDetails";
 import SavedJobs from "./SavedJobs/SavedJobs";
@@ -61,11 +63,14 @@ const Navbar = () => {
       const token = localStorage.getItem("accessToken");
       const role = localStorage.getItem("role");
 
+      // Khai báo Base URL từ file môi trường Vite
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
       if (!userId) return;
 
       try {
         // A. Lấy Số Dư
-        const resBalance = await axios.get(`https://itlocak.xyz/api/refill/${userId}`);
+        const resBalance = await axios.get(`${apiUrl}/refill/${userId}`);
         if (isMounted) {
           const amount = typeof resBalance.data === 'number' ? resBalance.data : (resBalance.data.amount || 0);
           setBalance(amount);
@@ -73,7 +78,7 @@ const Navbar = () => {
 
         // B. Lấy thông tin Profile để ép Navbar Đen Vàng (Nếu là Ứng viên)
         if (String(role) === "2" && token) {
-          const resProfile = await axios.get(`https://localhost:7272/api/candidateprofiles/user/${userId}`, {
+          const resProfile = await axios.get(`${apiUrl}/candidateprofiles/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           
@@ -124,8 +129,7 @@ const Navbar = () => {
     return null;
   }
 
-   const idCompanyEmployer = localStorage.getItem("IdCompany");
-
+  const idCompanyEmployer = localStorage.getItem("IdCompany");
 
   return (
     <nav className={`main-navbar ${user?.isCvPro ? 'navbar-pro' : ''}`}>
@@ -164,6 +168,9 @@ const Navbar = () => {
               <li className={location.pathname === "/employer/manage-jobs" ? "active" : ""} onClick={() => navigate("/employer/manage-jobs")}>
                 Đăng tin
               </li>
+               <li className={location.pathname === `/scheduled/${idCompanyEmployer}` ? "active" : ""} onClick={() => navigate(`/scheduled/${idCompanyEmployer}`)}>
+                   Lịch Phỏng Vấn 
+               </li>
             </>
           )}
 
@@ -173,6 +180,18 @@ const Navbar = () => {
               <li className={location.pathname === "/candidate/orders" ? "active" : ""} onClick={() => navigate("/candidate/orders")}>
                 Lịch sử giao dịch
               </li>
+              
+              {/* LINK LỊCH PHỎNG VẤN DÀNH CHO CANDIDATE */}
+              <li 
+                className={location.pathname.startsWith("/interview-schedule") ? "active" : ""} 
+                onClick={() => {
+                  const token = user.id; // Bạn có thể thay đổi token này tùy thuộc vào logic của backend
+                  navigate(`/interview-schedule/${token}`);
+                }}
+              >
+                Lịch Phỏng Vấn
+              </li>
+
               {!user?.isCvPro ? (
                 <li 
                   onClick={() => navigate('/upgrade-cv-pro')}
@@ -185,6 +204,9 @@ const Navbar = () => {
                   IT LOCAK Pro
                 </li>
               )}
+              <li className={location.pathname === "/candidate/orders" ? "active" : ""} onClick={() => navigate("/candidate/orders")}>
+                Lịch sử giao dịch
+              </li>
             </>
           )}
 
@@ -195,10 +217,7 @@ const Navbar = () => {
             >
               Hồ sơ & CV
             </li>
-          )}
-          <li className={location.pathname === `/scheduled/${idCompanyEmployer}` ? "active" : ""} onClick={() => navigate(`/scheduled/${idCompanyEmployer}`)}>
-            Lịch Phỏng Vấn 
-          </li>
+          )}       
           <li className={location.pathname === "/game" ? "active" : ""} onClick={() => navigate("/game")}>
             Game
           </li>
@@ -270,7 +289,7 @@ const Navbar = () => {
               <button className="navbar-btn-login" onClick={() => navigate("/login")}>
                 Đăng nhập
               </button>
-              <button className="navbar-btn-post">Đăng tuyển ngay</button>
+            
             </>
           )}
         </div>
@@ -308,8 +327,13 @@ function App() {
             <Route path="/applied-jobs" element={<ListAppliedJobs />} />
             <Route path="/create-company" element={<CreateCompany />} />
             <Route path="/game" element={<TaiXiuGame />} />
+            
+            {/* role employer */}
             <Route path="/scheduled/:companyId" element={<InterviewPage />} />
-            {/* Protected Routes */}
+
+            {/* role candidate */}
+            <Route path="/interview-schedule/:token" element={<InterviewSchedule />} />
+            
             <Route path="/manage-cv" element={<ProtectedRoute requiredRole={2}><CVs /></ProtectedRoute>} />
             <Route path="/employer/applications" element={<ProtectedRoute requiredRole={3}><ApplicationList /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole={1}><AdminDashboard /></ProtectedRoute>} />
@@ -326,7 +350,7 @@ function App() {
             <Route path="/employer/orders" element={<ProtectedRoute requiredRole={3}><OrderHistory /></ProtectedRoute>} />
             <Route path="/candidate/orders" element={<ProtectedRoute requiredRole={2}><OrderHistory /></ProtectedRoute>} />
             <Route path="/order-details/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
-           {/* <Route path="/scheduled/:id" element={<ProtectedRoute> <InterviewPage/> </ProtectedRoute>} /> */}
+  
           </Routes>
         </main>
       </div>
