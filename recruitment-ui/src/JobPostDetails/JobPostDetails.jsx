@@ -7,6 +7,29 @@ import './JobDetails.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+// --- PHẦN THÊM MỚI: Mảng chứa logo các công ty lớn ---
+const COMPANY_LOGOS = [
+    "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg", // Google
+    "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",     // Microsoft
+    "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",        // Amazon
+    "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",   // Apple
+    "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",  // Netflix
+    "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png",          // Tesla
+    "https://d3e6ckxkrs5ntg.cloudfront.net/artists/images/8636356/original/resize:248x186/crop:x0y29w245h183/hash:1755578318/avt-viet69.jpeg?1755578318",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Pornhub-logo.svg/3840px-Pornhub-logo.svg.png"
+];
+
+// --- PHẦN THÊM MỚI: Hàm lấy logo cố định theo ID của Job ---
+const getLogoForJob = (jobId) => {
+    if (!jobId) return COMPANY_LOGOS[0];
+    let hash = 0;
+    for (let i = 0; i < jobId.length; i++) {
+        hash = jobId.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % COMPANY_LOGOS.length;
+    return COMPANY_LOGOS[index];
+};
+
 const JobPostDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -205,6 +228,9 @@ const JobPostDetails = () => {
     if (loading) return <div className="status-msg">Đang tải dữ liệu công việc...</div>;
     if (!job) return <div className="status-msg">Không tìm thấy thông tin công việc.</div>;
 
+    // --- PHẦN THÊM MỚI: Lấy logo tương ứng cho job hiện tại ---
+    const jobLogo = getLogoForJob(jobId);
+
     return (
         <div className="job-page-wrapper">
 
@@ -376,11 +402,8 @@ const JobPostDetails = () => {
                     <div className="company-card-right">
                         <div className="company-header-flex">
                             <div className="company-logo-img">
-                                {job.company?.logoUrl ? (
-                                    <img src={job.company.logoUrl} alt="logo" />
-                                ) : (
-                                    <div className="logo-placeholder">LOGO</div>
-                                )}
+                                {/* --- PHẦN ĐƯỢC SỬA: Thay thế logo tĩnh thành Logo ngẫu nhiên dựa trên JobID --- */}
+                                <img src={jobLogo} alt="logo công ty" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px' }} />
                             </div>
                             <div className="company-name-box">
                                 <h4>{job.company?.name || 'Công ty chưa cập nhật'}</h4>
