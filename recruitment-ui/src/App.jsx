@@ -340,7 +340,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/select-role" element={<SelectRole />} />
             <Route path="/joblist" element={<JobList />} />
-            <Route path="/jobpostdetail/:id" element={<JobPostDetails />} />
+            <Route path="/jobpostdetail/:id" element={<JobPostDetails />} /> 
             <Route path="/candidate-profile" element={<CandidateProfile />} />
             <Route path="/employer-profile" element={<EmployerProfile />} />
             <Route path="/it-blog" element={<ITBlog />} />
