@@ -3,9 +3,19 @@ import { AuthContext } from '../Auth/AuthContext';
 import api from './api';
 import { 
   Plus, Search, Clock, Briefcase, Trash2, Edit3, AlertCircle,
-  ChevronRight, ChevronLeft // MỚI: Import thêm ChevronLeft cho nút Prev
+  ChevronRight, ChevronLeft 
 } from 'lucide-react';
 import './JobManager.css';
+
+// DANH SÁCH 63 TỈNH THÀNH VIỆT NAM
+const VIETNAM_PROVINCES = [
+ "Hà Nội", "Cao Bằng", "Lạng Sơn", "Quảng Ninh", "Hải Phòng",
+"Thái Nguyên", "Phú Thọ", "Lào Cai", "Sơn La", "Hòa Bình",
+"Hưng Yên", "Thái Bình", "Ninh Bình", "Thanh Hóa", "Nghệ An",
+"Hà Tĩnh", "Quảng Bình", "Quảng Trị", "Huế", "Đà Nẵng",
+"Quảng Ngãi", "Bình Định", "Khánh Hòa", "Đắk Lắk", "Lâm Đồng",
+"Bình Phước", "TP. Hồ Chí Minh", "Đồng Nai", "Tây Ninh",
+"Cần Thơ", "An Giang", "Đồng Tháp", "Cà Mau", "Kiên Giang"]
 
 const JobManager = () => {
   const { user, loading } = useContext(AuthContext);
@@ -15,7 +25,7 @@ const JobManager = () => {
 
   // --- STATE PHÂN TRANG ---
   const [currentPage, setCurrentPage] = useState(1);
-  const jobsPerPage = 8; // Số tin hiển thị trên 1 trang (bạn có thể đổi thành 12, 16...)
+  const jobsPerPage = 8; 
 
   const jobTypeLabels = {
     1: { label: "Toàn thời gian", bgColor: "#ecfdf5", color: "#059669" },
@@ -49,15 +59,13 @@ const JobManager = () => {
   // --- LOGIC PHÂN TRANG ---
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob); // Dữ liệu của trang hiện tại
+  const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob); 
   const totalPages = Math.ceil(jobs.length / jobsPerPage);
 
-  // Chuyển trang
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
-  // Nếu xóa tin ở trang cuối làm trang đó rỗng, tự lùi về trang trước
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
@@ -107,7 +115,7 @@ const JobManager = () => {
         await api.put('/CRUDJobPost/update', { ...payload, jobId: currentJob.id });
       } else {
         await api.post('/CRUDJobPost/create', payload);
-        setCurrentPage(1); // Tạo tin mới thì nhảy về trang 1
+        setCurrentPage(1); 
       }
       
       setIsModalOpen(false);
@@ -153,7 +161,6 @@ const JobManager = () => {
                <p>Chưa có tin đăng nào. Hãy tạo tin đầu tiên!</p>
             </div>
           ) : (
-            // MỚI: Render mảng currentJobs thay vì mảng jobs
             currentJobs.map(job => (
               <div key={job.id} className="jm-card">
                 
@@ -178,7 +185,7 @@ const JobManager = () => {
 
                 <div className="jm-tags">
                   <span className="jm-tag">IT Software</span>
-                  <span className="jm-tag">{job.location || "Hà Nội"}</span>
+                  <span className="jm-tag">{job.location || "Toàn quốc"}</span>
                   {jobTypeLabels[job.jobType] && (
                     <span 
                       className="jm-tag" 
@@ -208,7 +215,7 @@ const JobManager = () => {
           )}
         </div>
 
-        {/* MỚI: UI PHÂN TRANG */}
+        {/* PHÂN TRANG */}
         {totalPages > 1 && (
           <div className="jm-pagination">
             <button onClick={prevPage} disabled={currentPage === 1} className="jm-page-btn">
@@ -264,7 +271,17 @@ const JobManager = () => {
 
                   <div className="jm-form-group">
                     <label className="jm-label">Địa điểm *</label>
-                    <input required className="jm-input" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
+                    <select 
+                      required 
+                      className="jm-select" 
+                      value={formData.location} 
+                      onChange={e => setFormData({...formData, location: e.target.value})}
+                    >
+                      <option value="">-- Chọn địa điểm --</option>
+                      {VIETNAM_PROVINCES.map(city => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="jm-form-row">

@@ -43,11 +43,10 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      {/* CV Preview - cả Candidate (role 2) và Employer (role 3) đều xem được */}
       <Route
         path="/cv-preview/:cvId"
         element={
-          <ProtectedRoute requiredRole={[2, 3]}>
+          <ProtectedRoute requiredRole={3}>
             <CVViewer />
           </ProtectedRoute>
         }
