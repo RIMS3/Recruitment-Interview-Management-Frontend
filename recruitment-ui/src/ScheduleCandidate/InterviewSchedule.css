@@ -1,0 +1,220 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Bảng màu xanh lá hiện đại (dựa trên Tailwind Emerald/Green) */
+  --primary-color: #10b981; /* Xanh lá chủ đạo */
+  --primary-hover: #059669; /* Xanh đậm khi hover */
+  --primary-light: #ecfdf5; /* Nền nhạt cho slot được chọn */
+  --primary-border: #a7f3d0;
+  
+  --bg-color: #ffffff;
+  --bg-app: #f3f4f6; /* Nền ngoài cùng nếu cần */
+  
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  
+  --border-radius-lg: 16px;
+  --border-radius-md: 12px;
+  --transition-speed: 0.3s;
+}
+
+.schedule-container {
+  max-width: 850px;
+  margin: 3rem auto;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+  color: var(--text-main);
+}
+
+.schedule-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.schedule-header h2 {
+  margin: 0 0 12px 0;
+  color: var(--primary-hover);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.schedule-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.date-group {
+  margin-bottom: 32px;
+}
+
+.date-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+/* Biểu tượng lịch nhỏ kế bên ngày */
+.date-title::before {
+  content: "📅";
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.slot-card {
+  position: relative;
+  border: 1.5px solid #e5e7eb;
+  border-radius: var(--border-radius-md);
+  padding: 20px;
+  cursor: pointer;
+  background-color: #ffffff;
+  transition: all var(--transition-speed) ease;
+  overflow: hidden;
+}
+
+.slot-card:hover {
+  border-color: var(--primary-border);
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -2px rgba(16, 185, 129, 0.05);
+  transform: translateY(-4px);
+}
+
+/* Hiệu ứng viền bên trái khi được chọn */
+.slot-card.selected {
+  border-color: var(--primary-color);
+  background-color: var(--primary-light);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.slot-card.selected::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background-color: var(--primary-color);
+  border-top-left-radius: var(--border-radius-md);
+  border-bottom-left-radius: var(--border-radius-md);
+}
+
+.slot-time {
+  display: flex;
+  align-items: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 12px;
+}
+
+/* Biểu tượng đồng hồ nhỏ */
+.slot-time::before {
+  content: "🕒";
+  margin-right: 6px;
+  font-size: 1.1rem;
+}
+
+.slot-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.slot-location {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: flex-start;
+  line-height: 1.4;
+}
+
+.slot-location-icon {
+  margin-right: 6px;
+  margin-top: 2px;
+}
+
+.slot-description {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #d1d5db;
+  line-height: 1.5;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.schedule-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.confirm-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+}
+
+.confirm-button:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  box-shadow: 0 6px 8px -1px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+}
+
+.confirm-button:disabled {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.loading-state, .error-state, .empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  background: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  max-width: 600px;
+  margin: 3rem auto;
+}
+
+.error-state {
+  color: #ef4444; /* Màu đỏ cho lỗi */
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+}

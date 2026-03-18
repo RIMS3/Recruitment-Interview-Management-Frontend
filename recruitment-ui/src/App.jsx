@@ -16,6 +16,8 @@ import LoginPage from "./Auth/LoginForm";
 import "./App.css";
 import JobList from "./JobPost/JobList";
 import InterviewPage from "./Interviews/InterviewPage";
+// CHÚ Ý: Đảm bảo đường dẫn import này khớp với cấu trúc thư mục thực tế của bạn
+import InterviewSchedule from "./ScheduleCandidate/InterviewSchedule";
 import { AuthContext } from "./Auth/AuthContext";
 import JobPostDetails from "./JobPostDetails/JobPostDetails";
 import SavedJobs from "./SavedJobs/SavedJobs";
@@ -127,7 +129,7 @@ const Navbar = () => {
     return null;
   }
 
-   const idCompanyEmployer = localStorage.getItem("IdCompany");
+  const idCompanyEmployer = localStorage.getItem("IdCompany");
 
   return (
     <nav className={`main-navbar ${user?.isCvPro ? 'navbar-pro' : ''}`}>
@@ -166,12 +168,30 @@ const Navbar = () => {
               <li className={location.pathname === "/employer/manage-jobs" ? "active" : ""} onClick={() => navigate("/employer/manage-jobs")}>
                 Đăng tin
               </li>
+               <li className={location.pathname === `/scheduled/${idCompanyEmployer}` ? "active" : ""} onClick={() => navigate(`/scheduled/${idCompanyEmployer}`)}>
+                   Lịch Phỏng Vấn 
+               </li>
             </>
           )}
 
           {/* MENU DÀNH CHO ỨNG VIÊN */}
           {user && String(user.role) === "2" && (
            <>
+              <li className={location.pathname === "/candidate/orders" ? "active" : ""} onClick={() => navigate("/candidate/orders")}>
+                Lịch sử giao dịch
+              </li>
+              
+              {/* LINK LỊCH PHỎNG VẤN DÀNH CHO CANDIDATE */}
+              <li 
+                className={location.pathname.startsWith("/interview-schedule") ? "active" : ""} 
+                onClick={() => {
+                  const token = user.id; // Bạn có thể thay đổi token này tùy thuộc vào logic của backend
+                  navigate(`/interview-schedule/${token}`);
+                }}
+              >
+                Lịch Phỏng Vấn
+              </li>
+
               {!user?.isCvPro ? (
                 <li 
                   onClick={() => navigate('/upgrade-cv-pro')}
@@ -197,10 +217,7 @@ const Navbar = () => {
             >
               Hồ sơ & CV
             </li>
-          )}
-          <li className={location.pathname === `/scheduled/${idCompanyEmployer}` ? "active" : ""} onClick={() => navigate(`/scheduled/${idCompanyEmployer}`)}>
-            Lịch Phỏng Vấn 
-          </li>
+          )}       
           <li className={location.pathname === "/game" ? "active" : ""} onClick={() => navigate("/game")}>
             Game
           </li>
@@ -272,7 +289,7 @@ const Navbar = () => {
               <button className="navbar-btn-login" onClick={() => navigate("/login")}>
                 Đăng nhập
               </button>
-              <button className="navbar-btn-post">Đăng tuyển ngay</button>
+            
             </>
           )}
         </div>
@@ -310,8 +327,13 @@ function App() {
             <Route path="/applied-jobs" element={<ListAppliedJobs />} />
             <Route path="/create-company" element={<CreateCompany />} />
             <Route path="/game" element={<TaiXiuGame />} />
+            
+            {/* role employer */}
             <Route path="/scheduled/:companyId" element={<InterviewPage />} />
-            {/* Protected Routes */}
+
+            {/* role candidate */}
+            <Route path="/interview-schedule/:token" element={<InterviewSchedule />} />
+            
             <Route path="/manage-cv" element={<ProtectedRoute requiredRole={2}><CVs /></ProtectedRoute>} />
             <Route path="/employer/applications" element={<ProtectedRoute requiredRole={3}><ApplicationList /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole={1}><AdminDashboard /></ProtectedRoute>} />
@@ -328,7 +350,7 @@ function App() {
             <Route path="/employer/orders" element={<ProtectedRoute requiredRole={3}><OrderHistory /></ProtectedRoute>} />
             <Route path="/candidate/orders" element={<ProtectedRoute requiredRole={2}><OrderHistory /></ProtectedRoute>} />
             <Route path="/order-details/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
-           {/* <Route path="/scheduled/:id" element={<ProtectedRoute> <InterviewPage/> </ProtectedRoute>} /> */}
+  
           </Routes>
         </main>
       </div>
