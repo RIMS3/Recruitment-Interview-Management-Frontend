@@ -186,8 +186,7 @@ body {
   100% { transform: translateX(-150px) rotate(10deg) scale(0.9); opacity: 0; } 
 }
 
-
-/* Text và Box Tìm kiếm (Giữ nguyên) */
+/* Text và Box Tìm kiếm */
 .hero-badge {
   background: rgba(255,255,255,0.1);
   color: #34d399;
@@ -264,6 +263,22 @@ body {
 .indicator-bar:hover { background-color: rgba(255, 255, 255, 0.8); }
 .indicator-bar.active { background-color: #ffc107; width: 35px; }
 
+/* --- CSS MỚI CHO BANNER TITLE CĂN GIỮA NẰM DƯỚI --- */
+.banner-title-container {
+  text-align: center;
+  margin-top: 24px;
+  margin-bottom: 20px;
+  padding: 0 15px;
+}
+
+.banner-title-container h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  position: relative;
+  display: inline-block;
+}
 
 /* =========================================
    LOẠI 1: QUẢNG CÁO POPUP (GIỮA MÀN HÌNH)
@@ -324,7 +339,6 @@ body {
   z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s;
 }
 .close-popup-ad-btn:hover { background-color: #dc2626; transform: scale(1.15) rotate(90deg); }
-
 
 /* =========================================
    LOẠI 2: QUẢNG CÁO NỔI (2 CỘT SIDEBAR)
@@ -422,12 +436,12 @@ body {
 }
 
 /* =========================================
-   Stats Section (ĐÃ SỬA LỖI TRÀN DÒNG)
+   Stats Section
 ========================================= */
 .stats-section {
   display: flex; 
-  flex-wrap: wrap; /* Thêm để tự động rớt dòng */
-  gap: 20px;       /* Khoảng cách giữa các box */
+  flex-wrap: wrap; 
+  gap: 20px;       
   justify-content: space-around; 
   margin: 60px auto;
   padding: 40px 20px; 
@@ -437,7 +451,7 @@ body {
 }
 .stat-card { 
   display: flex; align-items: center; gap: 15px; flex: 1; 
-  min-width: 250px; /* Thêm độ rộng tối thiểu để thẻ rớt dòng khi bị ép hẹp */
+  min-width: 250px; 
   justify-content: center; 
 }
 .stat-icon {
@@ -457,7 +471,7 @@ body {
 .modern-section-title .title-line { display: block; width: 50px; height: 4px; background: var(--primary); margin-top: 8px; border-radius: 10px; }
 .link-all { text-decoration: none; color: var(--primary); display: flex; align-items: center; gap: 5px; font-weight: 600; cursor: pointer; }
 
-/* ĐÃ SỬA LẠI ĐỂ HIỂN THỊ CỐ ĐỊNH 4 CỘT TRÊN PC */
+/* HIỂN THỊ CỐ ĐỊNH 4 CỘT TRÊN PC */
 .job-grid-modern {
   display: grid; 
   grid-template-columns: repeat(4, 1fr);
@@ -542,58 +556,20 @@ body {
 .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
 /* =========================================
-   MEDIA QUERIES (Sửa để đẹp trên Mobile/Tablet)
+   MEDIA QUERIES 
 ========================================= */
 @media (max-width: 1024px) {
-  /* Tablet hiển thị 2 cột */
-  .job-grid-modern {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  /* Các phần khác nếu cần chỉnh sửa cho Tablet */
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+  .job-grid-modern { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 576px) {
-  /* Điện thoại hiển thị 1 cột */
-  .job-grid-modern {
-    grid-template-columns: 1fr;
-  }
-  
-  /* --- FIX THỐNG KÊ ỨNG VIÊN TRÊN ĐIỆN THOẠI --- */
-  .stats-section {
-    flex-direction: column; 
-    padding: 30px 20px;
-    gap: 0;
-  }
-  
-  .stat-card {
-    width: 100%;
-    justify-content: flex-start; 
-    padding: 15px 0;
-    border-bottom: 1px solid #f1f5f9; 
-  }
-
-  .stat-card:last-child {
-    border-bottom: none; 
-  }
-  /* ------------------------------------------- */
-
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .discovery-content {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .btn-discovery-premium {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .hero-section .rocket-container { display: none; } /* Ẩn phi thuyền trên đt để đỡ che chữ */
+  .job-grid-modern { grid-template-columns: 1fr; }
+  .stats-section { flex-direction: column; padding: 30px 20px; gap: 0; }
+  .stat-card { width: 100%; justify-content: flex-start; padding: 15px 0; border-bottom: 1px solid #f1f5f9; }
+  .stat-card:last-child { border-bottom: none; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .discovery-content { flex-direction: column; text-align: center; }
+  .btn-discovery-premium { width: 100%; justify-content: space-between; }
+  .hero-section .rocket-container { display: none; } 
 }

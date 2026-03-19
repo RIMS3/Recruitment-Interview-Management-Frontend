@@ -162,16 +162,13 @@ const HomePage = () => {
     <div className="home-page">
       {/* Hero Section */}
       <section className="hero-section">
-        {/* --- HIỆU ỨNG BẦU TRỜI ĐÊM ĐƯỢC THÊM VÀO ĐÂY --- */}
         <div className="stars"></div>
         <div className="crescent-moon"></div>
         
-        {/* Sao băng */}
         <div className="shooting-star star-1"></div>
         <div className="shooting-star star-2"></div>
         <div className="shooting-star star-3"></div>
 
-        {/* --- PHI THUYỀN TÊN LỬA MỚI ĐƯỢC THÊM VÀO ĐÂY --- */}
         <div className="rocket-container rocket-1">
           <div className="rocket-body">
             <div className="rocket-window"></div>
@@ -232,7 +229,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Banner Slider */}
+{/* Banner Slider */}
       <div className="container">
         <div className="banner-slider-modern">
           {banners.length > 0 ? (
@@ -244,9 +241,6 @@ const HomePage = () => {
                   style={{ backgroundImage: `url(${banner.imageUrl})`, cursor: userRole === "1" ? "pointer" : "default" }}
                   onClick={handleBannerClick}
                 >
-                  <div className="banner-text-overlay">
-                    <h2>{banner.title}</h2>
-                  </div>
                 </div>
               ))}
 
@@ -273,11 +267,17 @@ const HomePage = () => {
               style={{ backgroundImage: `url(https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1200)`, cursor: userRole === "1" ? "pointer" : "default" }}
               onClick={handleBannerClick} 
             >
-              <div className="banner-text-overlay">
-                <h2>Hãy thêm Banner từ trang Admin</h2>
-              </div>
             </div>
           )}
+        </div>
+
+        {/* --- TÊN BANNER NẰM TÁCH BIỆT BÊN DƯỚI, ĐÃ ĐƯỢC CĂN GIỮA BẰNG CSS --- */}
+        <div className="banner-title-container">
+          <h2>
+            {banners.length > 0 
+              ? banners[currentBanner]?.title 
+              : "Hãy thêm Banner từ trang Admin"}
+          </h2>
         </div>
       </div>
 
