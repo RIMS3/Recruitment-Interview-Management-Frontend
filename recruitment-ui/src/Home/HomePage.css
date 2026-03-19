@@ -33,13 +33,12 @@ body {
 ========================================= */
 .hero-section {
   position: relative;
-  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); /* Nền Gradient Vũ Trụ */
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
   padding: 100px 0 140px;
   text-align: center;
-  overflow: hidden; /* Cần thiết để sao băng/phi thuyền không tràn viền */
+  overflow: hidden; 
 }
 
-/* Sao lấp lánh tĩnh */
 .hero-section .stars {
   position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
   width: 100%; height: 100%; 
@@ -47,7 +46,6 @@ body {
   z-index: 0; 
 }
 
-/* Mặt trăng lắc lư */
 .hero-section .crescent-moon { 
   position: absolute; 
   top: 15%; right: 15%; 
@@ -65,7 +63,6 @@ body {
   50% { transform: translateY(-5px) rotate(40deg); } 
 }
 
-/* Sao băng (Shooting Stars) */
 .hero-section .shooting-star { 
   position: absolute; width: 120px; height: 2px; 
   background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0)); 
@@ -146,7 +143,6 @@ body {
   border-radius: 50px;
 }
 
-/* Hiệu ứng bay cho 4 chiếc phi thuyền */
 .hero-section .rocket-1 { top: 15%; animation: rocketFlyPass1 10s linear infinite; }
 @keyframes rocketFlyPass1 {
   0% { transform: translateX(100vw) rotate(10deg); opacity: 0; } 
@@ -186,7 +182,6 @@ body {
   100% { transform: translateX(-150px) rotate(10deg) scale(0.9); opacity: 0; } 
 }
 
-/* Text và Box Tìm kiếm */
 .hero-badge {
   background: rgba(255,255,255,0.1);
   color: #34d399;
@@ -263,7 +258,6 @@ body {
 .indicator-bar:hover { background-color: rgba(255, 255, 255, 0.8); }
 .indicator-bar.active { background-color: #ffc107; width: 35px; }
 
-/* --- CSS MỚI CHO BANNER TITLE CĂN GIỮA NẰM DƯỚI --- */
 .banner-title-container {
   text-align: center;
   margin-top: 24px;
@@ -301,7 +295,7 @@ body {
   display: block; 
   border-radius: 14px; 
   overflow: hidden;
-  padding: 4px; /* Độ dày viền LED */
+  padding: 4px;
   background-color: #0b1320; 
   box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 20px rgba(255, 0, 255, 0.3);
   transition: transform 0.2s;
@@ -471,7 +465,6 @@ body {
 .modern-section-title .title-line { display: block; width: 50px; height: 4px; background: var(--primary); margin-top: 8px; border-radius: 10px; }
 .link-all { text-decoration: none; color: var(--primary); display: flex; align-items: center; gap: 5px; font-weight: 600; cursor: pointer; }
 
-/* HIỂN THỊ CỐ ĐỊNH 4 CỘT TRÊN PC */
 .job-grid-modern {
   display: grid; 
   grid-template-columns: repeat(4, 1fr);
@@ -555,9 +548,6 @@ body {
 .footer-bottom-bar { border-top: 1px solid rgba(255,255,255,0.05); padding: 25px 0; }
 .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-/* =========================================
-   MEDIA QUERIES 
-========================================= */
 @media (max-width: 1024px) {
   .job-grid-modern { grid-template-columns: repeat(2, 1fr); }
   .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -572,4 +562,126 @@ body {
   .discovery-content { flex-direction: column; text-align: center; }
   .btn-discovery-premium { width: 100%; justify-content: space-between; }
   .hero-section .rocket-container { display: none; } 
+}
+
+
+/* =========================================
+   HIỆU ỨNG 4 PHÁO HOA SO LE (NHANH DẦN VÀ MẠNH)
+========================================= */
+.fireworks-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 99999;
+  overflow: hidden;
+}
+
+/* Base style cho từng quả pháo */
+.firework {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* Quả 1: Gốc trái ngoài cùng, bắn chéo nhiều */
+.firework-1 { left: 10%; animation: launch1 1.2s ease-in 0s forwards; }
+.firework-1 .launch-trail-container { transform: rotate(25deg); }
+.firework-1 .launch-flame { animation: showTrail 1.2s 0s forwards, flameFlicker 0.1s infinite alternate; }
+
+/* Quả 2: Gốc trái bên trong, bắn chéo ít */
+.firework-2 { left: 30%; animation: launch2 1.2s ease-in 0.4s forwards; }
+.firework-2 .launch-trail-container { transform: rotate(10deg); }
+.firework-2 .launch-flame { animation: showTrail 1.2s 0.4s forwards, flameFlicker 0.1s infinite alternate; }
+
+/* Quả 3: Gốc phải bên trong, bắn chéo ít */
+.firework-3 { right: 30%; animation: launch3 1.2s ease-in 0.8s forwards; }
+.firework-3 .launch-trail-container { transform: rotate(-10deg); }
+.firework-3 .launch-flame { animation: showTrail 1.2s 0.8s forwards, flameFlicker 0.1s infinite alternate; }
+
+/* Quả 4: Gốc phải ngoài cùng, bắn chéo nhiều */
+.firework-4 { right: 10%; animation: launch4 1.2s ease-in 1.2s forwards; }
+.firework-4 .launch-trail-container { transform: rotate(-25deg); }
+.firework-4 .launch-flame { animation: showTrail 1.2s 1.2s forwards, flameFlicker 0.1s infinite alternate; }
+
+
+/* Quỹ đạo bay (đích đến ở giữa màn hình bên trên) */
+@keyframes launch1 { 0% { transform: translate(0, 0); } 100% { transform: translate(25vw, -65vh); } }
+@keyframes launch2 { 0% { transform: translate(0, 0); } 100% { transform: translate(10vw, -75vh); } }
+@keyframes launch3 { 0% { transform: translate(0, 0); } 100% { transform: translate(-10vw, -75vh); } }
+@keyframes launch4 { 0% { transform: translate(0, 0); } 100% { transform: translate(-25vw, -65vh); } }
+
+/* Khung chứa đuôi lửa để xoay theo góc */
+.launch-trail-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Đuôi khói xịt lửa */
+.launch-flame {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 8px;
+  height: 80px;
+  background: linear-gradient(to bottom, #fff, #ffeb3b, #ff5722, transparent);
+  border-radius: 50px;
+  box-shadow: 0 0 15px #ff5722, 0 0 30px #ffeb3b;
+  transform-origin: top center;
+  opacity: 0; /* Ẩn đi chờ tới lượt bắn */
+}
+
+/* Hiển thị đuôi trong suốt thời gian bay, sau đó tắt ngóm */
+@keyframes showTrail {
+  0% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; } 
+}
+
+/* Nhấp nháy lửa */
+@keyframes flameFlicker {
+  0% { transform: scaleY(0.9); }
+  100% { transform: scaleY(1.1); }
+}
+
+.explosion {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Hạt bung tỏa khi nổ */
+.particle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: hsl(var(--hue), 100%, 65%);
+  box-shadow: 0 0 10px hsl(var(--hue), 100%, 65%), 0 0 20px white;
+  opacity: 0;
+  transform-origin: center;
+  /* Bung tỏa và rụng xuống mất 3.5s */
+  animation: burst 3.5s cubic-bezier(0.1, 0.8, 0.3, 1) var(--delay) forwards;
+}
+
+@keyframes burst {
+  0% {
+    transform: rotate(var(--angle)) translateY(0) scale(1);
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--angle)) translateY(calc(-1 * var(--dist))) scale(0);
+    opacity: 0;
+  }
 }

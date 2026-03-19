@@ -33,8 +33,11 @@ const AdminDashboard = () => {
         // 1. LẤY TOKEN TỪ LOCAL STORAGE
         const token = localStorage.getItem("accessToken");
 
-        // 2. GẮN TOKEN VÀO HEADER KHI GỌI API
-        const response = await axios.get("https://localhost:7272/api/Admin/dashboard-stats", {
+        // 2. LẤY BASE URL TỪ BIẾN MÔI TRƯỜNG VITE
+        const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
+        // 3. GẮN TOKEN VÀO HEADER KHI GỌI API VỚI URL ĐỘNG
+        const response = await axios.get(`${baseUrl}/Admin/dashboard-stats`, {
           headers: {
             Authorization: `Bearer ${token}` // <--- Thêm dòng này
           }

@@ -48,10 +48,9 @@ import UpgradeCvPro from "./CVs/UpgradeCvPro";
 import DepositPage from "./Coin/DepositPage";
 import TaiXiuGame from "./Game/TaiXiuGame";
 
-
-
 import ResetPassword from "./Password/ResetPassword";
 import ChangePassword from "./Password/ChangePassword";
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -88,18 +87,38 @@ const Navbar = () => {
           setBalance(amount);
         }
 
-        // B. Lấy thông tin Profile để ép Navbar Đen Vàng (Nếu là Ứng viên)
+        // B. Lấy thông tin Profile (Nếu là Ứng viên - Role 2)
         if (String(role) === "2" && token) {
           const resProfile = await axios.get(`${apiUrl}/candidateprofiles/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           
-          if (isMounted && resProfile.data && resProfile.data.isCvPro !== undefined) {
-            // Nếu Backend báo là VIP nhưng Context của React chưa kịp cập nhật
-            if (user && resProfile.data.isCvPro !== user.isCvPro) {
-              const updatedUser = { ...user, isCvPro: resProfile.data.isCvPro };
-              setUser(updatedUser); // Kích hoạt đổi màu Navbar
-              localStorage.setItem("user", JSON.stringify(updatedUser)); // Lưu lại để F5 không mất
+          if (isMounted && resProfile.data) {
+            if (user && (resProfile.data.isCvPro !== user.isCvPro || resProfile.data.avatarUrl !== user.avatarUrl)) {
+              const updatedUser = { 
+                ...user, 
+                isCvPro: resProfile.data.isCvPro !== undefined ? resProfile.data.isCvPro : user.isCvPro,
+                avatarUrl: resProfile.data.avatarUrl !== undefined ? resProfile.data.avatarUrl : user.avatarUrl
+              };
+              setUser(updatedUser); 
+              localStorage.setItem("user", JSON.stringify(updatedUser)); 
+            }
+          }
+        } 
+        // C. Lấy thông tin Profile (Nếu là Nhà tuyển dụng - Role 3) để cập nhật Avatar
+        else if (String(role) === "3" && token) {
+          const resProfile = await axios.get(`${apiUrl}/employerprofiles/user/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (isMounted && resProfile.data) {
+            if (user && resProfile.data.avatarUrl !== user.avatarUrl) {
+              const updatedUser = { 
+                ...user, 
+                avatarUrl: resProfile.data.avatarUrl !== undefined ? resProfile.data.avatarUrl : user.avatarUrl
+              };
+              setUser(updatedUser); 
+              localStorage.setItem("user", JSON.stringify(updatedUser)); 
             }
           }
         }
@@ -141,16 +160,21 @@ const Navbar = () => {
     return null;
   }
 
+  // Khai báo ảnh mặc định dựa trên Role (3 = icon công ty, còn lại = icon người)
+  const defaultAvatarSrc = String(user?.role) === "3" 
+    ? "https://cdn-icons-png.flaticon.com/512/2231/2231505.png" 
+    : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+
   return (
     <nav className={`main-navbar ${user?.isCvPro ? 'navbar-pro' : ''}`}>
-      <div className="nav-content">
-        <Link to="/" className="logo-text">
-          <div className="navbar-logo-box">T</div>
-          <span className="logo-main-text">IT LOCAK</span>
-          {user?.isCvPro && <span className="logo-pro-text">Pro</span>}
+      <div className="nav-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingLeft: '15px' }}>
+        
+        <Link to="/" className="logo-text" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', margin: 0 }}>
+          <div className="navbar-logo-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 0 }}>T</div>
+          <span className="logo-main-text" style={{ display: 'flex', alignItems: 'center', margin: 0, lineHeight: 1 }}>IT LOCAK</span>
+          {user?.isCvPro && <span className="logo-pro-text" style={{ display: 'flex', alignItems: 'center', margin: 0, lineHeight: 1 }}>Pro</span>}
         </Link>
 
-        {/* NÚT TOGGLE MENU DÀNH CHO MOBILE */}
         <div 
           className="mobile-menu-toggle" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -160,12 +184,10 @@ const Navbar = () => {
           <span className={`bar ${isMobileMenuOpen ? 'open' : ''}`}></span>
         </div>
 
-        {/* OVERLAY NỀN ĐEN KHI MỞ MENU MOBILE */}
         {isMobileMenuOpen && (
           <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>
         )}
 
-        {/* KHUNG BỌC MENU VÀ AUTH ĐỂ TRƯỢT TRÊN MOBILE */}
         <div className={`nav-right-panel ${isMobileMenuOpen ? 'open' : ''}`}>
           <ul className="nav-menu">
             {/* MENU DÀNH CHO ADMIN */}
@@ -210,7 +232,6 @@ const Navbar = () => {
                  </li>
               </>
             )}
-        
 
             {/* MENU DÀNH CHO ỨNG VIÊN */}
             {user && String(user.role) === "2" && (
@@ -287,22 +308,15 @@ const Navbar = () => {
                   }}
                 >
                   <div className={`nav-avatar ${user?.isCvPro ? 'vip-avatar' : ''}`}>
-                    {user.avatarUrl ? (
-                      <img
-                        src={user.avatarUrl}
-                        alt="avatar"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          e.target.nextSibling.style.display = "flex";
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className="avatar-fallback"
-                      style={{ display: user.avatarUrl ? "none" : "flex" }}
-                    >
-                      {user.fullName?.charAt(0).toUpperCase()}
-                    </div>
+                    {/* SỬ DỤNG defaultAvatarSrc ĐÃ KHAI BÁO BÊN TRÊN */}
+                    <img
+                      src={user?.avatarUrl || defaultAvatarSrc}
+                      alt="avatar"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.target.src = defaultAvatarSrc;
+                      }}
+                    />
                   </div>
                   <span className="welcome-text">
                     Xin chào, <strong className={user?.isCvPro ? 'vip-text' : ''}>{user.fullName}</strong>
