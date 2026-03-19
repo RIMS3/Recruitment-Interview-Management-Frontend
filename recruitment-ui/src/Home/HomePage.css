@@ -28,14 +28,166 @@ body {
   font-weight: 800;
 }
 
-/* Hero Section */
+/* =========================================
+   Hero Section & Bầu Trời Đêm
+========================================= */
 .hero-section {
   position: relative;
-  background: var(--dark-bg);
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); /* Nền Gradient Vũ Trụ */
   padding: 100px 0 140px;
   text-align: center;
+  overflow: hidden; /* Cần thiết để sao băng/phi thuyền không tràn viền */
 }
 
+/* Sao lấp lánh tĩnh */
+.hero-section .stars {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+  width: 100%; height: 100%; 
+  background: transparent url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png') repeat top center; 
+  z-index: 0; 
+}
+
+/* Mặt trăng lắc lư */
+.hero-section .crescent-moon { 
+  position: absolute; 
+  top: 15%; right: 15%; 
+  width: 60px; height: 60px; 
+  border-radius: 50%; 
+  box-shadow: inset -15px -15px 0 2px rgba(255, 255, 255, 0.9); 
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5)); 
+  z-index: 1; 
+  transform-origin: center center; 
+  animation: swingMoon 5s ease-in-out infinite; 
+}
+
+@keyframes swingMoon { 
+  0%, 100% { transform: translateY(0) rotate(-40deg); } 
+  50% { transform: translateY(-5px) rotate(40deg); } 
+}
+
+/* Sao băng (Shooting Stars) */
+.hero-section .shooting-star { 
+  position: absolute; width: 120px; height: 2px; 
+  background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0)); 
+  border-radius: 50%; filter: drop-shadow(0 0 6px #fff); 
+  transform: rotate(-45deg); z-index: 1; opacity: 0; 
+}
+.hero-section .star-1 { top: 10%; right: 20%; animation: shooting 4s linear infinite 0s; }
+.hero-section .star-2 { top: 30%; right: -10%; animation: shooting 5s linear infinite 2.5s; }
+.hero-section .star-3 { top: 0%; right: 50%; animation: shooting 6s linear infinite 4s; }
+
+@keyframes shooting { 
+  0% { transform: rotate(-45deg) translateX(0); opacity: 1; } 
+  70% { opacity: 1; } 
+  100% { transform: rotate(-45deg) translateX(-800px); opacity: 0; } 
+}
+
+/* --- PHI THUYỀN TÊN LỬA CSS --- */
+.hero-section .rocket-container {
+  position: absolute;
+  z-index: 2; 
+  opacity: 0; 
+  pointer-events: none; 
+  transform: rotate(45deg); 
+}
+
+.hero-section .rocket-body {
+  position: relative; width: 100px; height: 35px;
+  background: rgba(255, 255, 255, 1); border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+}
+.hero-section .rocket-body:before {
+  content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+  width: 50px; height: 25px; background: rgba(63, 126, 145, 1); border-radius: 50px 50px 10px 10px;
+}
+.hero-section .rocket-body:after {
+  content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 18px; background: rgba(26, 75, 93, 1); border-radius: 10px 10px 50px 50px;
+}
+.hero-section .rocket-window {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  width: 30px; height: 20px; background: rgba(255, 255, 255, 1);
+  border: 4px solid rgba(232, 91, 46, 1); border-radius: 50%;
+  box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.5); overflow: hidden;
+}
+.hero-section .rocket-window:before {
+  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 80%; height: 80%; background: radial-gradient(circle at 50% 50%, rgba(201, 230, 241, 1) 0%, rgba(167, 208, 223, 1) 100%);
+  border-radius: 50%; box-shadow: 0 0 5px rgba(26, 75, 93, 0.5); 
+}
+.hero-section .rocket-fins {
+  position: absolute; bottom: 0px; left: 50%; transform: translateX(-50%); width: 100%; height: 100%;
+}
+.hero-section .rocket-fins:before {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(180deg, transparent 0%, transparent 20%, rgba(63, 126, 145, 1) 20%, rgba(63, 126, 145, 1) 40%, transparent 40%, transparent 60%, rgba(63, 126, 145, 1) 60%, rgba(63, 126, 145, 1) 80%, transparent 80%, transparent 100%);
+}
+.hero-section .rocket-fins:after {
+  content: ''; position: absolute; top: 0; left: -20px; width: 20px; height: 100%;
+  background: rgba(63, 126, 145, 1); border-radius: 10px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.hero-section .rocket-engine {
+  position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%);
+  width: 50px; height: 10px; background: rgba(63, 126, 145, 1); border-radius: 10px;
+}
+.hero-section .rocket-flame {
+  position: absolute; bottom: -3px; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 12px; background: linear-gradient(180deg, rgba(232, 91, 46, 1) 0%, rgba(241, 154, 59, 1) 100%);
+  border-radius: 50px; box-shadow: 0 0 10px rgba(232, 91, 46, 0.8), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+.hero-section .rocket-flame:before {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: transparent; border-radius: 50px; box-shadow: inset 0 0 5px rgba(183, 49, 33, 1);
+}
+.hero-section .rocket-flame:after {
+  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 70%; height: 60%; background: linear-gradient(180deg, rgba(248, 194, 115, 1) 0%, rgba(241, 154, 59, 1) 100%);
+  border-radius: 50px;
+}
+
+/* Hiệu ứng bay cho 4 chiếc phi thuyền */
+.hero-section .rocket-1 { top: 15%; animation: rocketFlyPass1 10s linear infinite; }
+@keyframes rocketFlyPass1 {
+  0% { transform: translateX(100vw) rotate(10deg); opacity: 0; } 
+  5% { opacity: 1; transform: translateX(90vw) rotate(10deg); } 
+  40% { transform: translateX(50vw) rotate(-5deg); }
+  75% { transform: translateX(10vw) rotate(10deg); opacity: 1; }
+  95% { transform: translateX(-150px) rotate(10deg); opacity: 0; } 
+  100% { transform: translateX(-150px) rotate(10deg); opacity: 0; }
+}
+
+.hero-section .rocket-2 { top: 60%; animation: rocketFlyPass2 14s linear infinite; animation-delay: 2s; }
+@keyframes rocketFlyPass2 {
+  0% { transform: translateY(-150px) translateX(0) scale(0.8) rotate(45deg); opacity: 0; } 
+  5% { opacity: 1; transform: translateY(0) translateX(5vw) scale(0.8) rotate(45deg); } 
+  30% { transform: translateY(50vh) translateX(20vw) scale(0.8) rotate(65deg); }
+  85% { opacity: 1; }
+  100% { transform: translateY(110vh) translateX(35vw) scale(0.8) rotate(65deg); opacity: 0; } 
+}
+
+.hero-section .rocket-3 { top: 35%; animation: rocketFlyPass3 18s linear infinite; animation-delay: 4s; }
+@keyframes rocketFlyPass3 {
+  0% { transform: translateX(100vw) rotate(10deg) scale(1.1); opacity: 0; } 
+  5% { opacity: 1; transform: translateX(90vw) rotate(10deg) scale(1.1); } 
+  40% { transform: translateX(50vw) rotate(-5deg) scale(1.1); }
+  75% { transform: translateX(10vw) rotate(10deg) scale(1.1); opacity: 1; }
+  83% { transform: translateX(-150px) rotate(10deg) scale(1.1); opacity: 0; } 
+  100% { transform: translateX(-150px) rotate(10deg) scale(1.1); opacity: 0; } 
+}
+
+.hero-section .rocket-4 { top: 75%; animation: rocketFlyPass4 22s linear infinite; animation-delay: 6s; }
+@keyframes rocketFlyPass4 {
+  0% { transform: translateX(100vw) rotate(10deg) scale(0.9); opacity: 0; } 
+  5% { opacity: 1; transform: translateX(90vw) rotate(10deg) scale(0.9); } 
+  40% { transform: translateX(50vw) rotate(-5deg) scale(0.9); }
+  75% { transform: translateX(10vw) rotate(10deg) scale(0.9); opacity: 1; }
+  86% { transform: translateX(-150px) rotate(10deg) scale(0.9); opacity: 0; } 
+  100% { transform: translateX(-150px) rotate(10deg) scale(0.9); opacity: 0; } 
+}
+
+
+/* Text và Box Tìm kiếm (Giữ nguyên) */
 .hero-badge {
   background: rgba(255,255,255,0.1);
   color: #34d399;
@@ -442,4 +594,6 @@ body {
     width: 100%;
     justify-content: space-between;
   }
+
+  .hero-section .rocket-container { display: none; } /* Ẩn phi thuyền trên đt để đỡ che chữ */
 }

@@ -162,7 +162,50 @@ const HomePage = () => {
     <div className="home-page">
       {/* Hero Section */}
       <section className="hero-section">
-        <div className="container">
+        {/* --- HIỆU ỨNG BẦU TRỜI ĐÊM ĐƯỢC THÊM VÀO ĐÂY --- */}
+        <div className="stars"></div>
+        <div className="crescent-moon"></div>
+        
+        {/* Sao băng */}
+        <div className="shooting-star star-1"></div>
+        <div className="shooting-star star-2"></div>
+        <div className="shooting-star star-3"></div>
+
+        {/* --- PHI THUYỀN TÊN LỬA MỚI ĐƯỢC THÊM VÀO ĐÂY --- */}
+        <div className="rocket-container rocket-1">
+          <div className="rocket-body">
+            <div className="rocket-window"></div>
+            <div className="rocket-fins"></div>
+            <div className="rocket-engine"></div>
+            <div className="rocket-flame"></div>
+          </div>
+        </div>
+        <div className="rocket-container rocket-2">
+          <div className="rocket-body">
+            <div className="rocket-window"></div>
+            <div className="rocket-fins"></div>
+            <div className="rocket-engine"></div>
+            <div className="rocket-flame"></div>
+          </div>
+        </div>
+        <div className="rocket-container rocket-3">
+          <div className="rocket-body">
+            <div className="rocket-window"></div>
+            <div className="rocket-fins"></div>
+            <div className="rocket-engine"></div>
+            <div className="rocket-flame"></div>
+          </div>
+        </div>
+        <div className="rocket-container rocket-4">
+          <div className="rocket-body">
+            <div className="rocket-window"></div>
+            <div className="rocket-fins"></div>
+            <div className="rocket-engine"></div>
+            <div className="rocket-flame"></div>
+          </div>
+        </div>
+
+        <div className="container" style={{ position: 'relative', zIndex: 10 }}>
           <div className="hero-badge">🚀 Nền tảng tuyển dụng thế hệ mới</div>
           <h1 className="hero-title">Tìm kiếm công việc <span className="text-gradient">Software Engineer</span> tốt nhất</h1>
           <p className="hero-subtitle">Hơn 2,000+ vị trí đang chờ bạn ứng tuyển ngay hôm nay.</p>

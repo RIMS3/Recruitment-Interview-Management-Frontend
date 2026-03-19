@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+// BỎ prop { userId } đi
 const EmployerProfile = () => {
+    // TỰ LẤY ID TỪ LOCAL STORAGE TẠI ĐÂY
+    const userId = localStorage.getItem("userId");
+
     const [profile, setProfile] = useState({});
     const [formData, setFormData] = useState({});
     const [isEditing, setIsEditing] = useState(false);
@@ -8,19 +12,23 @@ const EmployerProfile = () => {
 
     const fileInputRef = useRef(null);
 
-    // ID thật của nhà tuyển dụng/công ty
-    const currentUserId = "A1234567-B123-C123-D123-E00000000003";
-    const apiUrl = "https://localhost:7272/api/employerprofiles";
+    const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/employerprofiles`;
 
     useEffect(() => {
-        fetch(`${apiUrl}/user/${currentUserId}`)
+        // Chặn lỗi: Nếu chưa có userId thì không gọi API
+        if (!userId || userId === "undefined") {
+            console.warn("Chưa có userId, ngừng gọi API");
+            return;
+        }
+
+        fetch(`${apiUrl}/user/${userId}`)
             .then(res => res.json())
             .then(data => {
                 setProfile(data);
                 setFormData(data);
             })
             .catch(err => console.error("Lỗi tải dữ liệu công ty:", err));
-    }, [currentUserId]);
+    }, [userId, apiUrl]);
 
     const handleAvatarChange = (e) => {
         const file = e.target.files[0];
@@ -31,7 +39,6 @@ const EmployerProfile = () => {
 
         setIsUploading(true);
         
-        // SỬA: Đã đổi thành /avatar cho khớp 100% với API C# Backend
         fetch(`${apiUrl}/${profile.id}/avatar`, { 
             method: 'POST',
             body: formDataFile,
@@ -40,7 +47,6 @@ const EmployerProfile = () => {
             .then(data => {
                 if (data.avatarUrl) {
                     alert("Cập nhật Logo công ty thành công!");
-                    // Đồng bộ link ảnh mới cho cả 2 trạng thái
                     setProfile(prev => ({ ...prev, avatarUrl: data.avatarUrl }));
                     setFormData(prev => ({ ...prev, avatarUrl: data.avatarUrl }));
                 }
@@ -63,7 +69,6 @@ const EmployerProfile = () => {
             body: JSON.stringify(formData)
         }).then(res => {
             if (res.ok) {
-                // SỬA: Đã xóa bớt if (res.ok) bị lồng nhau thừa thãi
                 alert("Cập nhật thông tin thành công!");
                 setProfile(prev => ({ ...prev, ...formData }));
                 setIsEditing(false);
@@ -81,10 +86,8 @@ const EmployerProfile = () => {
         <div style={styles.container}>
             <h2 style={{ color: '#0044cc', textAlign: 'center', marginBottom: '30px' }}>Hồ sơ Doanh nghiệp</h2>
 
-            {/* KHU VỰC LOGO CÔNG TY */}
             <div style={styles.avatarSection}>
                 <div style={styles.avatarWrapper}>
-                    {/* Dùng biến avatarUrl chuẩn theo C# trả về */}
                     <img src={profile.avatarUrl || defaultLogo} alt="Company Logo" style={{ ...styles.avatarImage, borderRadius: '12px', opacity: isUploading ? 0.5 : 1 }} />
                     <button onClick={() => fileInputRef.current.click()} style={styles.cameraButton} disabled={isUploading}>📷</button>
                 </div>
@@ -92,11 +95,9 @@ const EmployerProfile = () => {
                 <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handleAvatarChange} />
             </div>
 
-            {/* KHU VỰC THÔNG TIN */}
             {!isEditing ? (
                 <div style={styles.infoGrid}>
                     <p style={{ gridColumn: 'span 2', fontSize: '18px', color: '#0044cc' }}><strong>{profile.companyName || 'Tên công ty chưa cập nhật'}</strong></p>
-                    {/* Ghi chú: Nếu DB C# của bạn hiện tại chỉ có trường Position, bạn có thể bổ sung thêm các trường này vào DB sau để lưu được dữ liệu nhé */}
                     <p><strong>Mã số thuế:</strong> {profile.taxCode || 'Chưa có'}</p>
                     <p><strong>Website:</strong> <a href={profile.website} target="_blank" rel="noreferrer">{profile.website || 'Chưa có'}</a></p>
                     <p><strong>Địa chỉ trụ sở:</strong> {profile.address || 'Chưa có'}</p>
