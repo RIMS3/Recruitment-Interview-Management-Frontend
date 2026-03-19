@@ -10,7 +10,10 @@ const EmployerProfile = () => {
 
     // ID thật của nhà tuyển dụng/công ty
     const currentUserId = "A1234567-B123-C123-D123-E00000000003";
-    const apiUrl = "https://localhost:7272/api/employerprofiles";
+    
+    // SỬA: Lấy Base URL từ biến môi trường của Vite
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const apiUrl = `${baseUrl}/employerprofiles`;
 
     useEffect(() => {
         fetch(`${apiUrl}/user/${currentUserId}`)
@@ -20,7 +23,7 @@ const EmployerProfile = () => {
                 setFormData(data);
             })
             .catch(err => console.error("Lỗi tải dữ liệu công ty:", err));
-    }, [currentUserId]);
+    }, [currentUserId, apiUrl]);
 
     const handleAvatarChange = (e) => {
         const file = e.target.files[0];
@@ -63,7 +66,6 @@ const EmployerProfile = () => {
             body: JSON.stringify(formData)
         }).then(res => {
             if (res.ok) {
-                // SỬA: Đã xóa bớt if (res.ok) bị lồng nhau thừa thãi
                 alert("Cập nhật thông tin thành công!");
                 setProfile(prev => ({ ...prev, ...formData }));
                 setIsEditing(false);
@@ -96,7 +98,6 @@ const EmployerProfile = () => {
             {!isEditing ? (
                 <div style={styles.infoGrid}>
                     <p style={{ gridColumn: 'span 2', fontSize: '18px', color: '#0044cc' }}><strong>{profile.companyName || 'Tên công ty chưa cập nhật'}</strong></p>
-                    {/* Ghi chú: Nếu DB C# của bạn hiện tại chỉ có trường Position, bạn có thể bổ sung thêm các trường này vào DB sau để lưu được dữ liệu nhé */}
                     <p><strong>Mã số thuế:</strong> {profile.taxCode || 'Chưa có'}</p>
                     <p><strong>Website:</strong> <a href={profile.website} target="_blank" rel="noreferrer">{profile.website || 'Chưa có'}</a></p>
                     <p><strong>Địa chỉ trụ sở:</strong> {profile.address || 'Chưa có'}</p>
