@@ -194,15 +194,6 @@ font-size: 11px;
 font-weight: 500;
 }
 
-.jm-tag-experience {
-background-color: #eff6ff;
-color: #1d4ed8;
-font-weight: 600;
-display: inline-flex;
-align-items: center;
-gap: 4px;
-}
-
 /* Footer thẻ (Lương & Ngày) */
 .jm-card-footer {
 border-top: 1px solid #f3f4f6;
@@ -446,6 +437,7 @@ cursor: not-allowed;
 /* =========================================
 CSS MỚI ĐỂ LÀM MỀM MẠI SWEETALERT2
 ========================================= */
+/* Bo góc cho các nút confirm và cancel của SweetAlert2 */
 .swal-btn-soft {
 border-radius: 8px !important;
 padding: 10px 24px !important;
@@ -455,4 +447,14 @@ font-weight: 600 !important;
 /* Điều chỉnh khoảng cách giữa các nút */
 .swal2-actions {
 gap: 12px;
+}
+
+/* --- CHỈ THÊM MỚI PHẦN NÀY ĐỂ TRANG TRÍ TAG KINH NGHIỆM --- */
+.jm-tag-exp {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #dbeafe;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
 }
