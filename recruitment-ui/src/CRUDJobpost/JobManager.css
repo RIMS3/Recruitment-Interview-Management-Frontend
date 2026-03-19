@@ -446,7 +446,6 @@ cursor: not-allowed;
 /* =========================================
 CSS MỚI ĐỂ LÀM MỀM MẠI SWEETALERT2
 ========================================= */
-/* Bo góc cho các nút confirm và cancel của SweetAlert2 */
 .swal-btn-soft {
 border-radius: 8px !important;
 padding: 10px 24px !important;
