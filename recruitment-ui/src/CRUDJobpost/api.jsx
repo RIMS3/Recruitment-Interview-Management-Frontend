@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://localhost:7272/api', // Thay bằng URL Backend của bạn
+  // Sử dụng biến môi trường từ file .env.development hoặc .env.production
+  baseURL: import.meta.env.VITE_API_BASE_URL, 
 });
 
 // Tự động đính kèm Token vào Header
@@ -11,6 +12,8 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 export default api;

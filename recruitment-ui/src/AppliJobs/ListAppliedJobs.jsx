@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'; // Thêm thư viện thông báo sinh động
 import './ListAppliedJobs.css';
 
-// 1. Lấy Base URL từ biến môi trường của Vite
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ListAppliedJobs = () => {
@@ -11,24 +11,28 @@ const ListAppliedJobs = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Lấy candidateId động từ localStorage (đã được lưu khi đăng nhập hoặc ứng tuyển)
         const storedCandidateId = localStorage.getItem("candidateId");
 
-        // Kiểm tra quyền truy cập
         if (!storedCandidateId) {
-            alert("Vui lòng đăng nhập với vai trò ứng viên để xem danh sách này!");
-            navigate('/login');
+            // Thay alert bằng SweetAlert2 sinh động
+            Swal.fire({
+                title: 'Thông báo',
+                text: "Vui lòng đăng nhập với vai trò ứng viên để xem danh sách này!",
+                icon: 'warning',
+                confirmButtonColor: '#00b14f',
+                confirmButtonText: 'Đến trang đăng nhập'
+            }).then(() => {
+                navigate('/login');
+            });
             return;
         }
 
         fetchAppliedJobs(storedCandidateId);
     }, [navigate]);
 
-    // 2. Hàm lấy danh sách công việc đã ứng tuyển
     const fetchAppliedJobs = async (candidateId) => {
         try {
             setLoading(true);
-            // Sử dụng template literal để nối API_BASE_URL
             const response = await fetch(`${API_BASE_URL}/ViewListJobApply/candidate/${candidateId}`);
 
             if (!response.ok) {
@@ -44,9 +48,24 @@ const ListAppliedJobs = () => {
         }
     };
 
-    // 3. Hàm hủy ứng tuyển
+    // 3. Hàm hủy ứng tuyển - ĐÃ CẬP NHẬT MỀM MẠI HƠN
     const handleUnapply = async (applicationId) => {
-        if (!window.confirm("Bạn có chắc chắn muốn hủy ứng tuyển công việc này?")) return;
+        // Thay window.confirm bằng hộp thoại xác nhận cực đẹp
+        const resultConfirm = await Swal.fire({
+            title: 'Xác nhận hủy?',
+            text: "Bạn có chắc chắn muốn rút hồ sơ khỏi công việc này không?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#00b14f',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Đồng ý, hủy ngay',
+            cancelButtonText: 'Suy nghĩ lại',
+            reverseButtons: true, // Đưa nút hủy sang trái cho thuận tay
+            background: '#ffffff',
+            borderRadius: '20px'
+        });
+
+        if (!resultConfirm.isConfirmed) return;
 
         try {
             const response = await fetch(`${API_BASE_URL}/ViewListJobApply/unapply/${applicationId}`, {
@@ -57,19 +76,36 @@ const ListAppliedJobs = () => {
             const result = await response.json();
 
             if (result.isSuccess) {
-                alert(result.message || "Đã hủy ứng tuyển thành công.");
-                // Cập nhật lại UI bằng cách lọc bỏ item vừa xóa
+                // Thông báo thành công tự động đóng sau 2 giây
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: result.message || "Đã gỡ hồ sơ ứng tuyển.",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                
                 setAppliedList(prevList => prevList.filter(item => item.applicationId !== applicationId));
             } else {
-                alert("Hủy ứng tuyển thất bại: " + (result.message || "Lỗi không xác định"));
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Thất bại',
+                    text: result.message || "Lỗi không xác định",
+                    confirmButtonColor: '#00b14f'
+                });
             }
         } catch (error) {
             console.error("Lỗi khi hủy ứng tuyển:", error);
-            alert("Có lỗi xảy ra khi kết nối server.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi kết nối',
+                text: "Không thể kết nối đến máy chủ. Vui lòng thử lại sau!",
+                confirmButtonColor: '#00b14f'
+            });
         }
     };
 
-    // 4. Hàm helper xử lý trạng thái
     const getStatusDetails = (status) => {
         switch (status) {
             case 0: return { text: "Pending", class: "status-pending" };
@@ -79,7 +115,6 @@ const ListAppliedJobs = () => {
         }
     };
 
-    // Giao diện khi đang tải
     if (loading) return (
         <div className="loading-container">
             <div className="spinner"></div>
@@ -116,7 +151,6 @@ const ListAppliedJobs = () => {
                     <div className="job-grid">
                         {appliedList.map((item) => {
                             const status = getStatusDetails(item.status);
-                            // Ưu tiên lấy jobId để điều hướng về trang chi tiết
                             const targetJobId = item.jobId || item.id || item.idJobPost;
 
                             return (
@@ -160,7 +194,6 @@ const ListAppliedJobs = () => {
                 )}
             </div>
 
-            {/* Nút quay lại trang trước đó */}
             <button
                 className="floating-exit-btn"
                 title="Quay lại"

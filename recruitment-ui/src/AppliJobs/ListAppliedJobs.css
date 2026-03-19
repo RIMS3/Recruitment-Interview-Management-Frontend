@@ -233,3 +233,33 @@
     transform: scale(1.1) rotate(-10deg);
     background: #f0fdf4;
 }
+
+/* --- PHẦN BỔ SUNG: TÙY CHỈNH THÔNG BÁO SWEETALERT2 ---
+   Đoạn này giúp hộp thoại thông báo có bo góc 20px đồng bộ với Card của bạn
+*/
+.swal2-popup {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    border-radius: 20px !important;
+    padding: 1.5em !important;
+}
+
+.swal2-title {
+    font-weight: 700 !important;
+    color: #1e293b !important;
+}
+
+.swal2-confirm {
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 600 !important;
+}
+
+.swal2-cancel {
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 600 !important;
+}
+
+.swal2-timer-progress-bar {
+    background: #00b14f !important;
+}

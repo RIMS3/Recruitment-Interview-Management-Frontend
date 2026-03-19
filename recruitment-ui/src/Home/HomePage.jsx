@@ -63,6 +63,85 @@ const CountUpNumber = ({ end, duration = 2000 }) => {
   return <h4 ref={elementRef}>{formatNumber(count)}+</h4>;
 };
 
+// --- COMPONENT: HIỆU ỨNG 4 PHÁO HOA SO LE ---
+const Fireworks = ({ onComplete }) => {
+  useEffect(() => {
+    // Hàm hỗ trợ phát âm thanh theo độ trễ
+    const playSound = (src, delay, volume) => {
+      setTimeout(() => {
+        const audio = new Audio(src);
+        audio.volume = volume;
+        audio.play().catch(e => console.log("Trình duyệt chặn Autoplay Audio:", e));
+      }, delay);
+    };
+
+    const launchSrc = 'https://actions.google.com/sounds/v1/foley/whoosh_heavy.ogg';
+    const explodeSrc = 'https://actions.google.com/sounds/v1/weapons/large_explosion.ogg';
+
+    // 4 quả pháo bắn cách nhau 400ms (0s, 0.4s, 0.8s, 1.2s)
+    // Thời gian bay của mỗi quả là 1.2s (1200ms), sau đó mới phát tiếng nổ
+    [0, 400, 800, 1200].forEach(delay => {
+      playSound(launchSrc, delay, 0.5); // Tiếng bay xé gió
+      playSound(explodeSrc, delay + 1200, 1.0); // Tiếng nổ sau khi bay 1.2s
+    });
+
+    // Dọn dẹp DOM pháo hoa sau 8 giây cho nhẹ máy
+    const timerCleanup = setTimeout(onComplete, 8000);
+    return () => clearTimeout(timerCleanup);
+  }, [onComplete]);
+
+  // Tạo ra 90 hạt cho một cú nổ
+  const createParticles = (burstDelay) => {
+    return [...Array(90)].map((_, i) => {
+      const angle = `${Math.random() * 360}deg`; 
+      const dist = `${150 + Math.random() * 450}px`; // Nổ siêu rộng
+      const hue = Math.floor(Math.random() * 360);
+      const size = `${6 + Math.random() * 6}px`; 
+      return (
+        <div
+          key={i}
+          className="particle"
+          style={{
+            "--angle": angle,
+            "--dist": dist,
+            "--hue": hue,
+            "--size": size,
+            "--delay": burstDelay 
+          }}
+        ></div>
+      );
+    });
+  };
+
+  return (
+    <div className="fireworks-overlay">
+      {/* Quả 1: Bắn ngay lập tức (0s) - Nổ lúc 1.2s */}
+      <div className="firework firework-1">
+        <div className="launch-trail-container"><div className="launch-flame"></div></div>
+        <div className="explosion">{createParticles('1.2s')}</div>
+      </div>
+      
+      {/* Quả 2: Bắn sau 0.4s - Nổ lúc 1.6s */}
+      <div className="firework firework-2">
+        <div className="launch-trail-container"><div className="launch-flame"></div></div>
+        <div className="explosion">{createParticles('1.6s')}</div>
+      </div>
+
+      {/* Quả 3: Bắn sau 0.8s - Nổ lúc 2.0s */}
+      <div className="firework firework-3">
+        <div className="launch-trail-container"><div className="launch-flame"></div></div>
+        <div className="explosion">{createParticles('2.0s')}</div>
+      </div>
+
+      {/* Quả 4: Bắn sau 1.2s - Nổ lúc 2.4s */}
+      <div className="firework firework-4">
+        <div className="launch-trail-container"><div className="launch-flame"></div></div>
+        <div className="explosion">{createParticles('2.4s')}</div>
+      </div>
+    </div>
+  );
+};
+
 const mytoken = localStorage.getItem("accessToken");
 console.log("Token của bạn là gì:", mytoken);
 
@@ -79,10 +158,13 @@ const HomePage = () => {
   const [leftAds, setLeftAds] = useState([]);         
   const [rightAds, setRightAds] = useState([]);       
 
+  // --- BẬT PHÁO HOA NGAY LÚC LOAD ---
+  const [showFireworks, setShowFireworks] = useState(true);
+
   // LẤY ROLE CỦA USER HIỆN TẠI
   const userRole = localStorage.getItem("role");
 
- // CALL API
+  // CALL API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -160,9 +242,53 @@ const HomePage = () => {
 
   return (
     <div className="home-page">
+
+      {/* Container Pháo Hoa (Bắn luôn lúc render) */}
+      {showFireworks && <Fireworks onComplete={() => setShowFireworks(false)} />}
+
       {/* Hero Section */}
       <section className="hero-section">
-        <div className="container">
+        <div className="stars"></div>
+        <div className="crescent-moon"></div>
+        
+        <div className="shooting-star star-1"></div>
+        <div className="shooting-star star-2"></div>
+        <div className="shooting-star star-3"></div>
+
+        <div className="rocket-container rocket-1">
+          <div className="rocket-body">
+            <div className="rocket-window"></div>
+            <div className="rocket-fins"></div>
+            <div className="rocket-engine"></div>
+            <div className="rocket-flame"></div>
+          </div>
+        </div>
+        <div className="rocket-container rocket-2">
+          <div className="rocket-body">
+            <div className="rocket-window"></div>
+            <div className="rocket-fins"></div>
+            <div className="rocket-engine"></div>
+            <div className="rocket-flame"></div>
+          </div>
+        </div>
+        <div className="rocket-container rocket-3">
+          <div className="rocket-body">
+            <div className="rocket-window"></div>
+            <div className="rocket-fins"></div>
+            <div className="rocket-engine"></div>
+            <div className="rocket-flame"></div>
+          </div>
+        </div>
+        <div className="rocket-container rocket-4">
+          <div className="rocket-body">
+            <div className="rocket-window"></div>
+            <div className="rocket-fins"></div>
+            <div className="rocket-engine"></div>
+            <div className="rocket-flame"></div>
+          </div>
+        </div>
+
+        <div className="container" style={{ position: 'relative', zIndex: 10 }}>
           <div className="hero-badge">🚀 Nền tảng tuyển dụng thế hệ mới</div>
           <h1 className="hero-title">Tìm kiếm công việc <span className="text-gradient">Software Engineer</span> tốt nhất</h1>
           <p className="hero-subtitle">Hơn 2,000+ vị trí đang chờ bạn ứng tuyển ngay hôm nay.</p>
@@ -201,9 +327,6 @@ const HomePage = () => {
                   style={{ backgroundImage: `url(${banner.imageUrl})`, cursor: userRole === "1" ? "pointer" : "default" }}
                   onClick={handleBannerClick}
                 >
-                  <div className="banner-text-overlay">
-                    <h2>{banner.title}</h2>
-                  </div>
                 </div>
               ))}
 
@@ -230,11 +353,16 @@ const HomePage = () => {
               style={{ backgroundImage: `url(https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1200)`, cursor: userRole === "1" ? "pointer" : "default" }}
               onClick={handleBannerClick} 
             >
-              <div className="banner-text-overlay">
-                <h2>Hãy thêm Banner từ trang Admin</h2>
-              </div>
             </div>
           )}
+        </div>
+
+        <div className="banner-title-container">
+          <h2>
+            {banners.length > 0 
+              ? banners[currentBanner]?.title 
+              : "Hãy thêm Banner từ trang Admin"}
+          </h2>
         </div>
       </div>
 
@@ -334,7 +462,6 @@ const HomePage = () => {
           </div>
         ) : (
           <div className="job-grid-modern">
-            {/* LẤY ĐÚNG 8 ITEM (2 HÀNG x 4 CỘT) */}
             {jobs.slice(0, 8).map(job => {
               const jobLogo = getLogoForJob(String(job.idJobPost));
               
@@ -372,7 +499,7 @@ const HomePage = () => {
           </div>
         )}
 
-        {/* --- SECTION KHÁM PHÁ (CALL TO ACTION) --- */}
+        {/* --- SECTION KHÁM PHÁ --- */}
         <div className="discovery-cta-container">
           <div className="discovery-blob"></div>
           <div className="discovery-blob blob-2"></div>

@@ -16,7 +16,7 @@ const CandidateProfile = () => {
     
     // SỬ DỤNG BIẾN MÔI TRƯỜNG TỪ VITE TẠI ĐÂY
     const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/candidateprofiles`;
-
+ 
     // 2. TẠO MÀNG BẢO VỆ: CHẶN NGƯỜI CHƯA ĐĂNG NHẬP
     if (!currentUserId) {
         return (

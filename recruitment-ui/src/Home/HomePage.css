@@ -28,12 +28,158 @@ body {
   font-weight: 800;
 }
 
-/* Hero Section */
+/* =========================================
+   Hero Section & Bầu Trời Đêm
+========================================= */
 .hero-section {
   position: relative;
-  background: var(--dark-bg);
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
   padding: 100px 0 140px;
   text-align: center;
+  overflow: hidden; 
+}
+
+.hero-section .stars {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+  width: 100%; height: 100%; 
+  background: transparent url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png') repeat top center; 
+  z-index: 0; 
+}
+
+.hero-section .crescent-moon { 
+  position: absolute; 
+  top: 15%; right: 15%; 
+  width: 60px; height: 60px; 
+  border-radius: 50%; 
+  box-shadow: inset -15px -15px 0 2px rgba(255, 255, 255, 0.9); 
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5)); 
+  z-index: 1; 
+  transform-origin: center center; 
+  animation: swingMoon 5s ease-in-out infinite; 
+}
+
+@keyframes swingMoon { 
+  0%, 100% { transform: translateY(0) rotate(-40deg); } 
+  50% { transform: translateY(-5px) rotate(40deg); } 
+}
+
+.hero-section .shooting-star { 
+  position: absolute; width: 120px; height: 2px; 
+  background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0)); 
+  border-radius: 50%; filter: drop-shadow(0 0 6px #fff); 
+  transform: rotate(-45deg); z-index: 1; opacity: 0; 
+}
+.hero-section .star-1 { top: 10%; right: 20%; animation: shooting 4s linear infinite 0s; }
+.hero-section .star-2 { top: 30%; right: -10%; animation: shooting 5s linear infinite 2.5s; }
+.hero-section .star-3 { top: 0%; right: 50%; animation: shooting 6s linear infinite 4s; }
+
+@keyframes shooting { 
+  0% { transform: rotate(-45deg) translateX(0); opacity: 1; } 
+  70% { opacity: 1; } 
+  100% { transform: rotate(-45deg) translateX(-800px); opacity: 0; } 
+}
+
+/* --- PHI THUYỀN TÊN LỬA CSS --- */
+.hero-section .rocket-container {
+  position: absolute;
+  z-index: 2; 
+  opacity: 0; 
+  pointer-events: none; 
+  transform: rotate(45deg); 
+}
+
+.hero-section .rocket-body {
+  position: relative; width: 100px; height: 35px;
+  background: rgba(255, 255, 255, 1); border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+}
+.hero-section .rocket-body:before {
+  content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+  width: 50px; height: 25px; background: rgba(63, 126, 145, 1); border-radius: 50px 50px 10px 10px;
+}
+.hero-section .rocket-body:after {
+  content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 18px; background: rgba(26, 75, 93, 1); border-radius: 10px 10px 50px 50px;
+}
+.hero-section .rocket-window {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  width: 30px; height: 20px; background: rgba(255, 255, 255, 1);
+  border: 4px solid rgba(232, 91, 46, 1); border-radius: 50%;
+  box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.5); overflow: hidden;
+}
+.hero-section .rocket-window:before {
+  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 80%; height: 80%; background: radial-gradient(circle at 50% 50%, rgba(201, 230, 241, 1) 0%, rgba(167, 208, 223, 1) 100%);
+  border-radius: 50%; box-shadow: 0 0 5px rgba(26, 75, 93, 0.5); 
+}
+.hero-section .rocket-fins {
+  position: absolute; bottom: 0px; left: 50%; transform: translateX(-50%); width: 100%; height: 100%;
+}
+.hero-section .rocket-fins:before {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(180deg, transparent 0%, transparent 20%, rgba(63, 126, 145, 1) 20%, rgba(63, 126, 145, 1) 40%, transparent 40%, transparent 60%, rgba(63, 126, 145, 1) 60%, rgba(63, 126, 145, 1) 80%, transparent 80%, transparent 100%);
+}
+.hero-section .rocket-fins:after {
+  content: ''; position: absolute; top: 0; left: -20px; width: 20px; height: 100%;
+  background: rgba(63, 126, 145, 1); border-radius: 10px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.hero-section .rocket-engine {
+  position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%);
+  width: 50px; height: 10px; background: rgba(63, 126, 145, 1); border-radius: 10px;
+}
+.hero-section .rocket-flame {
+  position: absolute; bottom: -3px; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 12px; background: linear-gradient(180deg, rgba(232, 91, 46, 1) 0%, rgba(241, 154, 59, 1) 100%);
+  border-radius: 50px; box-shadow: 0 0 10px rgba(232, 91, 46, 0.8), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+.hero-section .rocket-flame:before {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: transparent; border-radius: 50px; box-shadow: inset 0 0 5px rgba(183, 49, 33, 1);
+}
+.hero-section .rocket-flame:after {
+  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 70%; height: 60%; background: linear-gradient(180deg, rgba(248, 194, 115, 1) 0%, rgba(241, 154, 59, 1) 100%);
+  border-radius: 50px;
+}
+
+.hero-section .rocket-1 { top: 15%; animation: rocketFlyPass1 10s linear infinite; }
+@keyframes rocketFlyPass1 {
+  0% { transform: translateX(100vw) rotate(10deg); opacity: 0; } 
+  5% { opacity: 1; transform: translateX(90vw) rotate(10deg); } 
+  40% { transform: translateX(50vw) rotate(-5deg); }
+  75% { transform: translateX(10vw) rotate(10deg); opacity: 1; }
+  95% { transform: translateX(-150px) rotate(10deg); opacity: 0; } 
+  100% { transform: translateX(-150px) rotate(10deg); opacity: 0; }
+}
+
+.hero-section .rocket-2 { top: 60%; animation: rocketFlyPass2 14s linear infinite; animation-delay: 2s; }
+@keyframes rocketFlyPass2 {
+  0% { transform: translateY(-150px) translateX(0) scale(0.8) rotate(45deg); opacity: 0; } 
+  5% { opacity: 1; transform: translateY(0) translateX(5vw) scale(0.8) rotate(45deg); } 
+  30% { transform: translateY(50vh) translateX(20vw) scale(0.8) rotate(65deg); }
+  85% { opacity: 1; }
+  100% { transform: translateY(110vh) translateX(35vw) scale(0.8) rotate(65deg); opacity: 0; } 
+}
+
+.hero-section .rocket-3 { top: 35%; animation: rocketFlyPass3 18s linear infinite; animation-delay: 4s; }
+@keyframes rocketFlyPass3 {
+  0% { transform: translateX(100vw) rotate(10deg) scale(1.1); opacity: 0; } 
+  5% { opacity: 1; transform: translateX(90vw) rotate(10deg) scale(1.1); } 
+  40% { transform: translateX(50vw) rotate(-5deg) scale(1.1); }
+  75% { transform: translateX(10vw) rotate(10deg) scale(1.1); opacity: 1; }
+  83% { transform: translateX(-150px) rotate(10deg) scale(1.1); opacity: 0; } 
+  100% { transform: translateX(-150px) rotate(10deg) scale(1.1); opacity: 0; } 
+}
+
+.hero-section .rocket-4 { top: 75%; animation: rocketFlyPass4 22s linear infinite; animation-delay: 6s; }
+@keyframes rocketFlyPass4 {
+  0% { transform: translateX(100vw) rotate(10deg) scale(0.9); opacity: 0; } 
+  5% { opacity: 1; transform: translateX(90vw) rotate(10deg) scale(0.9); } 
+  40% { transform: translateX(50vw) rotate(-5deg) scale(0.9); }
+  75% { transform: translateX(10vw) rotate(10deg) scale(0.9); opacity: 1; }
+  86% { transform: translateX(-150px) rotate(10deg) scale(0.9); opacity: 0; } 
+  100% { transform: translateX(-150px) rotate(10deg) scale(0.9); opacity: 0; } 
 }
 
 .hero-badge {
@@ -112,6 +258,21 @@ body {
 .indicator-bar:hover { background-color: rgba(255, 255, 255, 0.8); }
 .indicator-bar.active { background-color: #ffc107; width: 35px; }
 
+.banner-title-container {
+  text-align: center;
+  margin-top: 24px;
+  margin-bottom: 20px;
+  padding: 0 15px;
+}
+
+.banner-title-container h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  position: relative;
+  display: inline-block;
+}
 
 /* =========================================
    LOẠI 1: QUẢNG CÁO POPUP (GIỮA MÀN HÌNH)
@@ -134,7 +295,7 @@ body {
   display: block; 
   border-radius: 14px; 
   overflow: hidden;
-  padding: 4px; /* Độ dày viền LED */
+  padding: 4px;
   background-color: #0b1320; 
   box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 20px rgba(255, 0, 255, 0.3);
   transition: transform 0.2s;
@@ -172,7 +333,6 @@ body {
   z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s;
 }
 .close-popup-ad-btn:hover { background-color: #dc2626; transform: scale(1.15) rotate(90deg); }
-
 
 /* =========================================
    LOẠI 2: QUẢNG CÁO NỔI (2 CỘT SIDEBAR)
@@ -270,12 +430,12 @@ body {
 }
 
 /* =========================================
-   Stats Section (ĐÃ SỬA LỖI TRÀN DÒNG)
+   Stats Section
 ========================================= */
 .stats-section {
   display: flex; 
-  flex-wrap: wrap; /* Thêm để tự động rớt dòng */
-  gap: 20px;       /* Khoảng cách giữa các box */
+  flex-wrap: wrap; 
+  gap: 20px;       
   justify-content: space-around; 
   margin: 60px auto;
   padding: 40px 20px; 
@@ -285,7 +445,7 @@ body {
 }
 .stat-card { 
   display: flex; align-items: center; gap: 15px; flex: 1; 
-  min-width: 250px; /* Thêm độ rộng tối thiểu để thẻ rớt dòng khi bị ép hẹp */
+  min-width: 250px; 
   justify-content: center; 
 }
 .stat-icon {
@@ -305,7 +465,6 @@ body {
 .modern-section-title .title-line { display: block; width: 50px; height: 4px; background: var(--primary); margin-top: 8px; border-radius: 10px; }
 .link-all { text-decoration: none; color: var(--primary); display: flex; align-items: center; gap: 5px; font-weight: 600; cursor: pointer; }
 
-/* ĐÃ SỬA LẠI ĐỂ HIỂN THỊ CỐ ĐỊNH 4 CỘT TRÊN PC */
 .job-grid-modern {
   display: grid; 
   grid-template-columns: repeat(4, 1fr);
@@ -389,57 +548,140 @@ body {
 .footer-bottom-bar { border-top: 1px solid rgba(255,255,255,0.05); padding: 25px 0; }
 .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-/* =========================================
-   MEDIA QUERIES (Sửa để đẹp trên Mobile/Tablet)
-========================================= */
 @media (max-width: 1024px) {
-  /* Tablet hiển thị 2 cột */
-  .job-grid-modern {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  /* Các phần khác nếu cần chỉnh sửa cho Tablet */
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+  .job-grid-modern { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 576px) {
-  /* Điện thoại hiển thị 1 cột */
-  .job-grid-modern {
-    grid-template-columns: 1fr;
-  }
-  
-  /* --- FIX THỐNG KÊ ỨNG VIÊN TRÊN ĐIỆN THOẠI --- */
-  .stats-section {
-    flex-direction: column; 
-    padding: 30px 20px;
-    gap: 0;
-  }
-  
-  .stat-card {
-    width: 100%;
-    justify-content: flex-start; 
-    padding: 15px 0;
-    border-bottom: 1px solid #f1f5f9; 
-  }
+  .job-grid-modern { grid-template-columns: 1fr; }
+  .stats-section { flex-direction: column; padding: 30px 20px; gap: 0; }
+  .stat-card { width: 100%; justify-content: flex-start; padding: 15px 0; border-bottom: 1px solid #f1f5f9; }
+  .stat-card:last-child { border-bottom: none; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .discovery-content { flex-direction: column; text-align: center; }
+  .btn-discovery-premium { width: 100%; justify-content: space-between; }
+  .hero-section .rocket-container { display: none; } 
+}
 
-  .stat-card:last-child {
-    border-bottom: none; 
-  }
-  /* ------------------------------------------- */
 
-  .footer-grid {
-    grid-template-columns: 1fr;
+/* =========================================
+   HIỆU ỨNG 4 PHÁO HOA SO LE (NHANH DẦN VÀ MẠNH)
+========================================= */
+.fireworks-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 99999;
+  overflow: hidden;
+}
+
+/* Base style cho từng quả pháo */
+.firework {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* Quả 1: Gốc trái ngoài cùng, bắn chéo nhiều */
+.firework-1 { left: 10%; animation: launch1 1.2s ease-in 0s forwards; }
+.firework-1 .launch-trail-container { transform: rotate(25deg); }
+.firework-1 .launch-flame { animation: showTrail 1.2s 0s forwards, flameFlicker 0.1s infinite alternate; }
+
+/* Quả 2: Gốc trái bên trong, bắn chéo ít */
+.firework-2 { left: 30%; animation: launch2 1.2s ease-in 0.4s forwards; }
+.firework-2 .launch-trail-container { transform: rotate(10deg); }
+.firework-2 .launch-flame { animation: showTrail 1.2s 0.4s forwards, flameFlicker 0.1s infinite alternate; }
+
+/* Quả 3: Gốc phải bên trong, bắn chéo ít */
+.firework-3 { right: 30%; animation: launch3 1.2s ease-in 0.8s forwards; }
+.firework-3 .launch-trail-container { transform: rotate(-10deg); }
+.firework-3 .launch-flame { animation: showTrail 1.2s 0.8s forwards, flameFlicker 0.1s infinite alternate; }
+
+/* Quả 4: Gốc phải ngoài cùng, bắn chéo nhiều */
+.firework-4 { right: 10%; animation: launch4 1.2s ease-in 1.2s forwards; }
+.firework-4 .launch-trail-container { transform: rotate(-25deg); }
+.firework-4 .launch-flame { animation: showTrail 1.2s 1.2s forwards, flameFlicker 0.1s infinite alternate; }
+
+
+/* Quỹ đạo bay (đích đến ở giữa màn hình bên trên) */
+@keyframes launch1 { 0% { transform: translate(0, 0); } 100% { transform: translate(25vw, -65vh); } }
+@keyframes launch2 { 0% { transform: translate(0, 0); } 100% { transform: translate(10vw, -75vh); } }
+@keyframes launch3 { 0% { transform: translate(0, 0); } 100% { transform: translate(-10vw, -75vh); } }
+@keyframes launch4 { 0% { transform: translate(0, 0); } 100% { transform: translate(-25vw, -65vh); } }
+
+/* Khung chứa đuôi lửa để xoay theo góc */
+.launch-trail-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Đuôi khói xịt lửa */
+.launch-flame {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 8px;
+  height: 80px;
+  background: linear-gradient(to bottom, #fff, #ffeb3b, #ff5722, transparent);
+  border-radius: 50px;
+  box-shadow: 0 0 15px #ff5722, 0 0 30px #ffeb3b;
+  transform-origin: top center;
+  opacity: 0; /* Ẩn đi chờ tới lượt bắn */
+}
+
+/* Hiển thị đuôi trong suốt thời gian bay, sau đó tắt ngóm */
+@keyframes showTrail {
+  0% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; } 
+}
+
+/* Nhấp nháy lửa */
+@keyframes flameFlicker {
+  0% { transform: scaleY(0.9); }
+  100% { transform: scaleY(1.1); }
+}
+
+.explosion {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Hạt bung tỏa khi nổ */
+.particle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: hsl(var(--hue), 100%, 65%);
+  box-shadow: 0 0 10px hsl(var(--hue), 100%, 65%), 0 0 20px white;
+  opacity: 0;
+  transform-origin: center;
+  /* Bung tỏa và rụng xuống mất 3.5s */
+  animation: burst 3.5s cubic-bezier(0.1, 0.8, 0.3, 1) var(--delay) forwards;
+}
+
+@keyframes burst {
+  0% {
+    transform: rotate(var(--angle)) translateY(0) scale(1);
+    opacity: 1;
   }
-  
-  .discovery-content {
-    flex-direction: column;
-    text-align: center;
+  60% {
+    opacity: 1;
   }
-  
-  .btn-discovery-premium {
-    width: 100%;
-    justify-content: space-between;
+  100% {
+    transform: rotate(var(--angle)) translateY(calc(-1 * var(--dist))) scale(0);
+    opacity: 0;
   }
 }
