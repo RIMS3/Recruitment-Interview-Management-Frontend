@@ -8,11 +8,27 @@ const CVTemplates = () => {
   const { user } = useContext(AuthContext);
   const [isCallingApi, setIsCallingApi] = useState(false);
 
+  // --- STATE QUẢN LÝ POPUP ---
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: 'alert', // 'alert' hoặc 'error'
+    message: ''
+  });
+
   const [templates, setTemplates] = useState([
     { id: 'tpl-1', name: 'Mẫu Sang trọng (Xanh rêu)', imgUrl: 'https://placehold.co/300x420/8c9e82/ffffff?text=Loading...' },
     { id: 'tpl-2', name: 'Mẫu TikTok (Dark Mode)', imgUrl: 'https://placehold.co/300x420/111111/ffffff?text=Loading...' },
     { id: 'tpl-3', name: 'Mẫu Hiện đại (Vàng xám)', imgUrl: 'https://placehold.co/300x420/FDF7E7/333333?text=Loading...' }
   ]);
+
+  // --- HELPER ĐỂ MỞ/ĐÓNG POPUP ---
+  const showPopup = (message, type = 'alert') => {
+    setPopup({ isOpen: true, message, type });
+  };
+
+  const closePopup = () => {
+    setPopup({ ...popup, isOpen: false });
+  };
 
   // Tải danh sách ảnh mẫu từ Backend
   useEffect(() => {
@@ -43,7 +59,7 @@ const CVTemplates = () => {
       // 1. Lấy Token đăng nhập
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        alert("⚠️ Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn!");
+        showPopup("⚠️ Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn!", "error");
         setIsCallingApi(false);
         return;
       }
@@ -58,7 +74,7 @@ const CVTemplates = () => {
       });
 
       if (!profileRes.ok) {
-        alert("⚠️ Không tìm thấy thông tin Ứng viên trên hệ thống!");
+        showPopup("⚠️ Không tìm thấy thông tin Ứng viên trên hệ thống!", "error");
         setIsCallingApi(false);
         return;
       }
@@ -67,7 +83,7 @@ const CVTemplates = () => {
       const realCandidateId = profileData.candidateId || profileData.id; 
 
       if (!realCandidateId) {
-        alert("⚠️ Dữ liệu Ứng viên trả về không hợp lệ!");
+        showPopup("⚠️ Dữ liệu Ứng viên trả về không hợp lệ!", "error");
         setIsCallingApi(false);
         return;
       }
@@ -82,6 +98,7 @@ const CVTemplates = () => {
       formData.append('email', user?.email || '');
       formData.append('isDefault', 'true');
       formData.append('templateId', templateId); 
+      formData.append('phoneNumber', '[BẢN NHÁP]');
 
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs`, {
         method: 'POST',
@@ -102,7 +119,7 @@ const CVTemplates = () => {
 
     } catch (error) {
       console.error("Lỗi khi xử lý chọn mẫu:", error);
-      alert("Có lỗi xảy ra khi tạo bản nháp CV. Vui lòng kiểm tra Console (F12).");
+      showPopup("Có lỗi xảy ra khi tạo bản nháp CV. Vui lòng kiểm tra Console (F12).", "error");
     } finally {
       setIsCallingApi(false);
     }
@@ -136,6 +153,26 @@ const CVTemplates = () => {
           </div>
         ))}
       </div>
+
+      {/* RENDER POPUP THAY CHO ALERT */}
+      {popup.isOpen && (
+        <div className="custom-popup-overlay">
+          <div className="custom-popup-box">
+            <h4 className="custom-popup-title" style={{ color: popup.type === 'error' ? '#d9534f' : '#333' }}>
+              {popup.type === 'error' ? 'Lỗi' : 'Thông báo'}
+            </h4>
+            <p className="custom-popup-message">{popup.message}</p>
+            <div className="custom-popup-actions">
+              <button 
+                className={`btn-popup-confirm ${popup.type === 'error' ? 'btn-danger' : 'btn-primary'}`}
+                onClick={closePopup}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
