@@ -34,7 +34,6 @@ const CVTemplates = () => {
   useEffect(() => {
     const fetchTemplateImages = async () => {
       try {
-        // Sử dụng biến môi trường thay cho localhost cứng
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/images`);
         if (response.ok) {
           const imageUrls = await response.json(); 
@@ -56,7 +55,6 @@ const CVTemplates = () => {
     setIsCallingApi(true);
 
     try {
-      // 1. Lấy Token đăng nhập
       const token = localStorage.getItem("accessToken");
       if (!token) {
         showPopup("⚠️ Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn!", "error");
@@ -64,7 +62,6 @@ const CVTemplates = () => {
         return;
       }
 
-      // 2. GỌI API LẤY CANDIDATE ID TỪ BACKEND
       const profileRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/my-candidate-id`, {
         method: 'GET',
         headers: {
@@ -88,9 +85,6 @@ const CVTemplates = () => {
         return;
       }
 
-      console.log("Đã lấy được ID từ API:", realCandidateId);
-
-      // 3. GỌI API POST TẠO CV MỚI
       const formData = new FormData();
       formData.append('candidateId', realCandidateId); 
       formData.append('fullName', user?.fullName || 'CV chưa đặt tên'); 
@@ -113,7 +107,6 @@ const CVTemplates = () => {
         navigate(`/create-cv/${data.id}`, { state: { selectedTemplate: templateId } });
       } else {
         const errorText = await response.text();
-        console.error("Lỗi từ Backend:", errorText);
         throw new Error(`Gọi API tạo CV thất bại: ${errorText}`);
       }
 
@@ -128,7 +121,28 @@ const CVTemplates = () => {
   return (
     <div className="template-container">
       <div className="template-header">
-        <p className="breadcrumb">Trang chủ {'>'} Mẫu CV tiếng Việt</p>
+        {/* NÚT QUAY LẠI VÀ BREADCRUMB */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+          <button 
+            onClick={() => navigate('/manage-cv')} 
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              background: '#f8f9fa', border: '1px solid #e2e8f0', color: '#555',
+              cursor: 'pointer', fontSize: '14px', fontWeight: '500', padding: '6px 12px',
+              borderRadius: '20px', transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#e2e8f0'; e.currentTarget.style.color = '#00b14f'; e.currentTarget.style.borderColor = '#00b14f'; }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; e.currentTarget.style.color = '#555'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Quay lại
+          </button>
+          
+          <p className="breadcrumb" style={{ margin: 0 }}>Trang chủ {'>'} Mẫu CV tiếng Việt</p>
+        </div>
         <h1>Mẫu CV xin việc tiếng Việt chuẩn 2026</h1>
       </div>
 
@@ -154,7 +168,7 @@ const CVTemplates = () => {
         ))}
       </div>
 
-      {/* RENDER POPUP THAY CHO ALERT */}
+      {/* RENDER POPUP */}
       {popup.isOpen && (
         <div className="custom-popup-overlay">
           <div className="custom-popup-box">

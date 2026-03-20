@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import html2pdf from 'html2pdf.js'; 
 import Template1 from './Templates/Template1';
 import Template2 from './Templates/Template2';
@@ -9,6 +9,7 @@ import './CreateCV.css';
 const CreateCV = () => {
   const { cvId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const initialTemplate = location.state?.selectedTemplate || 'tpl-1';
   const [activeTemplateId, setActiveTemplateId] = useState(initialTemplate); 
@@ -189,18 +190,14 @@ const CreateCV = () => {
         return;
     }
 
-    // ==========================================
-    // FRONTEND VALIDATION
-    // ==========================================
     if (!cvData.fullName || cvData.fullName.trim() === "") {
         showPopup("❌ Vui lòng nhập Họ và tên!", "error");
         return; 
     }
 
-    // Kiểm tra định dạng ngày sinh
     if (cvData.birthday && cvData.birthday.trim() !== "") {
-        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/; // Chuẩn DD/MM/YYYY
-        const dateRegexDB = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/; // Chuẩn YYYY-MM-DD
+        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/; 
+        const dateRegexDB = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/; 
         const bStr = cvData.birthday.trim();
         
         if (!dateRegex.test(bStr) && !dateRegexDB.test(bStr)) {
@@ -373,14 +370,36 @@ const CreateCV = () => {
 
       <header className="workspace-header">
         <div className="header-container">
-          <input 
-            type="text" 
-            className="cv-name-input" 
-            value={cvData.fullName || ""} 
-            placeholder="Nhập tên CV của bạn..."
-            onChange={(e) => handleTextChange('fullName', e.target.value)} 
-            disabled={isLoading}
-          />
+          {/* NÚT QUAY LẠI VÀ INPUT TÊN CV */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flex: 1 }}>
+            <button 
+              onClick={() => navigate('/manage-cv')} 
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                background: 'transparent', border: 'none', color: '#666',
+                cursor: 'pointer', fontSize: '15px', fontWeight: '500', padding: '8px 12px',
+                borderRadius: '6px', transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#333'; }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#666'; }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              Quay lại
+            </button>
+
+            <input 
+              type="text" 
+              className="cv-name-input" 
+              value={cvData.fullName || ""} 
+              placeholder="Nhập tên CV của bạn..."
+              onChange={(e) => handleTextChange('fullName', e.target.value)} 
+              disabled={isLoading}
+              style={{ flex: 1, maxWidth: '300px' }}
+            />
+          </div>
           
           <div style={{ display: 'flex', gap: '12px' }}>
             <button 
@@ -421,7 +440,6 @@ const CreateCV = () => {
             <h4 className="custom-popup-title" style={{ color: popup.type === 'error' ? '#d9534f' : '#333' }}>
               {popup.type === 'error' ? 'Lỗi' : 'Thông báo'}
             </h4>
-            {/* Sử dụng pre-wrap để hiển thị đúng các ký tự \n trong chuỗi thông báo */}
             <p className="custom-popup-message" style={{ whiteSpace: 'pre-wrap' }}>{popup.message}</p>
             <div className="custom-popup-actions">
               <button 
