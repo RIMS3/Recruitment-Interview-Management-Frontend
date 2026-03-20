@@ -46,7 +46,18 @@ const CreateCV = () => {
   useEffect(() => {
     const fetchCVData = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}`);
+        // 1. Phải lấy Token vì CvsEditorController yêu cầu [Authorize]
+        const token = localStorage.getItem("accessToken");
+
+        // 2. Thêm "/editor" vào cuối URL và gắn Headers
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}/editor`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
         if (response.ok) {
           const data = await response.json();
           
@@ -60,10 +71,16 @@ const CreateCV = () => {
             gender: data.gender !== null ? String(data.gender) : "",
             nationality: data.nationality || "",
             field: data.field || "",
-            educationSummary: data.educationSummary || "",
-            currentSalary: data.currentSalary || "",
+            
+            // CHÚ Ý: DTO của Editor trả về biến tên là 'summary', nên ta hứng nó vào state
+            summary: data.summary || "",
+            educationSummary: data.summary || "", 
+            
+            currentSalary: data.currentSalary !== null ? String(data.currentSalary) : "",
             experienceYears: data.experienceYears !== null ? String(data.experienceYears) : "",
             fileUrl: data.fileUrl || "",
+            
+            // 3. CÁC MẢNG DỮ LIỆU BÂY GIỜ SẼ ĐƯỢC LOAD LÊN ĐẦY ĐỦ
             educations: data.educations || [],
             experiences: data.experiences || [],
             projects: data.projects || [],
