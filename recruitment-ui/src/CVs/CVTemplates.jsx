@@ -8,17 +8,32 @@ const CVTemplates = () => {
   const { user } = useContext(AuthContext);
   const [isCallingApi, setIsCallingApi] = useState(false);
 
+  // --- STATE QUẢN LÝ POPUP ---
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: 'alert', // 'alert' hoặc 'error'
+    message: ''
+  });
+
   const [templates, setTemplates] = useState([
     { id: 'tpl-1', name: 'Mẫu Sang trọng (Xanh rêu)', imgUrl: 'https://placehold.co/300x420/8c9e82/ffffff?text=Loading...' },
     { id: 'tpl-2', name: 'Mẫu TikTok (Dark Mode)', imgUrl: 'https://placehold.co/300x420/111111/ffffff?text=Loading...' },
     { id: 'tpl-3', name: 'Mẫu Hiện đại (Vàng xám)', imgUrl: 'https://placehold.co/300x420/FDF7E7/333333?text=Loading...' }
   ]);
 
+  // --- HELPER ĐỂ MỞ/ĐÓNG POPUP ---
+  const showPopup = (message, type = 'alert') => {
+    setPopup({ isOpen: true, message, type });
+  };
+
+  const closePopup = () => {
+    setPopup({ ...popup, isOpen: false });
+  };
+
   // Tải danh sách ảnh mẫu từ Backend
   useEffect(() => {
     const fetchTemplateImages = async () => {
       try {
-        // Sử dụng biến môi trường thay cho localhost cứng
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/images`);
         if (response.ok) {
           const imageUrls = await response.json(); 
@@ -40,15 +55,13 @@ const CVTemplates = () => {
     setIsCallingApi(true);
 
     try {
-      // 1. Lấy Token đăng nhập
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        alert("⚠️ Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn!");
+        showPopup("⚠️ Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn!", "error");
         setIsCallingApi(false);
         return;
       }
 
-      // 2. GỌI API LẤY CANDIDATE ID TỪ BACKEND
       const profileRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/my-candidate-id`, {
         method: 'GET',
         headers: {
@@ -58,7 +71,7 @@ const CVTemplates = () => {
       });
 
       if (!profileRes.ok) {
-        alert("⚠️ Không tìm thấy thông tin Ứng viên trên hệ thống!");
+        showPopup("⚠️ Không tìm thấy thông tin Ứng viên trên hệ thống!", "error");
         setIsCallingApi(false);
         return;
       }
@@ -67,14 +80,11 @@ const CVTemplates = () => {
       const realCandidateId = profileData.candidateId || profileData.id; 
 
       if (!realCandidateId) {
-        alert("⚠️ Dữ liệu Ứng viên trả về không hợp lệ!");
+        showPopup("⚠️ Dữ liệu Ứng viên trả về không hợp lệ!", "error");
         setIsCallingApi(false);
         return;
       }
 
-      console.log("Đã lấy được ID từ API:", realCandidateId);
-
-      // 3. GỌI API POST TẠO CV MỚI
       const formData = new FormData();
       formData.append('candidateId', realCandidateId); 
       formData.append('fullName', user?.fullName || 'CV chưa đặt tên'); 
@@ -82,6 +92,7 @@ const CVTemplates = () => {
       formData.append('email', user?.email || '');
       formData.append('isDefault', 'true');
       formData.append('templateId', templateId); 
+      formData.append('phoneNumber', '[BẢN NHÁP]');
 
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs`, {
         method: 'POST',
@@ -96,13 +107,12 @@ const CVTemplates = () => {
         navigate(`/create-cv/${data.id}`, { state: { selectedTemplate: templateId } });
       } else {
         const errorText = await response.text();
-        console.error("Lỗi từ Backend:", errorText);
         throw new Error(`Gọi API tạo CV thất bại: ${errorText}`);
       }
 
     } catch (error) {
       console.error("Lỗi khi xử lý chọn mẫu:", error);
-      alert("Có lỗi xảy ra khi tạo bản nháp CV. Vui lòng kiểm tra Console (F12).");
+      showPopup("Có lỗi xảy ra khi tạo bản nháp CV. Vui lòng kiểm tra Console (F12).", "error");
     } finally {
       setIsCallingApi(false);
     }
@@ -111,7 +121,28 @@ const CVTemplates = () => {
   return (
     <div className="template-container">
       <div className="template-header">
-        <p className="breadcrumb">Trang chủ {'>'} Mẫu CV tiếng Việt</p>
+        {/* NÚT QUAY LẠI VÀ BREADCRUMB */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+          <button 
+            onClick={() => navigate('/manage-cv')} 
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              background: '#f8f9fa', border: '1px solid #e2e8f0', color: '#555',
+              cursor: 'pointer', fontSize: '14px', fontWeight: '500', padding: '6px 12px',
+              borderRadius: '20px', transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#e2e8f0'; e.currentTarget.style.color = '#00b14f'; e.currentTarget.style.borderColor = '#00b14f'; }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; e.currentTarget.style.color = '#555'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Quay lại
+          </button>
+          
+          <p className="breadcrumb" style={{ margin: 0 }}>Trang chủ {'>'} Mẫu CV tiếng Việt</p>
+        </div>
         <h1>Mẫu CV xin việc tiếng Việt chuẩn 2026</h1>
       </div>
 
@@ -136,6 +167,26 @@ const CVTemplates = () => {
           </div>
         ))}
       </div>
+
+      {/* RENDER POPUP */}
+      {popup.isOpen && (
+        <div className="custom-popup-overlay">
+          <div className="custom-popup-box">
+            <h4 className="custom-popup-title" style={{ color: popup.type === 'error' ? '#d9534f' : '#333' }}>
+              {popup.type === 'error' ? 'Lỗi' : 'Thông báo'}
+            </h4>
+            <p className="custom-popup-message">{popup.message}</p>
+            <div className="custom-popup-actions">
+              <button 
+                className={`btn-popup-confirm ${popup.type === 'error' ? 'btn-danger' : 'btn-primary'}`}
+                onClick={closePopup}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

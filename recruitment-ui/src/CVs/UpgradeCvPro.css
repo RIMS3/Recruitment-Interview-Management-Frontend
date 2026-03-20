@@ -124,20 +124,12 @@
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-@keyframes spread1 { 
-  to { transform: translate(-140px, -120px) rotate(45deg); opacity: 1; } 
-}
-@keyframes spread2 { 
-  to { transform: translate(140px, -100px) rotate(-45deg); opacity: 1; } 
-}
-@keyframes spread3 { 
-  to { transform: translate(-40px, -160px) rotate(20deg); opacity: 1; } 
-}
-@keyframes spread4 { 
-  to { transform: translate(60px, -150px) rotate(-20deg); opacity: 1; } 
-}
+@keyframes spread1 { to { transform: translate(-140px, -120px) rotate(45deg); opacity: 1; } }
+@keyframes spread2 { to { transform: translate(140px, -100px) rotate(-45deg); opacity: 1; } }
+@keyframes spread3 { to { transform: translate(-40px, -160px) rotate(20deg); opacity: 1; } }
+@keyframes spread4 { to { transform: translate(60px, -150px) rotate(-20deg); opacity: 1; } }
 
-/* --- PHẦN CSS CŨ CỦA BẠN (GIỮ NGUYÊN HOẶC TINH CHỈNH) --- */
+/* --- PHẦN CSS CŨ CỦA BẠN (ĐÃ TINH CHỈNH) --- */
 .mesh-gradient-glow { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; opacity: 0.5; }
 .mesh-1 { width: 400px; height: 400px; background: #f59e0b; top: -100px; left: -100px; }
 .mesh-2 { width: 500px; height: 500px; background: #10b981; bottom: -150px; right: -100px; }
@@ -148,14 +140,39 @@
 .checkout-grid { z-index: 1; display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; max-width: 1100px; width: 100%; }
 .checkout-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid #e2e8f0; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
 
+/* --- STYLE MỚI CHO CỤM GIÁ TIỀN --- */
 .summary-total { margin-top: 20px; border-top: 2px dashed #e2e8f0; padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-.total-price { font-size: 28px; font-weight: 800; color: #ea580c; }
+
+.price-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* Giá gốc gạch ngang xịn xò */
+.original-price {
+  font-size: 16px;
+  color: #94a3b8; /* Màu xám nhạt */
+  font-weight: 600;
+  text-decoration: line-through;
+  text-decoration-color: #ef4444; /* Gạch ngang màu đỏ cực kỳ nổi bật */
+  text-decoration-thickness: 2px; /* Độ dày nét gạch */
+  opacity: 0.8;
+}
+
+.total-price { font-size: 28px; font-weight: 800; color: #ea580c; line-height: 1; }
 
 .payment-option { border: 2px solid #e2e8f0; padding: 15px; border-radius: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; transition: 0.3s; }
 .payment-option.active { border-color: #10b981; background: #f0fdf4; }
 
-.btn-pay-now { width: 100%; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.btn-pay-now { width: 100%; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
 .btn-pay-now:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(234, 88, 12, 0.3); }
+
+/* ẨN NÚT QUAY LẠI */
+.btn-cancel {
+  display: none !important; 
+}
 
 /* QR Modal */
 .qr-modal { text-align: center; }

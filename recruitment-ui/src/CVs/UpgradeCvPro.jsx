@@ -22,22 +22,29 @@ const UpgradeCvPro = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [connection, setConnection] = useState(null);
 
+  // LẤY BIẾN MÔI TRƯỜNG TỪ VITE
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
   const vouchers = [
-    { id: 1, code: 'CVPRO50', title: 'Giảm 50% Gói Pro', desc: 'Dành cho 100 khách hàng đầu tiên.' },
-    { id: 2, code: 'NEWBIE', title: 'Giảm 20.000₫', desc: 'Tặng riêng cho tài khoản mới.' }
+    { id: 1, code: 'CVPRO50', title: 'Giảm 50% Gói Pro', desc: 'Yêu cầu: Tài khoản được tạo trước ngày 01/01/2020.', progress: '0%' },
+    { id: 2, code: 'VIP200K', title: 'Giảm 200.000₫', desc: 'Yêu cầu: Tổng chi tiêu trên hệ thống đạt 50.000.000₫.', progress: '1%' },
+    { id: 3, code: 'FREECV', title: 'Miễn phí 1 năm', desc: 'Yêu cầu: Giới thiệu thành công 99 Nhà tuyển dụng.', progress: '1/99' }
   ];
 
   // Khởi tạo SignalR
   useEffect(() => {
+    // URL của Hub thường nằm ở gốc, nên ta sẽ cắt đuôi '/api' đi
+    const hubUrl = baseUrl ? baseUrl.replace('/api', '') + '/paymentHub' : 'https://itlocak.xyz/paymentHub';
+
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl("https://itlocak.xyz/paymentHub", {
+      .withUrl(hubUrl, {
          accessTokenFactory: () => localStorage.getItem("accessToken")
       })
       .withAutomaticReconnect()
       .build();
     setConnection(newConnection);
     return () => { if (newConnection) newConnection.stop(); };
-  }, []);
+  }, [baseUrl]);
 
   // Xử lý sự kiện thanh toán thành công qua SignalR
   useEffect(() => {
@@ -64,7 +71,8 @@ const UpgradeCvPro = () => {
     const fetchPackageData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('https://itlocak.xyz/api/Cvs/cvpro/24A8F863-35CD-47F1-9FD9-CCBA90CFFDA0');
+        // Thay link cứng bằng baseUrl
+        const response = await axios.get(`${baseUrl}/Cvs/cvpro/24A8F863-35CD-47F1-9FD9-CCBA90CFFDA0`);
         setPackageInfo(response.data);
       } catch (error) {
         toast.error('Không thể kết nối đến máy chủ!');
@@ -73,7 +81,7 @@ const UpgradeCvPro = () => {
       }
     };
     fetchPackageData();
-  }, []);
+  }, [baseUrl]);
 
   const handlePayment = async () => {
     const userId = localStorage.getItem("userId");
@@ -82,7 +90,8 @@ const UpgradeCvPro = () => {
     if (paymentMethod === 'bank') {
       try {
         setIsProcessing(true);
-        const response = await axios.post('https://itlocak.xyz/api/payment', {
+        // Thay link cứng bằng baseUrl
+        const response = await axios.post(`${baseUrl}/payment`, {
           IdUser: userId,
           IdService: packageInfo.idService
         });
@@ -144,14 +153,13 @@ const UpgradeCvPro = () => {
               <span className="payment-icon">🏦</span>
             </div>
             <div className="payment-option disabled" onClick={() => setIsMaintenanceModalOpen(true)}>
-              <div className="payment-option-left"><div className="check-circle"></div><span>VNPay (Bảo trì)</span></div>
+              <div className="payment-option-left"><div className="check-circle"></div><span>VNPay</span></div>
               <img src={vnpayLogo} alt="VNPay" className="payment-logo-img" />
             </div>
           </div>
           <button className="btn-pay-now" onClick={handlePayment} disabled={isProcessing}>
             {isProcessing ? 'Đang khởi tạo...' : `Thanh toán ${packageInfo.price.toLocaleString()} ₫`}
           </button>
-          <button className="btn-cancel" onClick={() => navigate(-1)}>Quay lại</button>
         </div>
       </div>
 
@@ -174,7 +182,7 @@ const UpgradeCvPro = () => {
             <button className="btn-understand" style={{marginTop: '20px'}} onClick={() => setIsQRModalOpen(false)}>Hủy bỏ</button>
           </div>
         </div>
-      )}
+      )}  
 
       {/* MODAL THÀNH CÔNG (HIỆU ỨNG TRUNG TÂM) */}
       {isSuccessModalOpen && (
@@ -218,6 +226,61 @@ const UpgradeCvPro = () => {
           </div>
         </div>
       )}
+
+     {/* MODAL VOUCHER (CHỌN MÃ GIẢM GIÁ - BẢN KHÔNG CHO DÙNG) */}
+      {isVoucherModalOpen && (
+        <div className="voucher-modal-overlay active" onClick={() => setIsVoucherModalOpen(false)}>
+          <div className="maintenance-modal-content" onClick={e => e.stopPropagation()} style={{ textAlign: 'left' }}>
+            <h3 style={{ textAlign: 'center', marginBottom: '20px', fontSize: '20px' }}>🎟️ Mã Giảm Giá Của Bạn</h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {vouchers.map(v => (
+                <div 
+                  key={v.id} 
+                  style={{ 
+                    border: '2px solid #e2e8f0', 
+                    borderRadius: '12px', 
+                    padding: '15px', 
+                    cursor: 'not-allowed', // Trỏ chuột cấm chỉ
+                    backgroundColor: '#f8fafc', // Nền xám nhạt
+                    opacity: 0.85
+                  }} 
+                  onClick={() => {
+                    // Cố tình bấm sẽ ăn ngay quả thông báo lỗi
+                    toast.error(`Bạn chưa đạt yêu cầu của mã ${v.code}!`);
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <strong style={{ color: '#94a3b8', fontSize: '18px', letterSpacing: '1px', textDecoration: 'line-through' }}>{v.code}</strong>
+                    <span style={{ backgroundColor: '#cbd5e1', color: '#475569', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>
+                      Không đủ ĐK
+                    </span>
+                  </div>
+                  <h4 style={{ margin: '0 0 5px 0', fontSize: '15px', color: '#64748b' }}>{v.title}</h4>
+                  <p style={{ margin: 0, fontSize: '13px', color: '#ef4444', fontWeight: '500' }}>❌ {v.desc}</p>
+                  
+                  {/* Thanh tiến độ ảo để khè người dùng */}
+                  <div style={{ marginTop: '12px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ width: '3%', height: '100%', background: '#94a3b8' }}></div>
+                  </div>
+                  <p style={{ margin: '5px 0 0 0', fontSize: '11px', color: '#94a3b8', textAlign: 'right' }}>
+                    Tiến độ: {v.progress}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <button 
+              className="btn-understand" 
+              style={{ marginTop: '20px', width: '100%', backgroundColor: '#e2e8f0', color: '#475569', cursor: 'pointer' }} 
+              onClick={() => setIsVoucherModalOpen(false)}
+            >
+              Đóng lại
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

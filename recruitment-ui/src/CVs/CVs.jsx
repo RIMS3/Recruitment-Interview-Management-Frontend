@@ -93,6 +93,14 @@ const CVManagement = () => {
   const [canCreateNew, setCanCreateNew] = useState(true);
   const [cvCountInfo, setCvCountInfo] = useState({ current: 0, isPro: false });
 
+  // --- STATE QUẢN LÝ POPUP THAY CHO ALERT/CONFIRM ---
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: 'alert', // 'alert' hoặc 'confirm'
+    message: '',
+    onConfirm: null
+  });
+
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -155,13 +163,30 @@ const CVManagement = () => {
   };
 
   // =========================================================================
-  // XỬ LÝ XÓA CV
+  // HELPER MỞ/ĐÓNG POPUP
   // =========================================================================
-  const handleDeleteCV = async (cvId) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa bản CV này không? Hành động này không thể hoàn tác.")) {
-      return;
-    }
+  const showAlert = (message) => {
+    setPopup({ isOpen: true, type: 'alert', message, onConfirm: null });
+  };
 
+  const showConfirm = (message, onConfirmCallback) => {
+    setPopup({ isOpen: true, type: 'confirm', message, onConfirm: onConfirmCallback });
+  };
+
+  const closePopup = () => {
+    setPopup(prev => ({ ...prev, isOpen: false }));
+  };
+
+  // =========================================================================
+  // XỬ LÝ XÓA CV MỚI (DÙNG POPUP)
+  // =========================================================================
+  const requestDeleteCV = (cvId) => {
+    showConfirm("Bạn có chắc chắn muốn xóa bản CV này không? Hành động này không thể hoàn tác.", () => {
+      executeDeleteCV(cvId);
+    });
+  };
+
+  const executeDeleteCV = async (cvId) => {
     try {
       const token = localStorage.getItem("accessToken");
       
@@ -175,7 +200,7 @@ const CVManagement = () => {
 
       if (response.ok) {
         const data = await response.json();
-        alert(data.message || "Xóa CV thành công!");
+        showAlert(data.message || "Xóa CV thành công!");
         
         setCvs((prevCvs) => {
             const updatedCvs = prevCvs.filter((cv) => cv.id !== cvId);
@@ -189,11 +214,11 @@ const CVManagement = () => {
             return updatedCvs;
         });
       } else {
-        alert("Có lỗi xảy ra khi xóa CV. Vui lòng thử lại sau.");
+        showAlert("Có lỗi xảy ra khi xóa CV. Vui lòng thử lại sau.");
       }
     } catch (error) {
       console.error("Lỗi gọi API xóa CV:", error);
-      alert("Không thể kết nối đến máy chủ.");
+      showAlert("Không thể kết nối đến máy chủ.");
     }
   };
 
@@ -239,7 +264,7 @@ const CVManagement = () => {
                   </span>
                   <button 
                     className="btn-upgrade-pro" 
-                   onClick={() => navigate('/upgrade-cv-pro')}
+                    onClick={() => navigate('/upgrade-cv-pro')}
                   >
                     ⭐ Nâng cấp ngay
                   </button>
@@ -291,10 +316,10 @@ const CVManagement = () => {
                         Cập nhật: {formatDate(cv.updatedAt)}
                       </span>
                       
-                      {/* NÚT XÓA CV */}
+                      {/* NÚT XÓA CV (GỌI POPUP THAY VÌ ALERT CŨ) */}
                       <button 
                         className="btn-delete-cv" 
-                        onClick={() => handleDeleteCV(cv.id)}
+                        onClick={() => requestDeleteCV(cv.id)}
                         title="Xóa CV này"
                       >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -352,6 +377,34 @@ const CVManagement = () => {
           </div>
         </aside>
       </main>
+
+      {/* RENDER POPUP TẠI ĐÂY */}
+      {popup.isOpen && (
+        <div className="custom-popup-overlay">
+          <div className="custom-popup-box">
+            <h4 className="custom-popup-title">
+              {popup.type === 'confirm' ? 'Xác nhận' : 'Thông báo'}
+            </h4>
+            <p className="custom-popup-message">{popup.message}</p>
+            <div className="custom-popup-actions">
+              {popup.type === 'confirm' && (
+                <button className="btn-popup-cancel" onClick={closePopup}>
+                  Hủy
+                </button>
+              )}
+              <button 
+                className={`btn-popup-confirm ${popup.type === 'alert' ? 'btn-primary' : 'btn-danger'}`}
+                onClick={() => {
+                  if (popup.onConfirm) popup.onConfirm();
+                  closePopup();
+                }}
+              >
+                {popup.type === 'confirm' ? 'Xóa' : 'Đóng'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

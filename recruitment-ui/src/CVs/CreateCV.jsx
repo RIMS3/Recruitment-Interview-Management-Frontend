@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import html2pdf from 'html2pdf.js'; 
 import Template1 from './Templates/Template1';
 import Template2 from './Templates/Template2';
@@ -9,6 +9,7 @@ import './CreateCV.css';
 const CreateCV = () => {
   const { cvId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const initialTemplate = location.state?.selectedTemplate || 'tpl-1';
   const [activeTemplateId, setActiveTemplateId] = useState(initialTemplate); 
@@ -18,6 +19,13 @@ const CreateCV = () => {
 
   const cvRef = useRef(null); 
   const fileInputRef = useRef(null); 
+
+  // --- THÊM STATE QUẢN LÝ POPUP ---
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: 'alert', // 'alert' hoặc 'error'
+    message: ''
+  });
 
   const [cvData, setCvData] = useState({
     cvId: cvId,
@@ -43,10 +51,28 @@ const CreateCV = () => {
     skills: []
   });
 
+  // --- HÀM HELPER ĐỂ MỞ/ĐÓNG POPUP ---
+  const showPopup = (message, type = 'alert') => {
+    setPopup({ isOpen: true, message, type });
+  };
+
+  const closePopup = () => {
+    setPopup({ ...popup, isOpen: false });
+  };
+
   useEffect(() => {
     const fetchCVData = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}`);
+        const token = localStorage.getItem("accessToken");
+
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cvs/${cvId}/editor`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
         if (response.ok) {
           const data = await response.json();
           
@@ -54,16 +80,20 @@ const CreateCV = () => {
             ...prev,
             ...data,
             email: data.email || "",
-            phoneNumber: data.phoneNumber || "",
+            phoneNumber: data.phoneNumber === '[BẢN NHÁP]' ? "" : (data.phoneNumber || ""),
             address: data.address || "",
             birthday: data.birthday ? data.birthday.split('T')[0] : "",
             gender: data.gender !== null ? String(data.gender) : "",
             nationality: data.nationality || "",
             field: data.field || "",
-            educationSummary: data.educationSummary || "",
-            currentSalary: data.currentSalary || "",
+            
+            summary: data.summary || "",
+            educationSummary: data.summary || "", 
+            
+            currentSalary: data.currentSalary !== null ? String(data.currentSalary) : "",
             experienceYears: data.experienceYears !== null ? String(data.experienceYears) : "",
             fileUrl: data.fileUrl || "",
+            
             educations: data.educations || [],
             experiences: data.experiences || [],
             projects: data.projects || [],
@@ -127,11 +157,11 @@ const CreateCV = () => {
         const data = await response.json();
         setCvData(prev => ({ ...prev, fileUrl: data.fileUrl }));
       } else {
-        alert("Lỗi khi upload ảnh lên server!");
+        showPopup("Lỗi khi upload ảnh lên server!", "error");
       }
     } catch (error) {
       console.error("Lỗi upload ảnh:", error);
-      alert("Đã xảy ra lỗi khi upload ảnh.");
+      showPopup("Đã xảy ra lỗi khi upload ảnh.", "error");
     }
   };
 
@@ -156,39 +186,35 @@ const CreateCV = () => {
 
   const handleSaveCV = async () => {
     if (cvId.startsWith('mock-cv')) {
-        alert("⚠️ Đang ở chế độ xem trước. Hãy quay lại chọn mẫu để tạo CV thật!");
+        showPopup("⚠️ Đang ở chế độ xem trước. Hãy quay lại chọn mẫu để tạo CV thật!", "error");
         return;
     }
 
-    // ==========================================
-    // FRONTEND VALIDATION
-    // ==========================================
     if (!cvData.fullName || cvData.fullName.trim() === "") {
-        alert("❌ Vui lòng nhập Họ và tên!");
+        showPopup("❌ Vui lòng nhập Họ và tên!", "error");
         return; 
     }
 
-    // Kiểm tra định dạng ngày sinh
     if (cvData.birthday && cvData.birthday.trim() !== "") {
-        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/; // Chuẩn DD/MM/YYYY
-        const dateRegexDB = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/; // Chuẩn YYYY-MM-DD
+        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/; 
+        const dateRegexDB = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/; 
         const bStr = cvData.birthday.trim();
         
         if (!dateRegex.test(bStr) && !dateRegexDB.test(bStr)) {
-            alert("❌ Định dạng Ngày sinh không hợp lệ!\nVui lòng nhập đúng định dạng: DD/MM/YYYY (Ví dụ: 26/05/1996)");
+            showPopup("❌ Định dạng Ngày sinh không hợp lệ!\nVui lòng nhập đúng định dạng: DD/MM/YYYY (Ví dụ: 26/05/1996)", "error");
             return;
         }
     }
 
     if (cvData.experienceYears && Number(cvData.experienceYears) >= 100) {
-        alert("❌ Số năm kinh nghiệm phải nhỏ hơn 100!");
+        showPopup("❌ Số năm kinh nghiệm phải nhỏ hơn 100!", "error");
         return;
     }
 
     if (cvData.email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(cvData.email.trim())) {
-            alert("❌ Định dạng Email không hợp lệ!");
+            showPopup("❌ Định dạng Email không hợp lệ!", "error");
             return;
         }
     }
@@ -196,7 +222,7 @@ const CreateCV = () => {
     if (cvData.phoneNumber) {
         const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
         if (!phoneRegex.test(cvData.phoneNumber.replace(/\s+/g, ''))) {
-            alert("❌ Số điện thoại không hợp lệ (Phải là số ĐT Việt Nam 10 số)!");
+            showPopup("❌ Số điện thoại không hợp lệ (Phải là số ĐT Việt Nam 10 số)!", "error");
             return;
         }
     }
@@ -204,7 +230,7 @@ const CreateCV = () => {
     for (let i = 0; i < (cvData.experiences || []).length; i++) {
         const exp = cvData.experiences[i];
         if ((exp.position || exp.description) && (!exp.companyName || exp.companyName.trim() === "")) {
-            alert(`❌ Kinh nghiệm làm việc #${i + 1}: Vui lòng nhập Tên Công ty/Tổ chức!`);
+            showPopup(`❌ Kinh nghiệm làm việc #${i + 1}: Vui lòng nhập Tên Công ty/Tổ chức!`, "error");
             return;
         }
     }
@@ -214,16 +240,13 @@ const CreateCV = () => {
       let safeSalary = (cvData.currentSalary === "" || cvData.currentSalary === undefined) ? null : Number(cvData.currentSalary);
       let safeExpYears = (cvData.experienceYears === "" || cvData.experienceYears === undefined) ? null : Number(cvData.experienceYears);
 
-      // XỬ LÝ ĐỊNH DẠNG NGÀY CHO BACKEND (Ép về chuẩn YYYY-MM-DD)
       let safeBirthday = null;
       if (cvData.birthday && cvData.birthday.trim() !== "") {
           let bStr = cvData.birthday.trim();
           if (bStr.includes('/')) {
               let parts = bStr.split('/');
-              // parts[0] là DD, parts[1] là MM, parts[2] là YYYY -> Đổi sang YYYY-MM-DD
               safeBirthday = `${parts[2]}-${parts[1]}-${parts[0]}`; 
           } else {
-              // Trường hợp load từ DB lên mà user chưa sửa, nó vẫn là YYYY-MM-DD
               safeBirthday = bStr;
           }
       }
@@ -241,7 +264,7 @@ const CreateCV = () => {
         nationality: cvData.nationality || "",
         field: cvData.field || "",
         gender: cvData.gender !== "" ? Number(cvData.gender) : null,
-        birthday: safeBirthday, // <-- TRUYỀN NGÀY ĐÃ CONVERT Ở ĐÂY
+        birthday: safeBirthday, 
         currentSalary: safeSalary,
         experienceYears: safeExpYears,
         educations: (cvData.educations || []).map(item => ({
@@ -292,9 +315,8 @@ const CreateCV = () => {
       });
 
       if (response.ok) {
-        alert("🎉 Đã lưu CV thành công!");
+        showPopup("🎉 Đã lưu CV thành công!", "success");
       } else {
-        // Bắt lỗi Validation từ Backend C#
         let errorMsg = "Lỗi không xác định từ server.";
         try {
             const errorData = await response.json(); 
@@ -312,7 +334,7 @@ const CreateCV = () => {
       }
     } catch (error) {
       console.error("Lỗi khi lưu CV:", error);
-      alert(`❌ Lưu thất bại!\n\nChi tiết lỗi:\n${error.message}`);
+      showPopup(`❌ Lưu thất bại!\n\nChi tiết lỗi:\n${error.message}`, "error");
     } finally {
       setIsSaving(false);
     }
@@ -348,14 +370,36 @@ const CreateCV = () => {
 
       <header className="workspace-header">
         <div className="header-container">
-          <input 
-            type="text" 
-            className="cv-name-input" 
-            value={cvData.fullName || ""} 
-            placeholder="Nhập tên CV của bạn..."
-            onChange={(e) => handleTextChange('fullName', e.target.value)} 
-            disabled={isLoading}
-          />
+          {/* NÚT QUAY LẠI VÀ INPUT TÊN CV */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flex: 1 }}>
+            <button 
+              onClick={() => navigate('/manage-cv')} 
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                background: 'transparent', border: 'none', color: '#666',
+                cursor: 'pointer', fontSize: '15px', fontWeight: '500', padding: '8px 12px',
+                borderRadius: '6px', transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#333'; }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#666'; }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              Quay lại
+            </button>
+
+            <input 
+              type="text" 
+              className="cv-name-input" 
+              value={cvData.fullName || ""} 
+              placeholder="Nhập tên CV của bạn..."
+              onChange={(e) => handleTextChange('fullName', e.target.value)} 
+              disabled={isLoading}
+              style={{ flex: 1, maxWidth: '300px' }}
+            />
+          </div>
           
           <div style={{ display: 'flex', gap: '12px' }}>
             <button 
@@ -388,6 +432,26 @@ const CreateCV = () => {
           {renderTemplate()}
         </div>
       </main>
+
+      {/* RENDER POPUP */}
+      {popup.isOpen && (
+        <div className="custom-popup-overlay">
+          <div className="custom-popup-box">
+            <h4 className="custom-popup-title" style={{ color: popup.type === 'error' ? '#d9534f' : '#333' }}>
+              {popup.type === 'error' ? 'Lỗi' : 'Thông báo'}
+            </h4>
+            <p className="custom-popup-message" style={{ whiteSpace: 'pre-wrap' }}>{popup.message}</p>
+            <div className="custom-popup-actions">
+              <button 
+                className={`btn-popup-confirm ${popup.type === 'error' ? 'btn-danger' : 'btn-primary'}`}
+                onClick={closePopup}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

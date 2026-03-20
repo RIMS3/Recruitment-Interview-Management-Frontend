@@ -271,6 +271,14 @@ const Navbar = () => {
               Việc làm
             </li>
 
+            <li 
+            className={location.pathname === "/it-blog" ? "active" : ""}
+            onClick={() => navigate("/it-blog")}
+            style={{ cursor: "pointer" }}
+             >
+            Cẩm nang
+            </li>
+
             <li className={location.pathname === "/game" ? "active" : ""} onClick={() => navigate("/game")}>
               Game
             </li>
