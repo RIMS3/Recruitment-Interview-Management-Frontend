@@ -448,7 +448,7 @@ const JobPostDetails = () => {
                 </svg>
             </button>
 
-            {/* FLOATING HEART BUTTON – Badge số lượng job đã lưu (realtime) */}
+            {/* FLOATING HEART BUTTON  */}
             <div
                 className="saved-jobs-floating"
                 onClick={() => navigate('/saved-jobs')}
