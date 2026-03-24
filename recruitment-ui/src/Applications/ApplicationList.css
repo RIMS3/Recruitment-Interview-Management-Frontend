@@ -1,10 +1,10 @@
 /* ==========================================================
-   CSS CHO QUẢN LÝ HỒ SƠ ỨNG TUYỂN (THEO STYLE NAVBAR XANH LÁ)
+   CSS CHO QUẢN LÝ HỒ SƠ ỨNG TUYỂN (ĐÃ FIX XUNG ĐỘT TOÀN CỤC)
    ========================================================== */
 
 /* Biến màu sắc chủ đạo */
 :root {
-  --primary: #00b14f; /* Màu xanh lá thương hiệu */
+  --primary: #00b14f; 
   --primary-dark: #009643;
   --primary-light: rgba(0, 177, 79, 0.1);
   --bg-body: #f4f7f6;
@@ -23,16 +23,16 @@
   font-family: 'Inter', -apple-system, sans-serif;
 }
 
-.app-wrapper {
-  padding: 30px 10% 60px; /* Giảm padding hai bên xuống còn 2% để tận dụng không gian */
+.app-container .app-wrapper {
+  padding: 30px 10% 60px; 
   flex: 1;
-  max-width: 100%;       /* Thay 1400px bằng 100% để tràn màn hình */
-  margin: 0;             /* Loại bỏ căn giữa tự động */
+  max-width: 100%;      
+  margin: 0;            
   width: 100%;
 }
 
-/* Header Section - Modern Style */
-.app-header {
+/* Header Section */
+.app-container .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -41,29 +41,29 @@
   background: var(--white);
   border-radius: 16px;
   box-shadow: var(--shadow-sm);
-  border-left: 6px solid var(--primary); /* Thanh dọc màu xanh */
+  border-left: 6px solid var(--primary); 
 }
 
-.title-group {
+.app-container .title-group {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
-.app-header h2 {
+.app-container .app-header h2 {
   font-size: 24px;
   font-weight: 700;
   color: var(--text-dark);
   margin: 0;
 }
 
-.waiting-count {
+.app-container .waiting-count {
   margin-top: 5px;
   font-size: 14px;
   color: var(--text-muted);
 }
 
-.count-badge {
+.app-container .count-badge {
   background: var(--primary);
   color: white;
   padding: 2px 10px;
@@ -73,25 +73,25 @@
 }
 
 /* Bộ lọc & Tìm kiếm */
-.app-filters {
+.app-container .app-filters {
   display: flex;
   gap: 12px;
 }
 
-.search-box {
+.app-container .search-box {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.search-icon {
+.app-container .search-icon {
   position: absolute;
   left: 20px;
   color: #94a3b8;
   z-index: 5;
 }
 
-.search-input {
+.app-container .search-input {
   min-width: 320px;
   padding: 12px 12px 12px 48px !important;
   border: 1.5px solid #e2e8f0 !important;
@@ -101,12 +101,12 @@
   outline: none !important;
 }
 
-.search-input:focus {
+.app-container .search-input:focus {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 3px var(--primary-light) !important;
 }
 
-.status-select {
+.app-container .status-select {
   padding: 0 15px;
   border-radius: 10px;
   border: 1.5px solid #e2e8f0;
@@ -118,35 +118,37 @@
   transition: 0.3s;
 }
 
-.status-select:focus {
+.app-container .status-select:focus {
   border-color: var(--primary);
 }
 
 /* Grid Layout */
-/* Tìm và thay thế đoạn .card-grid cũ của bạn bằng đoạn này */
-.card-grid {
+.app-container .card-grid {
   display: grid;
-  /* Chia cố định 4 cột bằng nhau */
   grid-template-columns: repeat(4, 1fr); 
   gap: 20px;
 }
 
-/* Thêm đoạn này để trên các màn hình nhỏ hơn (như laptop nhỏ hoặc tablet) 
-   giao diện vẫn tự nhảy hàng cho đẹp, tránh bị nát layout */
-@media (max-width: 1200px) {
-  .card-grid {
-    grid-template-columns: repeat(2, 1fr); /* Laptop nhỏ/Tablet: 2 cột */
+@media (max-width: 1400px) {
+  .app-container .card-grid {
+    grid-template-columns: repeat(3, 1fr); 
+  }
+}
+
+@media (max-width: 1024px) {
+  .app-container .card-grid {
+    grid-template-columns: repeat(2, 1fr); 
   }
 }
 
 @media (max-width: 600px) {
-  .card-grid {
-    grid-template-columns: 1fr; /* Điện thoại: 1 cột */
+  .app-container .card-grid {
+    grid-template-columns: 1fr; 
   }
 }
 
-/* Candidate Card - Clean & Modern */
-.candidate-card {
+/* Candidate Card */
+.app-container .candidate-card {
   background: var(--white);
   border-radius: 16px;
   border: 1px solid #edf2f7;
@@ -157,28 +159,30 @@
   position: relative;
 }
 
-.candidate-card:hover {
+.app-container .candidate-card:hover {
   transform: translateY(-6px);
   box-shadow: var(--shadow-md);
   border-color: var(--primary);
 }
 
-.card-top {
+.app-container .card-top {
   padding: 20px;
   display: flex;
   gap: 15px;
   align-items: center;
 }
 
-.avatar-img, .avatar {
+.app-container .avatar-img, 
+.app-container .avatar {
   width: 60px;
   height: 60px;
-  border-radius: 12px; /* Bo góc hiện đại thay vì hình tròn */
+  border-radius: 12px; 
   object-fit: cover;
+  flex-shrink: 0; /* Ép avatar không bị bóp méo */
 }
 
-.avatar {
-  background: var(--primary); /* Màu nền xanh lá cho avatar chữ */
+.app-container .avatar {
+  background: var(--primary); 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -186,26 +190,38 @@
   font-weight: 700;
 }
 
-.candidate-meta h4 {
+.app-container .candidate-meta {
+  overflow: hidden; /* Giữ text không đẩy khung */
+  width: 100%;
+}
+
+.app-container .candidate-meta h4 {
   margin: 0;
   color: var(--text-dark);
   font-size: 16px;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.candidate-meta .email {
+.app-container .candidate-meta .email {
   margin: 2px 0;
   color: var(--text-muted);
   font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Tự động cắt email dài thành ... */
+  display: block;
 }
 
-.applied-date {
+.app-container .applied-date {
   font-size: 12px;
   color: #94a3b8;
   display: block;
 }
 
-.card-middle {
+.app-container .card-middle {
   padding: 0 20px 20px;
   flex: 1;
   display: flex;
@@ -213,7 +229,12 @@
   align-items: flex-end;
 }
 
-.job-info .label {
+.app-container .job-info {
+  overflow: hidden;
+  padding-right: 10px;
+}
+
+.app-container .job-info .label {
   display: block;
   font-size: 11px;
   text-transform: uppercase;
@@ -222,77 +243,89 @@
   margin-bottom: 2px;
 }
 
-.job-title {
+.app-container .job-title {
   font-weight: 700;
-  color: var(--primary); /* Tên công việc màu xanh */
+  color: var(--primary); 
   font-size: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Status Badges */
-.status {
+.app-container .status {
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.status-0 { background: #fff8e1; color: #f57c00; } /* Chờ duyệt */
-.status-1 { background: #e8f5e9; color: var(--primary); } /* Chấp nhận */
-.status-2 { background: #ffebee; color: #d32f2f; } /* Từ chối */
+.app-container .status-0 { background: #fff8e1; color: #f57c00; } 
+.app-container .status-1 { background: #e8f5e9; color: var(--primary); } 
+.app-container .status-2 { background: #ffebee; color: #d32f2f; } 
 
 /* Actions */
-.card-actions {
+.app-container .card-actions {
   padding: 15px 20px;
   background: #fafafa;
   border-top: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap; /* Cho phép nút rớt dòng nếu màn hình quá hẹp */
 }
 
-.btn {
+.app-container .btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   border: none;
   transition: 0.2s;
+  white-space: nowrap; /* Cấm chữ trong nút bị rớt dòng */
 }
 
-.btn-view {
+.app-container .btn-view {
   background: white;
   color: var(--text-muted);
   border: 1.5px solid #e2e8f0;
 }
 
-.btn-view:hover {
+.app-container .btn-view:hover {
   border-color: var(--primary);
   color: var(--primary);
 }
 
-.decision-buttons { display: flex; gap: 6px; }
+.app-container .decision-buttons { 
+  display: flex; 
+  gap: 6px; 
+}
 
-.btn-accept { 
+.app-container .btn-accept { 
   background: var(--primary); 
   color: white; 
 }
 
-.btn-accept:hover { 
+.app-container .btn-accept:hover { 
   background: var(--primary-dark); 
 }
 
-.btn-reject { 
+.app-container .btn-reject { 
   background: #f44336; 
   color: white; 
 }
 
 /* Loading & Pagination */
-.loading-box {
+.app-container .loading-box {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -301,17 +334,17 @@
   color: var(--text-muted);
 }
 
-.spin { animation: rotate 1s linear infinite; }
+.app-container .spin { animation: rotate 1s linear infinite; }
 @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-.pagination {
+.app-container .pagination {
   display: flex;
   justify-content: center;
   gap: 8px;
   margin-top: 40px;
 }
 
-.page-btn {
+.app-container .page-btn {
   width: 38px;
   height: 38px;
   border-radius: 8px;
@@ -322,33 +355,30 @@
   transition: 0.3s;
 }
 
-.page-btn.active {
+.app-container .page-btn.active {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
 }
  
-.page-btn:hover:not(.active):not(:disabled) {
+.app-container .page-btn:hover:not(.active):not(:disabled) {
   border-color: var(--primary);
   color: var(--primary);
 }
 
-/* Footer đồng bộ màu đen sâu như hình của bạn */
+/* Footer đồng bộ */
 .main-footer {
   background: #1a1a1a;
   color: #999;
   padding: 60px 5% 30px;
 } 
-/* Đổi màu icon lấp lánh cạnh tiêu đề Quản lý hồ sơ */
-.app-header .title-group i, 
-.app-header .title-group svg,
-.app-header .title-group .lucide {
-  color: var(--primary) !important; /* Sử dụng biến màu xanh #00b14f đã định nghĩa */
-  fill: var(--primary); /* Nếu là SVG cần đổ màu fill */
-}
 
-/* Nếu bạn dùng class cụ thể cho icon đó (ví dụ .sparkle-icon) */
-.title-group .fa-sparkles, 
-.title-group .lucide-sparkles {
-  color: #00b14f !important;
+/* Màu icon lấp lánh */
+.app-container .app-header .title-group i, 
+.app-container .app-header .title-group svg,
+.app-container .app-header .title-group .lucide,
+.app-container .title-group .fa-sparkles, 
+.app-container .title-group .lucide-sparkles {
+  color: var(--primary) !important; 
+  fill: var(--primary); 
 }
