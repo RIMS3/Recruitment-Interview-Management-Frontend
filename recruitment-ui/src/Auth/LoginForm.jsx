@@ -142,14 +142,12 @@ const LoginForm = () => {
         
         // 1. Trường hợp lỗi từ FluentValidation (trả về object errors)
         if (data.errors) {
-          // Lấy tất cả các mảng lỗi gom thành 1 mảng phẳng (flat)
           const errorMessages = Object.values(data.errors).flat();
-          // Hiển thị lỗi đầu tiên trong danh sách cho người dùng đỡ rối
           toast.error(errorMessages[0], { id: toastId });
           return;
         }
 
-        // 2. Trường hợp lỗi do bạn tự define (ví dụ: message = "Email đã tồn tại")
+        // 2. Trường hợp lỗi do bạn tự define
         toast.error(data.message || (isLogin ? "Tài khoản hoặc mật khẩu không chính xác" : "Có lỗi xảy ra khi đăng ký"), { id: toastId });
         return;
       }
